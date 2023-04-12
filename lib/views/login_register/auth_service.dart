@@ -1,0 +1,53 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import '../components/layout.dart';
+import 'login.dart';
+
+class AuthService {
+  //Determine if the user is authenticated and redirect accordingly
+  handleAuthState() {
+    return StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.hasData) {
+            return const Layout(
+              selectedIndex: 0,
+            );
+          } else {
+            return const LoginPage();
+          }
+        });
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Initiate the auth procedure
+    final GoogleSignInAccount? googleUser =
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
+    // fetch the auth details from the request made earlier
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser!.authentication;
+    // Create a new credential for signing in with google
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<void> signOut(BuildContext context) async {
+    final GoogleSignIn googleUser = GoogleSignIn();
+    await FirebaseAuth.instance.signOut();
+    googleUser.disconnect();
+    // ignore: use_build_context_synchronously
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const Layout(
+                  selectedIndex: 0,
+                )),
+        (route) => false);
+  }
+}
