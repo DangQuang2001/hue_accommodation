@@ -5,7 +5,7 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../view_models/chat_provider.dart';
-import '../../view_models/message_provider.dart';
+import '../../view_models/message_pusher.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewRoom;
