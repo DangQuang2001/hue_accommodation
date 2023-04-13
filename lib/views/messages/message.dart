@@ -4,6 +4,7 @@ import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as time_ago;
 
 
 class MessagePage extends StatefulWidget {
@@ -106,7 +107,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget message(BuildContext context,Map<String,dynamic> roomChat) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) =>  GestureDetector(
-        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context)=>  ChatScreen(isNewRoom: false,roomId: roomChat['id'],infoUserRoom: roomChat['userId'],))),
+        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context)=>  ChatScreen(isNewRoom: false,roomId: roomChat['_id']['_id'],infoUserRoom: roomChat['userId'],))),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
@@ -141,11 +142,11 @@ class _MessagePageState extends State<MessagePage> {
                         children: [
                           Text(
                             roomChat['userId'][0]['_id']!=userProvider.userCurrent!.id?roomChat['userId'][0]['name']:roomChat['userId'][1]['name'],
-                            style: Theme.of(context).textTheme.displayMedium,
+                            style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 18),
                           ),
                           Text(
-                            "Quang dep trai vl....",
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            roomChat['_id']['message'][0]['content'],
+                            style:(roomChat['_id']['readBy'] as List).contains(userProvider.userCurrent!.id)?Theme.of(context).textTheme.headlineMedium :Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.black),
                           )
                         ],
                       ),
@@ -158,7 +159,10 @@ class _MessagePageState extends State<MessagePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text('9:32 AM',style: Theme.of(context).textTheme.headlineMedium,),
+                      Text("${time_ago.format(DateTime.parse(roomChat['_id']['message'][0]['createdAt']),
+                          locale: 'en_short', clock: DateTime.now())} ago",style: Theme.of(context).textTheme.headlineMedium,),
+
+                      (roomChat['_id']['readBy'] as List).contains(userProvider.userCurrent!.id)?const SizedBox():
                       Container(
                         width: 15,
                         height: 15,

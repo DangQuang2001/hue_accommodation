@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/config/routes/routes.dart';
 import 'package:hue_accommodation/config/themes/dark_theme.dart';
@@ -23,6 +24,7 @@ void main() async {
   await Firebase.initializeApp();
   await NotificationController.initializeLocalNotifications(debug: true);
   await NotificationController.initializeRemoteNotifications(debug: true);
+
   runApp(const MyApp());
 }
 
@@ -52,6 +54,7 @@ class MyApp extends StatelessWidget {
           checkLoginUser(userProvider, fcmToken, notificationProvider,chatProvider);
           checkAndUpdateFCMToken(
               lifecycle.lifecycleState, userProvider, fcmToken);
+
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Hue Accommodation',

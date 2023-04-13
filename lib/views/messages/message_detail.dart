@@ -5,7 +5,7 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../view_models/chat_provider.dart';
-import '../../view_models/message_pusher.dart';
+import '../../view_models/message_provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewRoom;
@@ -33,9 +33,18 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     isNewRooms = widget.isNewRoom;
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+
     _chatController.initSocket(widget.roomId,
-        [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']]);
+        [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id);
     var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    if(userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']){
+      chatProvider.isOnline(widget.infoUserRoom[0]['_id']);
+    }
+    else{
+      chatProvider.isOnline(widget.infoUserRoom[1]['_id']);
+    }
+
     if (widget.isNewRoom) {
       _messages = [];
       setState(() {
@@ -44,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
     } else {
       (() async {
         _messages = await chatProvider.getChatDetail(widget.roomId, -10, 10);
+        chatProvider.isReadMessage(widget.roomId,userProvider.userCurrent!.id );
         setState(() {
           isLoading = false;
         });

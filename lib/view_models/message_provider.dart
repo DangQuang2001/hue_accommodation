@@ -5,6 +5,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 
+
+
 class ChatController {
   late String roomIdReplace;
   late String roomIdReplaceFirst;
@@ -14,7 +16,7 @@ class ChatController {
 
   late IO.Socket _socket;
 
-  void initSocket(String roomId, List<String> userId) {
+  void initSocket(String roomId, List<String> userId,String userCurrentId) {
     _socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
     });
@@ -52,6 +54,10 @@ class ChatController {
       final encrypted = encrypt.Encrypted.fromBase64(data['content']);
       data['content'] = encrypter.decrypt(encrypted, iv: iv);
       _messageController!.add(data);
+      if(roomIdReplace!=""){
+          isReadMessage(roomIdReplace, userCurrentId);
+
+      }
     });
 
     _socket.connect();
@@ -135,6 +141,16 @@ class ChatController {
             'typeM': typeM,
             'createdAt': DateTime.now().toString()
           }
+        }));
+  }
+  Future isReadMessage(String roomId, String userId) async {
+    await http.post(Uri.parse('$url/api/room-chat/is-read-message'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'roomId': roomId,
+          'userId': userId
         }));
   }
 

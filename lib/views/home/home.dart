@@ -43,7 +43,27 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(
               builder: (context) => BoardingHouseDetail(motel: room)));
     });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+      final snackBar = SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: const Text(
+            'Em áo hồng mại đỉnk!'),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(snackBar);
 
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
   }
 
   @override
