@@ -1,11 +1,9 @@
 import 'dart:ui';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 
-void checkAndUpdateFCMToken(AppLifecycleState lifecycleState, UserProvider userProvider,fcmToken) async {
+void checkAndUpdateFCMToken(AppLifecycleState lifecycleState,
+    UserProvider userProvider, fcmToken) async {
   final String? currentToken = await FirebaseMessaging.instance.getToken();
 
   if (currentToken != null) {

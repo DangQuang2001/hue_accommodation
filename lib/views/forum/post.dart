@@ -18,25 +18,32 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   late bool isLike;
+  late int likeCount;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    var userProvider = Provider.of<UserProvider>(context,listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     isLike = widget.post.likedBy!.contains(userProvider.userCurrent!.id);
+    likeCount = widget.post.likedBy!.length;
   }
+
   @override
   Widget build(BuildContext context) {
-
-      Widget spaceH = const SizedBox(
-        height: 10,
-      );
-      Widget spaceW = const SizedBox(
-        width: 5,
-      );
-      return Consumer2<PostProvider,UserProvider>(
-        builder: (context, postProvider,userProvider, child) =>  Container(
+    Widget spaceH = const SizedBox(
+      height: 10,
+    );
+    Widget spaceW = const SizedBox(
+      width: 5,
+    );
+    return Consumer2<PostProvider, UserProvider>(
+      builder: (context, postProvider, userProvider, child) => GestureDetector(
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PostDetailPage(post: widget.post))),
+        child: Container(
           margin: const EdgeInsets.only(bottom: 7),
           width: MediaQuery.of(context).size.width,
           color: Theme.of(context).colorScheme.onBackground,
@@ -50,10 +57,10 @@ class _PostCardState extends State<PostCard> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => PostDetailPage(
-                            post: widget.post,
-                          ))),
+                                post: widget.post,
+                              ))),
                   child: Text(
-                    widget.post.caption.toString(),
+                    widget.post.title.toString(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.readexPro(
@@ -83,7 +90,8 @@ class _PostCardState extends State<PostCard> {
                     Icon(
                       Icons.access_time_outlined,
                       size: 18,
-                      color: Theme.of(context).iconTheme.color!.withOpacity(0.5),
+                      color:
+                          Theme.of(context).iconTheme.color!.withOpacity(0.5),
                     ),
                     spaceW,
                     Opacity(
@@ -103,38 +111,56 @@ class _PostCardState extends State<PostCard> {
                   ],
                 ),
                 spaceH,
-                InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PostDetailPage(
-                            post: widget.post,
-                          ))),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: CachedNetworkImage(
-                      imageUrl: widget.post.imageUrls![0],
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+                widget.post.imageUrls!.isEmpty
+                    ? const SizedBox()
+                    : InkWell(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PostDetailPage(
+                                      post: widget.post,
+                                    ))),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: CachedNetworkImage(
+                            imageUrl: widget.post.imageUrls![0],
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                 spaceH,
                 Row(
                   children: [
                     IconButton(
                         onPressed: () {
-                          postProvider.likePost(widget.post.id, userProvider.userCurrent!.id);
+                          if (isLike) {
+                            postProvider.dislikePost(
+                                widget.post.id, userProvider.userCurrent!.id);
+                          } else {
+                            postProvider.likePost(
+                                widget.post.id, userProvider.userCurrent!.id);
+                          }
+                          setState(() {
+                            isLike = !isLike;
+                            likeCount += isLike ? 1 : -1;
+                          });
                         },
-                        icon: Icon(
-                          Icons.favorite_border_outlined,
-                          color: Theme.of(context).iconTheme.color,
-                          size: 30,
-                        )),
+                        icon: isLike
+                            ? const Icon(
+                                Icons.favorite_sharp,
+                                color: Colors.redAccent,
+                                size: 30,
+                              )
+                            : Icon(
+                                Icons.favorite_border_outlined,
+                                color: Theme.of(context).iconTheme.color,
+                                size: 30,
+                              )),
                     spaceW,
                     Text(
-                      widget.post.likesCount.toString(),
+                      likeCount.toString(),
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
                     spaceW,
@@ -145,8 +171,8 @@ class _PostCardState extends State<PostCard> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => PostDetailPage(
-                                  post: widget.post,
-                                ))),
+                                      post: widget.post,
+                                    ))),
                         icon: Icon(
                           Icons.chat_bubble_outline,
                           color: Theme.of(context).iconTheme.color,
@@ -163,7 +189,7 @@ class _PostCardState extends State<PostCard> {
             ),
           ),
         ),
-      );
-
+      ),
+    );
   }
 }

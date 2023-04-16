@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/views/forum/forum.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house.dart';
@@ -16,23 +17,56 @@ import '../../views/components/layout.dart';
 import '../../views/manage/statistical.dart';
 
 final routes = {
-  RouteName.home: (context) => const Layout(selectedIndex:0),
-  RouteName.boardinghouse: (context) =>const  BoardingHousePage(),
-  // RouteName.boardinghousedetail: (context) => const BoardingHouseDetail(),
-  RouteName.blogSale: (context) =>const ForumPage(),
-  RouteName.messages: (context) =>const  Layout(selectedIndex:2),
-  RouteName.roomManage:(context)=> const RoomManage(),
-  RouteName.interactManage:(context)=> const InteractManage(),
-  RouteName.statisticalManage:(context)=> const StatisticalManage(),
-  RouteName.addRoom:(context)=> const AddRoomPage(),
-  RouteName.removeRoom:(context)=> const RemoveRoomPage(),
-  RouteName.login:(context)=> const LoginPage(),
-  RouteName.register:(context)=> const RegisterPage(),
-  RouteName.editProfile:(context)=> const EditProfile(),
-  RouteName.profile:(context)=>  const UserInfoPage(),
-  RouteName.rentHistory:(context)=>  const RentHistory(),
-  RouteName.favorite:(context)=>  const FavoritePage(),
-  RouteName.postHistory:(context)=>  const PostHistory(),
-
-
+  RouteName.home: (context) => const Layout(selectedIndex: 0),
 };
+
+transitionRightToLeftPage(RouteSettings settings) {
+  return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) {
+        switch (settings.name) {
+          case RouteName.boardinghouse:
+            return const BoardingHousePage();
+          case RouteName.blogSale:
+            return const ForumPage();
+          case RouteName.roomManage:
+            return const RoomManage();
+          case RouteName.interactManage:
+            return const InteractManage();
+          case RouteName.statisticalManage:
+            return const StatisticalManage();
+          case RouteName.addRoom:
+            return const AddRoomPage();
+          case RouteName.removeRoom:
+            return const RemoveRoomPage();
+          case RouteName.login:
+            return const LoginPage();
+          case RouteName.register:
+            return const RegisterPage();
+          case RouteName.editProfile:
+            return const EditProfile();
+          case RouteName.profile:
+            return const UserInfoPage();
+          case RouteName.rentHistory:
+            return const RentHistory();
+          case RouteName.favorite:
+            return const FavoritePage();
+          case RouteName.postHistory:
+            return const PostHistory();
+          default:
+            return const Layout(selectedIndex: 0);
+        }
+      },
+      transitionDuration: const Duration(milliseconds: 600),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+      settings: RouteSettings(name: settings.name));
+}

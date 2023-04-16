@@ -8,6 +8,7 @@ import 'package:hue_accommodation/view_models/appLifeCycle.dart';
 import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/check_and_update_fcmToken.dart';
 import 'package:hue_accommodation/view_models/check_login_user.dart';
+import 'package:hue_accommodation/view_models/comment_provider.dart';
 import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/post_provider.dart';
@@ -39,28 +40,38 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => RoomProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => RentProvider()),
-        ChangeNotifierProvider(
-            create: (context) => AppLifecycleStateNotifier()),
         ChangeNotifierProvider(create: (context) => FcmTokenProvider()),
         ChangeNotifierProvider(create: (context) => NotificationProvider()),
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => ChatProvider()),
+        ChangeNotifierProvider(create: (context) => CommentProvider()),
+        ChangeNotifierProvider(
+            create: (context) => AppLifecycleStateNotifier()),
       ],
-      child: Consumer6<FcmTokenProvider, UserProvider,
-          AppLifecycleStateNotifier, ThemeProvider,NotificationProvider,ChatProvider>(
-        builder: (context, fcmToken, userProvider, lifecycle, themeObj,notificationProvider,chatProvider, child) {
-          checkLoginUser(userProvider, fcmToken, notificationProvider,chatProvider);
+      child: Consumer6<
+          FcmTokenProvider,
+          UserProvider,
+          AppLifecycleStateNotifier,
+          ThemeProvider,
+          NotificationProvider,
+          ChatProvider>(
+        builder: (context, fcmToken, userProvider, lifecycle, themeObj,
+            notificationProvider, chatProvider, child) {
+          checkLoginUser(
+              userProvider, fcmToken, notificationProvider, chatProvider);
           checkAndUpdateFCMToken(
               lifecycle.lifecycleState, userProvider, fcmToken);
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Hue Accommodation',
-            routes: routes,
-            initialRoute: initialRoute,
-            themeMode: themeObj.mode,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-          );
+              debugShowCheckedModeBanner: false,
+              title: 'Hue Accommodation',
+              routes: routes,
+              initialRoute: initialRoute,
+              themeMode: themeObj.mode,
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              onGenerateRoute: (RouteSettings settings) {
+                return transitionRightToLeftPage(settings);
+              });
         },
       ),
     );
