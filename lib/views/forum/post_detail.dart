@@ -23,6 +23,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   int choose = -1;
   late bool isLike;
   late int likeCount;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   String _replyPrefix = '';
+  String commentId = "";
 
   void onReply(String username) {
     setState(() {
@@ -62,6 +64,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             appBar(context),
             Expanded(
                 child: SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: [
                   post(context),
@@ -102,14 +105,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.send),
-                    onPressed: () {
-                      commentProvider.addComment(
-                          widget.post.id,
-                          userProvider.userCurrent!.id,
-                          _textController.text,
-                          "text");
-                      _focusNode.unfocus();
-                      _textController.clear();
+                    onPressed: () async {
+                      if (_textController.text.trim() != "" &&
+                          _replyPrefix == "" &&
+                          commentId == "") {
+                        await commentProvider.addComment(
+                            widget.post.id,
+                            userProvider.userCurrent!.id,
+                            _textController.text,
+                            "text");
+                        _focusNode.unfocus();
+                        _textController.clear();
+                        _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.linear);
+                      }
+                      if (_textController.text.trim() != "" &&
+                          _replyPrefix != "" &&
+                          commentId != "") {
+                        commentProvider.createReplyComment(
+                            commentId,
+                            userProvider.userCurrent!.id,
+                            _textController.text,
+                            "Text");
+                      }
                     },
                   ),
                 ],
@@ -425,38 +445,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
         ],
       );
     }
-
-    // return Row(
-    //   children: [
-    //     Expanded(
-    //       flex: 1,
-    //       child: FutureBuilder<String?>(
-    //         future: imagesChoose[0].file,
-    //         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-    //           if (snapshot.hasData) {
-    //             return Image.file(snapshot.data!,width: MediaQuery.of(context).size.width/2-4,height:MediaQuery.of(context).size.width/2-4 ,fit: BoxFit.cover,);
-    //           } else {
-    //             return const SizedBox();
-    //           }
-    //         },
-    //       ),
-    //     ),
-    //     const SizedBox(width: 4),
-    //     Expanded(
-    //       flex: 1,
-    //       child: FutureBuilder<String?>(
-    //         future: widget.images![1].file,
-    //         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-    //           if (snapshot.hasData) {
-    //             return Image.file(snapshot.data!,width: MediaQuery.of(context).size.width/2-4,height:MediaQuery.of(context).size.width/2-4 ,fit: BoxFit.cover);
-    //           } else {
-    //             return const SizedBox();
-    //           }
-    //         },
-    //       ),
-    //     ),
-    //   ],
-    // );
   }
 
   Widget comment(BuildContext context) {
@@ -502,23 +490,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               children: [
                                 IconButton(
                                     onPressed: () {
-                                      if (choose != indexX) {
+                                      if (choose != indexX && e['replyCommentId'] != null) {
                                         setState(() {
                                           choose = indexX;
-                                          onReply('DieuHoang');
+                                          onReply(e['userId']['name']);
+                                          commentId = e['_id'];
+                                          commentProvider.getReplyComment(e['_id'], 10, 10);
                                         });
                                       } else {
                                         setState(() {
                                           choose = -1;
                                           _textController.text = "";
+                                          _replyPrefix = "";
+                                          commentId = "";
                                         });
+                                      }
+                                      if(e['replyCommentId'] == null){
+                                        commentId = e['_id'];
+                                        onReply(e['userId']['name']);
                                       }
                                     },
                                     icon: const Icon(Icons.comment_outlined)),
                                 Opacity(
                                   opacity: 0.7,
                                   child: Text(
-                                    '3',
+                                    e['replyCommentId'] == null ? "0" : (e['replyCommentId']['comment']as List).length.toString(),
                                     style: Theme.of(context)
                                         .textTheme
                                         .displayMedium,
@@ -599,10 +595,86 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ),
                           );
                         },
-                        body: Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.red,
+                        body: Column(
+                          children: [
+                            ...commentProvider.listReply.map((e) => Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 40, bottom: 20),
+                                  padding: const EdgeInsets.only(left: 10),
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                      border: Border(
+                                          left: BorderSide(
+                                              color: Colors.grey
+                                                  .withOpacity(0.4)))),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            child: CachedNetworkImage(
+                                              imageUrl: e['userId']['image'],
+                                              width: 30,
+                                              height: 30,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          spaceW,
+                                          Text(
+                                            e['userId']['name'],
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displayMedium,
+                                          ),
+                                          spaceW,
+                                          spaceW,
+                                          spaceW,
+                                          Icon(
+                                            Icons.access_time_outlined,
+                                            size: 18,
+                                            color: Theme.of(context)
+                                                .iconTheme
+                                                .color!
+                                                .withOpacity(0.5),
+                                          ),
+                                          spaceW,
+                                          Opacity(
+                                              opacity: 0.5,
+                                              child: Text(
+                                                '1m ago',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displaySmall,
+                                              )),
+                                        ],
+                                      ),
+                                      spaceH,
+                                      Row(
+                                        children: [
+                                          Opacity(
+                                            opacity: 0.7,
+                                            child: Text(
+                                              e['content'],
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displayMedium,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                          ],
                         ));
                   })
                 ],
