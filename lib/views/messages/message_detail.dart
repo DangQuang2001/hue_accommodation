@@ -35,30 +35,33 @@ class _ChatScreenState extends State<ChatScreen> {
     isNewRooms = widget.isNewRoom;
     var userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    _chatController.initSocket(widget.roomId,
-        [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id);
-    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    if(userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']){
-      chatProvider.isOnline(widget.infoUserRoom[0]['_id']);
-    }
-    else{
-      chatProvider.isOnline(widget.infoUserRoom[1]['_id']);
-    }
 
-    if (widget.isNewRoom) {
-      _messages = [];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      (() async {
-        _messages = await chatProvider.getChatDetail(widget.roomId, -10, 10);
-        chatProvider.isReadMessage(widget.roomId,userProvider.userCurrent!.id );
+    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    (()async{
+      if(userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']){
+        await chatProvider.isOnline(widget.infoUserRoom[0]['_id']);
+      }
+      else{
+        await chatProvider.isOnline(widget.infoUserRoom[1]['_id']);
+      }
+      _chatController.initSocket(widget.roomId,
+          [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id, chatProvider.tokenUser);
+      if (widget.isNewRoom) {
+        _messages = [];
         setState(() {
           isLoading = false;
         });
-      })();
-    }
+      } else {
+        (() async {
+          _messages = await chatProvider.getChatDetail(widget.roomId, -10, 20);
+          chatProvider.isReadMessage(widget.roomId,userProvider.userCurrent!.id );
+          setState(() {
+            isLoading = false;
+          });
+        })();
+      }
+    })();
+
   }
 
   @override
@@ -218,13 +221,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             Container(
                               margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
+                                  vertical: 7, horizontal: 10),
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: isMyMessage
                                     ? Colors.blue.withOpacity(0.7)
                                     : Colors.grey[500],
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Container(
                                   padding:

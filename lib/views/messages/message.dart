@@ -1,11 +1,12 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
-
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -16,6 +17,25 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   bool isPlaying = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      chatProvider.getRoomChat(userProvider.userCurrent!.id);
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +58,6 @@ class _MessagePageState extends State<MessagePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-
           Hero(
             tag: "Messages",
             child: Text(
@@ -89,25 +108,42 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer2<UserProvider,ChatProvider>(
-      builder: (context,userProvider, chatProvider, child) =>  Expanded(
-        child: userProvider.userCurrent==null?
-        Padding(
-          padding: const EdgeInsets.only(top:20.0),
-          child: Text('Login to seen chat!',style: Theme.of(context).textTheme.displayMedium,),
-        ):chatProvider.listRoomChat.isEmpty?Text('No chat messages!',style: Theme.of(context).textTheme.displayMedium,): ListView(
-          children: [
-              ...chatProvider.listRoomChat.map((e) => message(context,e))
-          ],
-        ),
+    return Consumer2<UserProvider, ChatProvider>(
+      builder: (context, userProvider, chatProvider, child) => Expanded(
+        child: userProvider.userCurrent == null
+            ? Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Text(
+                  'Login to seen chat!',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+              )
+            : chatProvider.listRoomChat.isEmpty
+                ? Text(
+                    'No chat messages!',
+                    style: Theme.of(context).textTheme.displayMedium,
+                  )
+                : ListView(
+                    children: [
+                      ...chatProvider.listRoomChat
+                          .map((e) => message(context, e))
+                    ],
+                  ),
       ),
     );
   }
 
-  Widget message(BuildContext context,Map<String,dynamic> roomChat) {
+  Widget message(BuildContext context, Map<String, dynamic> roomChat) {
     return Consumer<UserProvider>(
-      builder: (context, userProvider, child) =>  GestureDetector(
-        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context)=>  ChatScreen(isNewRoom: false,roomId: roomChat['_id']['_id'],infoUserRoom: roomChat['userId'],))),
+      builder: (context, userProvider, child) => GestureDetector(
+        onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatScreen(
+                      isNewRoom: false,
+                      roomId: roomChat['_id']['_id'],
+                      infoUserRoom: roomChat['userId'],
+                    ))),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
@@ -124,8 +160,14 @@ class _MessagePageState extends State<MessagePage> {
                     ClipRRect(
                         borderRadius: BorderRadius.circular(50),
                         child: CachedNetworkImage(
-                          imageUrl:
-                          roomChat['userId'][0]['_id']!=userProvider.userCurrent!.id?roomChat['userId'][0]['image']:roomChat['userId'][1]['image'],
+                          imageUrl: roomChat['userId'][0]['_id'] !=
+                                  userProvider.userCurrent!.id
+                              ? (roomChat['userId'][0]['image'] == ""
+                                  ? "https://avatars.mds.yandex.net/i?id=2a00000179f1a9f78cd5b7c8647b9e14819f-4362541-images-thumbs&n=13"
+                                  : roomChat['userId'][0]['image'])
+                              : (roomChat['userId'][1]['image'] == ""
+                                  ? "https://avatars.mds.yandex.net/i?id=2a00000179f1a9f78cd5b7c8647b9e14819f-4362541-images-thumbs&n=13"
+                                  : roomChat['userId'][1]['image']),
                           width: 50,
                           height: 50,
                           fit: BoxFit.fill,
@@ -141,12 +183,24 @@ class _MessagePageState extends State<MessagePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            roomChat['userId'][0]['_id']!=userProvider.userCurrent!.id?roomChat['userId'][0]['name']:roomChat['userId'][1]['name'],
-                            style: Theme.of(context).textTheme.displayMedium!.copyWith(fontSize: 18),
+                            roomChat['userId'][0]['_id'] !=
+                                    userProvider.userCurrent!.id
+                                ? roomChat['userId'][0]['name']
+                                : roomChat['userId'][1]['name'],
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayMedium!
+                                .copyWith(fontSize: 18),
                           ),
                           Text(
                             roomChat['_id']['message'][0]['content'],
-                            style:(roomChat['_id']['readBy'] as List).contains(userProvider.userCurrent!.id)?Theme.of(context).textTheme.headlineMedium :Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.black),
+                            style: (roomChat['_id']['readBy'] as List)
+                                    .contains(userProvider.userCurrent!.id)
+                                ? Theme.of(context).textTheme.headlineMedium
+                                : Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium!
+                                    .copyWith(color: Colors.black),
                           )
                         ],
                       ),
@@ -159,18 +213,20 @@ class _MessagePageState extends State<MessagePage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text("${time_ago.format(DateTime.parse(roomChat['_id']['message'][0]['createdAt']),
-                          locale: 'en_short', clock: DateTime.now())} ago",style: Theme.of(context).textTheme.headlineMedium,),
-
-                      (roomChat['_id']['readBy'] as List).contains(userProvider.userCurrent!.id)?const SizedBox():
-                      Container(
-                        width: 15,
-                        height: 15,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.redAccent
-                        ),
-                      )
+                      Text(
+                        "${time_ago.format(DateTime.parse(roomChat['_id']['message'][0]['createdAt']), locale: 'en_short', clock: DateTime.now())} ago",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      (roomChat['_id']['readBy'] as List)
+                              .contains(userProvider.userCurrent!.id)
+                          ? const SizedBox()
+                          : Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: Colors.redAccent),
+                            )
                     ],
                   ),
                 )

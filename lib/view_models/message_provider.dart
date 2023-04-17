@@ -5,18 +5,17 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class ChatController {
   late String roomIdReplace;
   late String roomIdReplaceFirst;
+  late List listJoinRoom;
   StreamController<Map<String, dynamic>>? _messageController;
 
   Stream<Map<String, dynamic>> get messages => _messageController!.stream;
 
   late IO.Socket _socket;
 
-  void initSocket(String roomId, List<String> userId,String userCurrentId) {
+  void initSocket(String roomId, List<String> userId, String userCurrentId,String token) {
     _socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
     });
@@ -32,9 +31,11 @@ class ChatController {
         _socket.emit('join-room', roomId);
       } else {
         if (userId[0].compareTo(userId[1]) < 0) {
+          roomIdReplace="";
           roomIdReplaceFirst = userId[0] + userId[1];
           _socket.emit('join-room', userId[0] + userId[1]);
         } else {
+          roomIdReplace="";
           roomIdReplaceFirst = userId[1] + userId[0];
           _socket.emit('join-room', userId[1] + userId[0]);
         }
@@ -42,6 +43,11 @@ class ChatController {
     });
 
     _socket.on('disconnect', (_) => print('disconnect: ${_socket.id}'));
+    _socket.on('list-user-join-room', (data) {
+      listJoinRoom = data as List;
+      print(listJoinRoom);
+    });
+
     _socket.on('new-message', (data) {
       if (_messageController!.isClosed) {
         _messageController = StreamController<Map<String, dynamic>>.broadcast();
@@ -54,9 +60,12 @@ class ChatController {
       final encrypted = encrypt.Encrypted.fromBase64(data['content']);
       data['content'] = encrypter.decrypt(encrypted, iv: iv);
       _messageController!.add(data);
-      if(roomIdReplace!=""){
-          isReadMessage(roomIdReplace, userCurrentId);
-
+      if (roomIdReplace != "") {
+        isReadMessage(roomIdReplace, userCurrentId);
+      }
+      if (listJoinRoom.length == 1) {
+        print(token);
+        sendNotification(token);
       }
     });
 
@@ -119,10 +128,10 @@ class ChatController {
         }));
 
     if (response.statusCode == 200) {
-      roomIdReplace = jsonDecode(response.body)['roomChatId'];
+      roomIdReplace = jsonDecode(response.body)['_id'];
     }
     if (response.statusCode == 403) {
-      print('Error: Khong them duoc user');
+      print(response.body);
     }
 
     return true;
@@ -143,17 +152,29 @@ class ChatController {
           }
         }));
   }
+
   Future isReadMessage(String roomId, String userId) async {
     await http.post(Uri.parse('$url/api/room-chat/is-read-message'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
-        body: jsonEncode(<String, dynamic>{
-          'roomId': roomId,
-          'userId': userId
-        }));
+        body:
+            jsonEncode(<String, dynamic>{'roomId': roomId, 'userId': userId}));
+
   }
 
+  Future sendNotification(String token) async {
+    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization':
+              'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
+        },
+        body: jsonEncode(<String, dynamic>{
+          "to":token,
+          "data": {"message": "Tin nhan moi!", "type": "notification"}
+        }));
+  }
 
   void dispose() {
     _socket.off('connect');

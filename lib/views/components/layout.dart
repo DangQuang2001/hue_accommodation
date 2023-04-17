@@ -127,7 +127,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                             color: color,
                             size: 31,
                           ),
-                          chatProvider.listRoomChat.isEmpty?const Text(""):
+                          chatProvider.countNewChat==0?const Text(""):
                           Positioned(
                               right: 0,
                               top: 0,
@@ -140,7 +140,7 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    chatProvider.listRoomChat.length.toString() ,
+                                    chatProvider.countNewChat.toString() ,
                                     style: GoogleFonts.readexPro(
                                         color: Colors.white,
                                         fontSize: 10,

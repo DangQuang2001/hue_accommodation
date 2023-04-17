@@ -1,5 +1,5 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/config/routes/routes.dart';
 import 'package:hue_accommodation/config/themes/dark_theme.dart';
@@ -51,9 +51,19 @@ class MyApp extends StatelessWidget {
       child: Consumer6<FcmTokenProvider, UserProvider,
           AppLifecycleStateNotifier, ThemeProvider,NotificationProvider,ChatProvider>(
         builder: (context, fcmToken, userProvider, lifecycle, themeObj,notificationProvider,chatProvider, child) {
-          checkLoginUser(userProvider, fcmToken, notificationProvider,chatProvider);
-          checkAndUpdateFCMToken(
-              lifecycle.lifecycleState, userProvider, fcmToken);
+
+          (()async{
+            var connectivityResult = await  Connectivity().checkConnectivity();
+            if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
+              checkLoginUser(userProvider, fcmToken, notificationProvider,chatProvider);
+              checkAndUpdateFCMToken(
+                  lifecycle.lifecycleState, userProvider, fcmToken);
+            } else {
+              print("Could not connect wifi. Please connect a wifi!");
+            }
+          })();
+
+
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,

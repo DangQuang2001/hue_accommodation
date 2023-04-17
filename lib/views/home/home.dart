@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,10 @@ import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
 
+
 import '../../models/room.dart';
+import '../../view_models/chat_provider.dart';
+
 
 
 class HomePage extends StatefulWidget {
@@ -35,6 +39,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // Add listeners to this class
     var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       Room room = await roomProvider.getDetailRoom(message.data['roomID']);
       // ignore: use_build_context_synchronously
@@ -46,19 +52,22 @@ class _HomePageState extends State<HomePage> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
-      final snackBar = SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: const Text(
-            'Em áo hồng mại đỉnk!'),
-        action: SnackBarAction(
-          label: 'Close',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
+
+      chatProvider.getRoomChat(userProvider.userCurrent!.id);
+      final helpSnackBar = SnackBar(
+        margin: const EdgeInsets.only(bottom: 1000,top:50),
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Tin nhắn mới!',
+          message:
+          'Dang Quang đã gửi tin nhắn cho bạn!',
+          contentType: ContentType.help,
         ),
       );
-      ScaffoldMessenger.of(context)
-          .showSnackBar(snackBar);
+
+      ScaffoldMessenger.of(context).showSnackBar(helpSnackBar);
 
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');

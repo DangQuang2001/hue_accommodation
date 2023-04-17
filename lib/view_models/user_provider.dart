@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
 import '../models/user.dart';
 
 
@@ -32,7 +30,9 @@ class UserProvider extends ChangeNotifier {
           "isHost": isHost
         }));
 
-    if (response.statusCode == 200) {}
+    if (response.statusCode == 200) {
+      return true;
+    }
     if (response.statusCode == 403) {
       print('Error: Khong them duoc user');
     }

@@ -8,12 +8,15 @@ import 'package:hue_accommodation/constants/server_url.dart';
 class ChatProvider extends ChangeNotifier {
   bool isGetChat = false;
   bool isUserOnline1 = false;
-  bool isUserInChatRoom = false;
+  String tokenUser = "";
+  int countNewChat = 0;
   late bool isNewRoom;
   late String roomId;
   late List infoUserRoom;
   List<Map<String, dynamic>> listMessage = [];
   List<Map<String, dynamic>> listRoomChat = [];
+
+
 
   Future<bool> checkRoom(List<String> userId) async {
     isNewRoom = true;
@@ -113,7 +116,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future getRoomChat(String userId) async {
-
+    countNewChat = 0;
     try {
       final response =
           await http.get(Uri.parse('$url/api/room-chat/get-room-chat/$userId'));
@@ -136,6 +139,14 @@ class ChatProvider extends ChangeNotifier {
           return msg;
         }).toList();
         listRoomChat =decryptedMessages.cast<Map<String, dynamic>>();
+        if(countNewChat == 0){
+          for (var element in listRoomChat) {
+            if(!(element['_id']['readBy']as List).contains(userId)){
+              countNewChat = countNewChat +1;
+              notifyListeners();
+            }
+          }
+        }
         isGetChat = true;
         notifyListeners();
       }
@@ -153,6 +164,7 @@ class ChatProvider extends ChangeNotifier {
           'roomId': roomId,
           'userId': userId
         }));
+    getRoomChat(userId);
   }
 
   Future isOnline(String userId) async {
@@ -160,8 +172,8 @@ class ChatProvider extends ChangeNotifier {
     if(response.statusCode == 200){
       if((jsonDecode(response.body) as List).isNotEmpty){
         isUserOnline1 = true;
+        tokenUser = jsonDecode(response.body)[0];
       }
-
     }
   }
 }
