@@ -86,7 +86,7 @@ class _FilterHouseState extends State<FilterHouse> {
               children: [
                 ExpansionPanel(
                   backgroundColor: Theme.of(context).colorScheme.onBackground,
-                  hasIcon: false,
+                  // hasIcon: false,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 30.0, bottom: 10),
@@ -217,7 +217,8 @@ class _FilterHouseState extends State<FilterHouse> {
                                                       .listMain[index]))),
                                   child: SlideInRight(
                                     delay: const Duration(milliseconds: 200),
-                                    duration: Duration(milliseconds: (index+1)*100),
+                                    duration: Duration(
+                                        milliseconds: (index + 1) * 100),
                                     child: Container(
                                       margin: const EdgeInsets.only(bottom: 5),
                                       padding: const EdgeInsets.only(
@@ -254,18 +255,21 @@ class _FilterHouseState extends State<FilterHouse> {
                                                           true
                                                       ? Colors.green
                                                       : Colors.red,
-                                                  location: BannerLocation.topEnd,
+                                                  location:
+                                                      BannerLocation.topEnd,
                                                   child: CachedNetworkImage(
                                                     imageUrl: roomProvider
                                                         .listMain[index].image,
-                                                    width: MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            2 -
-                                                        20,
-                                                    height: MediaQuery.of(context)
-                                                        .size
-                                                        .height,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .width /
+                                                                2 -
+                                                            20,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height,
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
@@ -314,7 +318,8 @@ class _FilterHouseState extends State<FilterHouse> {
                                                                   null
                                                               ? "0 đ"
                                                               : roomProvider
-                                                                      .listMain[index]
+                                                                      .listMain[
+                                                                          index]
                                                                       .adParams[
                                                                   'deposit']['value'],
                                                           style: GoogleFonts
@@ -340,9 +345,10 @@ class _FilterHouseState extends State<FilterHouse> {
                                                           Icons
                                                               .location_on_rounded,
                                                           size: 20,
-                                                          color: Theme.of(context)
-                                                              .iconTheme
-                                                              .color,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .iconTheme
+                                                                  .color,
                                                         ),
                                                         const SizedBox(
                                                           width: 5,
@@ -354,12 +360,13 @@ class _FilterHouseState extends State<FilterHouse> {
                                                                     .adParams[
                                                                 'address']['value'],
                                                             maxLines: 2,
-                                                            overflow: TextOverflow
-                                                                .ellipsis,
-                                                            style:
-                                                                Theme.of(context)
-                                                                    .textTheme
-                                                                    .displaySmall,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .displaySmall,
                                                           ),
                                                         ),
                                                       ],
@@ -372,10 +379,10 @@ class _FilterHouseState extends State<FilterHouse> {
                                                       children: [
                                                         Icon(Icons.description,
                                                             size: 20,
-                                                            color:
-                                                                Theme.of(context)
-                                                                    .iconTheme
-                                                                    .color),
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .iconTheme
+                                                                .color),
                                                         const SizedBox(
                                                           width: 5,
                                                         ),
@@ -385,12 +392,13 @@ class _FilterHouseState extends State<FilterHouse> {
                                                                 .listMain[index]
                                                                 .description,
                                                             maxLines: 2,
-                                                            overflow: TextOverflow
-                                                                .ellipsis,
-                                                            style:
-                                                                Theme.of(context)
-                                                                    .textTheme
-                                                                    .displaySmall,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .displaySmall,
                                                           ),
                                                         ),
                                                       ],
@@ -615,30 +623,34 @@ class _FilterHouseState extends State<FilterHouse> {
                 onTap: () {
                   if (_character == SingingCharacter.newPost) {
                     setState(() {
-                      roomProvider.listMain= roomProvider.listRent;
-                      roomProvider.listMain = roomProvider.listMain
-                          .where((item) {
-                        return
-                          _currentRangeValues.start.round() <= double.parse(item.adParams['deposit']?['value']??"0") &&
-                              double.parse(item.adParams['deposit']?['value']??"0")<= _currentRangeValues.end.round();
-                      }
-                      )
-                          .toList();
+                      roomProvider.listMain = roomProvider.listRent;
+                      roomProvider.listMain =
+                          roomProvider.listMain.where((item) {
+                        return _currentRangeValues.start.round() <=
+                                double.parse(item.adParams['deposit']
+                                        ?['value'] ??
+                                    "0") &&
+                            double.parse(item.adParams['deposit']?['value'] ??
+                                    "0") <=
+                                _currentRangeValues.end.round();
+                      }).toList();
                       roomProvider.listMain
                           .sort((a, b) => b.createAt.compareTo(a.createAt));
                       _isExpanded = false;
                     });
                   } else {
                     setState(() {
-                      roomProvider.listMain= roomProvider.listRent;
-                      roomProvider.listMain = roomProvider.listMain
-                          .where((item) {
-                            return
-                        _currentRangeValues.start.round() <= double.parse(item.adParams['deposit']?['value']??"0") &&
-                            double.parse(item.adParams['deposit']?['value']??"0")<= _currentRangeValues.end.round();
-                      }
-                      )
-                          .toList();
+                      roomProvider.listMain = roomProvider.listRent;
+                      roomProvider.listMain =
+                          roomProvider.listMain.where((item) {
+                        return _currentRangeValues.start.round() <=
+                                double.parse(item.adParams['deposit']
+                                        ?['value'] ??
+                                    "0") &&
+                            double.parse(item.adParams['deposit']?['value'] ??
+                                    "0") <=
+                                _currentRangeValues.end.round();
+                      }).toList();
                       roomProvider.listMain.sort((a, b) {
                         if (a.adParams['deposit'] == null &&
                             b.adParams['deposit'] == null) {

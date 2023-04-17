@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 

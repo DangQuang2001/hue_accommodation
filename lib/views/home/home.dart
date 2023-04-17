@@ -17,7 +17,6 @@ import '../../models/room.dart';
 import '../../view_models/chat_provider.dart';
 
 
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -90,10 +89,12 @@ class _HomePageState extends State<HomePage> {
                 header(context),
                 body(context),
                 userProvider.userCurrent != null
-                        ? utilities(context)
-                        : const Text(''),
+                    ? utilities(context)
+                    : const Text(''),
                 slider(context),
-                const SizedBox(height: 100,)
+                const SizedBox(
+                  height: 100,
+                )
               ],
             ),
           ),
@@ -354,7 +355,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget body(BuildContext context) {
     return Consumer<UserProvider>(
-      builder: (context, userProvider, child) =>  Padding(
+      builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 20, right: 20),
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -369,12 +370,16 @@ class _HomePageState extends State<HomePage> {
                         context,
                         "https://cdn-icons-png.flaticon.com/512/3010/3010995.png",
                         "Motel House",
-                        RouteName.boardinghouse,true,300),
+                        RouteName.boardinghouse,
+                        true,
+                        300),
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/3820/3820134.png",
                         "Forum",
-                        RouteName.blogSale,userProvider.userCurrent!=null,400),
+                        RouteName.blogSale,
+                        userProvider.userCurrent != null,
+                        400),
                   ]),
               const SizedBox(
                 width: 10,
@@ -401,12 +406,16 @@ class _HomePageState extends State<HomePage> {
                                     context,
                                     "https://cdn-icons-png.flaticon.com/512/384/384999.png",
                                     "SuperMarket",
-                                    RouteName.home,300,true),
+                                    RouteName.home,
+                                    300,
+                                    true),
                                 buttonLinkSmall(
                                     context,
                                     "https://cdn-icons-png.flaticon.com/512/4320/4320350.png",
                                     "Hospital",
-                                    RouteName.home,400,true),
+                                    RouteName.home,
+                                    400,
+                                    true),
                               ],
                             ),
                             const SizedBox(
@@ -416,7 +425,9 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 "https://cdn-icons-png.flaticon.com/512/1261/1261143.png",
                                 "Household Goods",
-                                RouteName.home,500,true),
+                                RouteName.home,
+                                500,
+                                true),
                           ],
                         ),
                       ),
@@ -470,17 +481,23 @@ class _HomePageState extends State<HomePage> {
                     context,
                     "https://cdn-icons-png.flaticon.com/512/4757/4757351.png",
                     "Room",
-                    RouteName.roomManage,300,false),
+                    RouteName.roomManage,
+                    300,
+                    false),
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/9155/9155818.png",
                     "Rent",
-                    RouteName.interactManage,400,false),
+                    RouteName.interactManage,
+                    400,
+                    false),
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/2783/2783924.png",
                     "Statistical",
-                    RouteName.statisticalManage,500,false),
+                    RouteName.statisticalManage,
+                    500,
+                    false),
               ],
             )
           ],
@@ -489,33 +506,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buttonLink(
-      BuildContext context, String image, String name, String page,bool isNavigator,int duration) {
+  Widget buttonLink(BuildContext context, String image, String name,
+      String page, bool isNavigator, int duration) {
     return GestureDetector(
       onTap: () {
-        if(isNavigator){
+        if (isNavigator) {
           Navigator.pushNamed(context, page);
-        }else{
+        } else {
           final snackBar = SnackBar(
             backgroundColor: Colors.redAccent,
-            content: const Text(
-                'Bạn phải đăng nhập để sử dụng chức năng này!'),
+            content: const Text('Bạn phải đăng nhập để sử dụng chức năng này!'),
             action: SnackBarAction(
               label: 'Đăng nhập',
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            AuthService()
-                                .handleAuthState()));
+                        builder: (context) => AuthService().handleAuthState()));
               },
             ),
           );
-          ScaffoldMessenger.of(context)
-              .showSnackBar(snackBar);
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
-
       },
       child: SlideInRight(
         duration: Duration(milliseconds: duration),
@@ -555,19 +567,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buttonLinkSmall(
-      BuildContext context, String image, String name, String page,int duration,bool isComingSoon) {
+  Widget buttonLinkSmall(BuildContext context, String image, String name,
+      String page, int duration, bool isComingSoon) {
     return SlideInRight(
       duration: Duration(milliseconds: duration),
       child: Column(
         children: [
           GestureDetector(
             onTap: () {
-              if(isComingSoon){
+              if (isComingSoon) {
                 final snackBar = SnackBar(
                   backgroundColor: Colors.redAccent,
-                  content: const Text(
-                      'Chức năng đang được phát triển!'),
+                  content: const Text('Chức năng đang được phát triển!'),
                   action: SnackBarAction(
                     label: 'Close',
                     onPressed: () {
@@ -575,10 +586,8 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 );
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(snackBar);
-              }
-              else{
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else {
                 Navigator.pushNamed(context, page);
               }
             },
@@ -630,11 +639,10 @@ class _HomePageState extends State<HomePage> {
     return SizedBox(
       height: 200,
       child: PageView.builder(
-
         itemCount: imageList.length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
-            padding: const EdgeInsets.only(top:40,left: 25.0,right: 25),
+            padding: const EdgeInsets.only(top: 40, left: 25.0, right: 25),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(

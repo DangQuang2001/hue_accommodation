@@ -91,7 +91,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (isNewRooms) {
                         _chatController.sendMessage(
                             userProvider.userCurrent!.id,
-                            [widget.infoUserRoom[0]['_id'],widget.infoUserRoom[1]['_id']],
+                            [
+                              widget.infoUserRoom[0]['_id'],
+                              widget.infoUserRoom[1]['_id']
+                            ],
                             _textController.text,
                             'text',
                             true);
@@ -100,7 +103,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       } else {
                         _chatController.sendMessage(
                             userProvider.userCurrent!.id,
-                            [widget.infoUserRoom[0]['_id'],widget.infoUserRoom[1]['_id']],
+                            [
+                              widget.infoUserRoom[0]['_id'],
+                              widget.infoUserRoom[1]['_id']
+                            ],
                             _textController.text,
                             'text',
                             false);
@@ -136,11 +142,13 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Row(
                 children: [
-                  IconButton(onPressed: ()=> Navigator.pop(context), icon: Icon(
-                    Icons.arrow_back_outlined,
-                    color: Theme.of(context).iconTheme.color,
-                    size: 30,
-                  )),
+                  IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.arrow_back_outlined,
+                        color: Theme.of(context).iconTheme.color,
+                        size: 30,
+                      )),
                   const SizedBox(
                     width: 15,
                   ),
@@ -181,8 +189,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget messages(BuildContext context) {
-    return Consumer2<UserProvider,ChatProvider>(
-      builder: (context, userProvider,chatProvider, child) => Expanded(
+    return Consumer2<UserProvider, ChatProvider>(
+      builder: (context, userProvider, chatProvider, child) => Expanded(
         child: isLoading
             ? Container()
             : StreamBuilder(
@@ -204,14 +212,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
                       if (_messages.isEmpty || _messages[0] != messages) {
                         _messages.insert(_messages.length, messages);
-
                       }
                     }
                     return ListView.builder(
                       reverse: true,
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
-                        final message = _messages[_messages.length-1-index];
+                        final message = _messages[_messages.length - 1 - index];
                         final isMyMessage =
                             message['userId'] == userProvider.userCurrent!.id;
                         return Row(
@@ -245,7 +252,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                         message['content'],
                                         style: GoogleFonts.readexPro(
                                             fontWeight: FontWeight.w300,
-                                            fontSize: 17,color: Colors.white),
+                                            fontSize: 17,
+                                            color: Colors.white),
                                       ),
                                       const SizedBox(
                                         width: 5,
@@ -263,7 +271,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                           const SizedBox(
                                             width: 5,
                                           ),
-                                          const Icon(Icons.check, color: Colors.greenAccent, size: 15)
+                                          const Icon(Icons.check,
+                                              color: Colors.greenAccent,
+                                              size: 15)
                                         ],
                                       )
                                     ],

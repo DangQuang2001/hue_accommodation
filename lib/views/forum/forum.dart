@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/post_provider.dart';
@@ -5,6 +6,8 @@ import 'package:hue_accommodation/views/forum/create_post.dart';
 import 'package:hue_accommodation/views/forum/post.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+
+import '../../view_models/user_provider.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({Key? key}) : super(key: key);
@@ -30,8 +33,8 @@ class _ForumPageState extends State<ForumPage>
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
-    var postProvider = Provider.of<PostProvider>(context, listen: false);
-    postProvider.getPost([0, 1, 2, 3], 's');
+    // var postProvider = Provider.of<PostProvider>(context, listen: false);
+    // postProvider.getPost([0, 1, 2, 3], 's');
     super.initState();
   }
 
@@ -63,128 +66,137 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget appBar(BuildContext context) {
-    return Container(
-      height: 160,
-      width: MediaQuery.of(context).size.width,
-      color: Theme.of(context).colorScheme.onBackground,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios_new_outlined)),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text('Forum',
-                        style: Theme.of(context).textTheme.headlineLarge),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          color: Theme.of(context).colorScheme.onSecondary),
-                      child: Icon(Icons.search_sharp,
-                          color: Theme.of(context).iconTheme.color, size: 27),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Stack(children: [
-                      Container(
-                        alignment: Alignment.center,
-                        width: 50,
-                        height: 50,
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              color: Theme.of(context).colorScheme.onSecondary),
-                          child: Icon(Icons.message_outlined,
-                              color: Theme.of(context).iconTheme.color,
-                              size: 24),
-                        ),
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) => Container(
+        height: 160,
+        width: MediaQuery.of(context).size.width,
+        color: Theme.of(context).colorScheme.onBackground,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back_ios_new_outlined)),
+                      const SizedBox(
+                        width: 5,
                       ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Colors.red),
-                          child: Center(
-                              child: Text(
-                            '3',
-                            style: GoogleFonts.readexPro(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white),
-                          )),
-                        ),
-                      )
-                    ])
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: Image.network(
-                        'https://bedental.vn/wp-content/uploads/2022/11/hot-girl_8-683x1024.jpg',
+                      Text('Forum',
+                          style: Theme.of(context).textTheme.headlineLarge),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
                         width: 40,
                         height: 40,
-                        fit: BoxFit.cover,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(40),
+                            color: Theme.of(context).colorScheme.onSecondary),
+                        child: Icon(Icons.search_sharp,
+                            color: Theme.of(context).iconTheme.color, size: 27),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 7,
-                    ),
-                    Text(
-                      'Post something for forum?',
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                  ],
-                ),
-                IconButton(
-                    onPressed: () async {
-                      await _selectImages();
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CreatePostPage(
-                                    images: _images,
-                                  )));
-                    },
-                    icon: const Icon(
-                      Icons.image,
-                      color: Color.fromRGBO(1, 138, 221, 1.0),
-                      size: 35,
-                    ))
-              ],
-            )
-          ],
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Stack(children: [
+                        Container(
+                          alignment: Alignment.center,
+                          width: 50,
+                          height: 50,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary),
+                            child: Icon(Icons.message_outlined,
+                                color: Theme.of(context).iconTheme.color,
+                                size: 24),
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.red),
+                            child: Center(
+                                child: Text(
+                              '3',
+                              style: GoogleFonts.readexPro(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white),
+                            )),
+                          ),
+                        )
+                      ])
+                    ],
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(40),
+                        child: CachedNetworkImage(
+                          imageUrl: userProvider.userCurrent!.image,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 7,
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const CreatePostPage())),
+                        child: Text(
+                          'Post something for forum?',
+                          style: Theme.of(context).textTheme.displaySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                      onPressed: () async {
+                        await _selectImages();
+                        // ignore: use_build_context_synchronously
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreatePostPage(
+                                      images: _images,
+                                    )));
+                      },
+                      icon: const Icon(
+                        Icons.image,
+                        color: Color.fromRGBO(1, 138, 221, 1.0),
+                        size: 35,
+                      ))
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -227,13 +239,24 @@ class _ForumPageState extends State<ForumPage>
 
   Widget content(BuildContext context) {
     return Consumer<PostProvider>(
-      builder: (context, postProvider, child) => ListView(
-        padding: const EdgeInsets.only(top: 5),
-        shrinkWrap: true,
-        children: [...postProvider.listPost.map((e) => PostCard(post: e))],
-      ),
+      builder: (context, postProvider, child) => FutureBuilder(
+          future: postProvider.getPost([0, 1, 2, 3], "s"),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text('Bài viết không tồn tại!');
+            }
+            if (snapshot.hasData) {
+              return ListView(
+                padding: const EdgeInsets.only(top: 5),
+                shrinkWrap: true,
+                children: [
+                  ...postProvider.listPost.map((e) => PostCard(post: e))
+                ],
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
     );
   }
-
-
 }
