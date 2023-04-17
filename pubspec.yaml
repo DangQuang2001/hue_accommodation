@@ -65,6 +65,7 @@ dependencies:
   pusher_channels_flutter: ^2.1.2
   connectivity_plus: ^3.0.4
   awesome_snackbar_content: ^0.1.2
+  pusher_client: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+import 'package:pusher_client/pusher_client.dart';
 
 class ChatController {
   late String roomIdReplace;
@@ -11,42 +12,39 @@ class ChatController {
   StreamController<Map<String, dynamic>>? _messageController;
 
   Stream<Map<String, dynamic>> get messages => _messageController!.stream;
-  late PusherChannelsFlutter pusher;
-
+  late PusherClient pusher;
   void initSocket(String roomId, List<String> userId) async {
     _messageController ??= StreamController<Map<String, dynamic>>.broadcast();
-    pusher = PusherChannelsFlutter.getInstance();
     try {
-      await pusher.init(
-          apiKey: 'a41b81a5a45ccac88d62',
-          cluster: 'ap1',
-          onConnectionStateChange: onConnectionStateChange,
-          onError: onError,
-          onSubscriptionSucceeded: onSubscriptionSucceeded,
-          onEvent: onEvent,
-          onSubscriptionError: onSubscriptionError,
-          onDecryptionFailure: onDecryptionFailure,
-          onMemberAdded: onMemberAdded,
-          onMemberRemoved: onMemberRemoved,
-          // authEndpoint: "<Your Authendpoint>",
-          onAuthorizer: onAuthorizer);
+      PusherOptions options = PusherOptions(
+        host: url,
+        wsPort: 6001,
+        encrypted: false,
+        auth: PusherAuth(
+          '$url/pusher/user-auth',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      pusher =
+          PusherClient('a41b81a5a45ccac88d62', options, autoConnect: false);
+
+// connect at a later time than at instantiation.
       pusher.connect();
 
       if (roomId != "") {
         roomIdReplace = roomId;
         roomIdReplaceFirst = "private-$roomId";
-        pusher.subscribe(
-            channelName: roomIdReplaceFirst,
-            onEvent: (event) {
-              print('hello $event');
-            });
+        pusher.subscribe(roomIdReplaceFirst);
       } else {
         if (userId[0].compareTo(userId[1]) < 0) {
           roomIdReplaceFirst = "private-${userId[0] + userId[1]}";
         } else {
           roomIdReplaceFirst = "private-${userId[1] + userId[0]}";
         }
-        pusher.subscribe(channelName: roomIdReplaceFirst);
+        pusher.subscribe(roomIdReplaceFirst);
       }
     } catch (e) {
       print("ERROR: $e");
@@ -85,11 +83,11 @@ class ChatController {
       };
 
       String messageString = jsonEncode(messageData);
-      await pusher.trigger(PusherEvent(
-        channelName: roomIdReplaceFirst,
-        eventName: 'client-send-message',
-        data: messageString,
-      ));
+      // await pusher.trigger(PusherEvent(
+      //   channelName: roomIdReplaceFirst,
+      //   eventName: 'client-send-message',
+      //   data: messageString,
+      // ));
     }
     // Update ChatDetail
     else {
@@ -104,11 +102,11 @@ class ChatController {
       };
 
       String messageString = jsonEncode(messageData);
-      await pusher.trigger(PusherEvent(
-        channelName: roomIdReplaceFirst,
-        eventName: 'client-send-message',
-        data: messageString,
-      ));
+      // await pusher.trigger(PusherEvent(
+      //   channelName: roomIdReplaceFirst,
+      //   eventName: 'client-send-message',
+      //   data: messageString,
+      // ));
       addMessage(sender, encrypted.base64.trim(), typeM);
     }
   }
@@ -182,10 +180,6 @@ class ChatController {
     }
   }
 
-  void onEvent(PusherEvent event) {
-    print("onEvent: $event");
-  }
-
   void onSubscriptionSucceeded(String channelName, dynamic data) {
     print("onSubscriptionSucceeded: $channelName data: $data");
   }
@@ -215,7 +209,7 @@ class ChatController {
   }
 
   void dispose() async {
-    await pusher.unsubscribe(channelName: roomIdReplaceFirst);
+    await pusher.unsubscribe(roomIdReplaceFirst);
     await pusher.disconnect();
     _messageController?.close();
   }

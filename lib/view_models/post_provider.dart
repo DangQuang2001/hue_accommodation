@@ -12,6 +12,7 @@ class PostProvider extends ChangeNotifier {
   List<Post> listPost = [];
 
   Future<bool> createPost(
+      String title,
       String caption,
       String userId,
       String hostName,
@@ -45,6 +46,7 @@ class PostProvider extends ChangeNotifier {
         },
         body: jsonEncode(<String, dynamic>{
           "id": DateTime.now().millisecondsSinceEpoch.toString(),
+          "title": title,
           "caption": caption,
           "userId": userId,
           "hostName": hostName,
@@ -67,32 +69,49 @@ class PostProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<void> getPost(List<int> tag, String userId) async {
-    final response = await http.post(
-        Uri.parse('$url/api/post/get-all-post-by-tag'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "tag": tag,
-          "isHidden": userId,
-        }));
-    var jsonObject = jsonDecode(response.body);
-    var listObject = jsonObject as List;
-    listPost = listObject.map((e) => Post.fromJson(e)).toList();
-    notifyListeners();
+  Future<List<Post>> getPost(List<int> tag, String userId) async {
+    try {
+      final response = await http.post(
+          Uri.parse('$url/api/post/get-all-post-by-tag'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{
+            "tag": tag,
+            "isHidden": userId,
+          }));
+      var jsonObject = jsonDecode(response.body);
+      var listObject = jsonObject as List;
+      listPost = listObject.map((e) => Post.fromJson(e)).toList();
+      return listPost;
+    } catch (e) {
+      print('Error get post: $e');
+    }
+    return listPost;
   }
 
-  Future<void> likePost(String id, String userId)async{
-    final response = await http.post(
-        Uri.parse('$url/api/post/like-post'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": id,
-          "userId":userId
-        }));
+  Future<void> likePost(String id, String userId) async {
+    try {
+      await http.post(Uri.parse('$url/api/post/like-post'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+    } catch (e) {
+      // Handle any exceptions that may be thrown
+      print('Error liking post: $e');
+    }
+  }
 
+  Future<void> dislikePost(String id, String userId) async {
+    try {
+      await http.post(Uri.parse('$url/api/post/dislike-post'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+    } catch (e) {
+      print('Error dislike post: $e');
+    }
   }
 }
