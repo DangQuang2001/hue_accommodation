@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'dart:ui' as ui;
 
 import '../../models/room.dart';
+import '../../view_models/favourite_provider.dart';
 
 class BoardingHouseDetail extends StatefulWidget {
   final Room motel;
@@ -31,6 +32,7 @@ class BoardingHouseDetail extends StatefulWidget {
 }
 
 class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
+  bool isCheckFavourite = false;
   int listImageLength = 10;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
@@ -58,7 +60,13 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   @override
   void initState() {
     super.initState();
-
+    var favouriteProvider =
+        Provider.of<FavouriteProvider>(context, listen: false);
+    (() async {
+      await favouriteProvider.checkFavourite(widget.motel.roomId,
+          Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
+      isCheckFavourite = favouriteProvider.isCheckFavourite;
+    })();
     getLocationUser() async {
       var currentLocation = await location.getLocation();
       double latitude = double.parse(currentLocation.latitude.toString());
@@ -110,9 +118,10 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
-        Consumer2<UserProvider, ChatProvider>(
-          builder: (context, userProvider, chatProvider, child) =>
-              NestedScrollView(
+        Consumer3<UserProvider, ChatProvider, FavouriteProvider>(
+          builder:
+              (context, userProvider, chatProvider, favouriteProvider, child) =>
+                  NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
@@ -168,6 +177,22 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                 );
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(snackBar);
+                              } else {
+                                if (isCheckFavourite) {
+                                  favouriteProvider.removeFavourite(
+                                      widget.motel.roomId,
+                                      userProvider.userCurrent!.id);
+                                  setState(() {
+                                    isCheckFavourite = false;
+                                  });
+                                } else {
+                                  favouriteProvider.addFavourite(
+                                      widget.motel.roomId,
+                                      userProvider.userCurrent!.id);
+                                  setState(() {
+                                    isCheckFavourite = true;
+                                  });
+                                }
                               }
                             },
                             child: Container(
@@ -178,10 +203,15 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: Colors.grey.withOpacity(0.5)),
-                                child: const Icon(
-                                  Icons.favorite_border_outlined,
-                                  color: Colors.white,
-                                ),
+                                child: isCheckFavourite
+                                    ? const Icon(
+                                        Icons.favorite_rounded,
+                                        color: Colors.redAccent,
+                                      )
+                                    : const Icon(
+                                        Icons.favorite_border_outlined,
+                                        color: Colors.white,
+                                      ),
                               ),
                             ),
                           ),
@@ -228,8 +258,8 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                               roomId: chatProvider.isNewRoom
                                                   ? ""
                                                   : chatProvider.roomId,
-                                          infoUserRoom: chatProvider.infoUserRoom,
-
+                                              infoUserRoom:
+                                                  chatProvider.infoUserRoom,
                                             )));
                               }
                             },

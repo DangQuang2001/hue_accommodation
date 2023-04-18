@@ -10,6 +10,7 @@ import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/check_and_update_fcmToken.dart';
 import 'package:hue_accommodation/view_models/check_login_user.dart';
 import 'package:hue_accommodation/view_models/comment_provider.dart';
+import 'package:hue_accommodation/view_models/favourite_provider.dart';
 import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/post_provider.dart';
@@ -26,7 +27,7 @@ void main() async {
   await NotificationController.initializeLocalNotifications(debug: true);
   await NotificationController.initializeRemoteNotifications(debug: true);
 
-  runApp(const  MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -47,25 +48,31 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => ChatProvider()),
         ChangeNotifierProvider(create: (context) => CommentProvider()),
+        ChangeNotifierProvider(create: (context) => FavouriteProvider()),
         ChangeNotifierProvider(
             create: (context) => AppLifecycleStateNotifier()),
       ],
-      child: Consumer6<FcmTokenProvider, UserProvider,
-          AppLifecycleStateNotifier, ThemeProvider,NotificationProvider,ChatProvider>(
-        builder: (context, fcmToken, userProvider, lifecycle, themeObj,notificationProvider,chatProvider, child) {
-
-          (()async{
-            var connectivityResult = await  Connectivity().checkConnectivity();
-            if (connectivityResult == ConnectivityResult.mobile || connectivityResult == ConnectivityResult.wifi) {
-              checkLoginUser(userProvider, fcmToken, notificationProvider,chatProvider);
+      child: Consumer6<
+          FcmTokenProvider,
+          UserProvider,
+          AppLifecycleStateNotifier,
+          ThemeProvider,
+          NotificationProvider,
+          ChatProvider>(
+        builder: (context, fcmToken, userProvider, lifecycle, themeObj,
+            notificationProvider, chatProvider, child) {
+          (() async {
+            var connectivityResult = await Connectivity().checkConnectivity();
+            if (connectivityResult == ConnectivityResult.mobile ||
+                connectivityResult == ConnectivityResult.wifi) {
+              checkLoginUser(
+                  userProvider, fcmToken, notificationProvider, chatProvider);
               checkAndUpdateFCMToken(
                   lifecycle.lifecycleState, userProvider, fcmToken);
             } else {
               print("Could not connect wifi. Please connect a wifi!");
             }
           })();
-
-
 
           return MaterialApp(
               debugShowCheckedModeBanner: false,
