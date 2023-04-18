@@ -9,7 +9,10 @@ import 'package:hue_accommodation/models/post.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class PostProvider extends ChangeNotifier {
-  List<Post> listPost = [];
+  List<Post> listAllPost = [];
+  List<Post> listRoommate = [];
+  List<Post> listTransfer = [];
+  List<Post> listOther = [];
 
   Future<bool> createPost(
       String title,
@@ -61,7 +64,10 @@ class PostProvider extends ChangeNotifier {
           "isHidden": []
         }));
 
-    if (response.statusCode == 200) {}
+    if (response.statusCode == 200) {
+      getPost([tag], userId);
+      getPost([0,1,2], userId);
+    }
     if (response.statusCode == 403) {
       print(response.body);
     }
@@ -69,7 +75,7 @@ class PostProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<List<Post>> getPost(List<int> tag, String userId) async {
+  Future<void> getPost(List<int> tag, String userId) async {
     try {
       final response = await http.post(
           Uri.parse('$url/api/post/get-all-post-by-tag'),
@@ -82,12 +88,26 @@ class PostProvider extends ChangeNotifier {
           }));
       var jsonObject = jsonDecode(response.body);
       var listObject = jsonObject as List;
-      listPost = listObject.map((e) => Post.fromJson(e)).toList();
-      return listPost;
+      if(tag[0]==0 && tag.length==1){
+        listRoommate = listObject.map((e) => Post.fromJson(e)).toList();
+        notifyListeners();
+      }
+      else if(tag[0]==1){
+        listTransfer = listObject.map((e) => Post.fromJson(e)).toList();
+        notifyListeners();
+      }
+      else if(tag[0]==2){
+        listOther  = listObject.map((e) => Post.fromJson(e)).toList();
+        notifyListeners();
+      }
+      else{
+        listAllPost = listObject.map((e) => Post.fromJson(e)).toList();
+        notifyListeners();
+      }
+
     } catch (e) {
       print('Error get post: $e');
     }
-    return listPost;
   }
 
   Future<void> likePost(String id, String userId) async {
@@ -97,6 +117,7 @@ class PostProvider extends ChangeNotifier {
             'Content-Type': 'application/json; charset=UTF-8'
           },
           body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      getPost([0,1,2], userId);
     } catch (e) {
       // Handle any exceptions that may be thrown
       print('Error liking post: $e');
@@ -110,6 +131,34 @@ class PostProvider extends ChangeNotifier {
             'Content-Type': 'application/json; charset=UTF-8'
           },
           body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      getPost([0,1,2], userId);
+    } catch (e) {
+      print('Error dislike post: $e');
+    }
+  }
+
+  Future<void> hiddenPost(String id, String userId) async {
+    try {
+      await http.post(Uri.parse('$url/api/post/hidden-post'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      getPost([0,1,2], userId);
+      getPost([0], userId);
+      getPost([1], userId);
+      getPost([2], userId);
+    } catch (e) {
+      print('Error dislike post: $e');
+    }
+  }
+  Future<void> deletePost(String id, String userId) async {
+    try {
+      await http.get(Uri.parse('$url/api/post/delete-post/$id'));
+      getPost([0,1,2], userId);
+      getPost([0], userId);
+      getPost([1], userId);
+      getPost([2], userId);
     } catch (e) {
       print('Error dislike post: $e');
     }

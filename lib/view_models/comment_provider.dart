@@ -46,7 +46,7 @@ class CommentProvider extends ChangeNotifier {
               'createdAt': DateTime.now().toString()
             }
           }));
-
+      getReplyComment(commentId,10,10,listReply);
     } catch (e) {
       print('Error reply comment: $e');
     }
@@ -75,8 +75,8 @@ class CommentProvider extends ChangeNotifier {
       print('Error get comment: $e');
     }
   }
-  Future<void> getReplyComment(String id, int skip, int limit) async {
-    listReply = [];
+  Future<void> getReplyComment(String id, int skip, int limit,List<Map<String, dynamic>> list) async {
+    listReply = list;
     notifyListeners();
     try {
       final response = await http.post(
@@ -105,6 +105,27 @@ class CommentProvider extends ChangeNotifier {
       if (response.statusCode == 403) {}
     } catch (e) {
       print('Error get comment: $e');
+    }
+  }
+  Future addReplyComment(
+      String commentId, String sender, String content, String typeC) async {
+    try {
+      await http.post(Uri.parse('$url/api/post-comment/add-reply-comment'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{
+            'commentId': commentId,
+            'comment': {
+              'userId': sender,
+              'content': content,
+              'typeC': typeC,
+              'createdAt': DateTime.now().toString()
+            }
+          }));
+      getReplyComment(commentId,10,10,listReply);
+    } catch (e) {
+      print('Error add comment: $e');
     }
   }
 }

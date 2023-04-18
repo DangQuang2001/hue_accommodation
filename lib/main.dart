@@ -26,7 +26,7 @@ void main() async {
   await NotificationController.initializeLocalNotifications(debug: true);
   await NotificationController.initializeRemoteNotifications(debug: true);
 
-  runApp(const MyApp());
+  runApp(const  MyApp());
 }
 
 class MyApp extends StatelessWidget {

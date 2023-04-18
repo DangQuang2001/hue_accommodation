@@ -8,6 +8,7 @@ class FcmTokenProvider extends ChangeNotifier {
   bool isCheckDevice = false;
   bool isCheckUser = false;
   Future<bool> isCheckUserToken(String userID, String fcmToken) async {
+    isCheckUser = true;
     final response = await http.post(
         Uri.parse('$url/api/fcmtoken/check-user-token'),
         headers: <String, String>{
@@ -21,7 +22,7 @@ class FcmTokenProvider extends ChangeNotifier {
           "lastSigned": DateTime.now().toString()
         }));
     if (response.statusCode == 200) {
-      isCheckUser = true;
+
     }
     if (response.statusCode == 201) {
       isCheckUser = true;
@@ -34,6 +35,7 @@ class FcmTokenProvider extends ChangeNotifier {
   }
 
   Future<bool> isCheckDeviceToken(String fcmToken) async {
+    isCheckDevice = true;
     final response = await http.post(
         Uri.parse('$url/api/fcmtoken/checkdevicetoken'),
         headers: <String, String>{
@@ -58,6 +60,7 @@ class FcmTokenProvider extends ChangeNotifier {
   }
 
   Future<bool> checkDeviceTurnOff(String fcmToken, bool isOpenApp) async {
+    isCheckDevice = true;
     final response = await http.post(
         Uri.parse('$url/api/fcmtoken/checkdeviceturnoff'),
         headers: <String, String>{
@@ -69,7 +72,6 @@ class FcmTokenProvider extends ChangeNotifier {
           "lastSigned": DateTime.now().toString()
         }));
     if (response.statusCode == 200) {
-      isCheckDevice = true;
     }
     if (response.statusCode == 403) {
       print('Error: Co gi do sai sai');

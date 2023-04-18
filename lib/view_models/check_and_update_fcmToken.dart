@@ -1,8 +1,9 @@
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 
-void checkAndUpdateFCMToken(AppLifecycleState lifecycleState, UserProvider userProvider,fcmToken) async {
+void checkAndUpdateFCMToken(AppLifecycleState lifecycleState, UserProvider userProvider,FcmTokenProvider fcmToken) async {
 
 
 
@@ -11,12 +12,11 @@ void checkAndUpdateFCMToken(AppLifecycleState lifecycleState, UserProvider userP
   if (currentToken != null) {
     final bool isTurnedOn = lifecycleState == AppLifecycleState.resumed;
 
-    if (userProvider.userCurrent != null) {
+    if (userProvider.userCurrent != null && fcmToken.isCheckUser == false) {
       final String userId = userProvider.userCurrent!.id;
-
       fcmToken.checkDeviceTurnOff(currentToken, isTurnedOn);
       fcmToken.checkUserTurnOff(userId, currentToken, isTurnedOn);
-    } else {
+    } else if(fcmToken.isCheckDevice==false) {
       fcmToken.checkDeviceTurnOff(currentToken, isTurnedOn);
     }
   }

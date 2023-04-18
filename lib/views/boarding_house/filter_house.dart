@@ -86,7 +86,7 @@ class _FilterHouseState extends State<FilterHouse> {
               children: [
                 ExpansionPanel(
                   backgroundColor: Theme.of(context).colorScheme.onBackground,
-                  // hasIcon: false,
+                  hasIcon: false,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 30.0, bottom: 10),

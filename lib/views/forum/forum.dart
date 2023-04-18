@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/post_provider.dart';
+import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/forum/create_post.dart';
 import 'package:hue_accommodation/views/forum/post.dart';
+import 'package:hue_accommodation/views/messages/message.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -33,9 +36,14 @@ class _ForumPageState extends State<ForumPage>
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
-    // var postProvider = Provider.of<PostProvider>(context, listen: false);
-    // postProvider.getPost([0, 1, 2, 3], 's');
+    var postProvider = Provider.of<PostProvider>(context, listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    postProvider.getPost([0, 1, 2], userProvider.userCurrent!.id);
+    postProvider.getPost([0], userProvider.userCurrent!.id);
+    postProvider.getPost([1], userProvider.userCurrent!.id);
+    postProvider.getPost([2], userProvider.userCurrent!.id);
     super.initState();
+
   }
 
   List<AssetEntity> _images = [];
@@ -66,8 +74,8 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) => Container(
+    return Consumer2<UserProvider,ChatProvider>(
+      builder: (context, userProvider,chatProvider, child) => Container(
         height: 160,
         width: MediaQuery.of(context).size.width,
         color: Theme.of(context).colorScheme.onBackground,
@@ -105,20 +113,23 @@ class _ForumPageState extends State<ForumPage>
                         width: 8,
                       ),
                       Stack(children: [
-                        Container(
-                          alignment: Alignment.center,
-                          width: 50,
-                          height: 50,
+                        GestureDetector(
+                          onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>Layout(selectedIndex: 1,))),
                           child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary),
-                            child: Icon(Icons.message_outlined,
-                                color: Theme.of(context).iconTheme.color,
-                                size: 24),
+                            alignment: Alignment.center,
+                            width: 50,
+                            height: 50,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(40),
+                                  color:
+                                      Theme.of(context).colorScheme.onSecondary),
+                              child: Icon(Icons.message_outlined,
+                                  color: Theme.of(context).iconTheme.color,
+                                  size: 24),
+                            ),
                           ),
                         ),
                         Positioned(
@@ -132,7 +143,7 @@ class _ForumPageState extends State<ForumPage>
                                 color: Colors.red),
                             child: Center(
                                 child: Text(
-                              '3',
+                              chatProvider.countNewChat.toString(),
                               style: GoogleFonts.readexPro(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
@@ -211,6 +222,7 @@ class _ForumPageState extends State<ForumPage>
             SizedBox(
               height: 50,
               child: TabBar(
+
                 isScrollable: true,
                 controller: _tabController,
                 tabs: _tabs,
@@ -222,12 +234,13 @@ class _ForumPageState extends State<ForumPage>
             ),
             Expanded(
               child: TabBarView(
+
                 controller: _tabController,
                 children: [
-                  content(context),
-                  content(context),
-                  content(context),
-                  content(context),
+                  allPost(context),
+                  roommate(context),
+                  transfer(context),
+                  others(context),
                 ],
               ),
             ),
@@ -237,26 +250,77 @@ class _ForumPageState extends State<ForumPage>
     );
   }
 
-  Widget content(BuildContext context) {
+  Widget allPost(BuildContext context) {
     return Consumer<PostProvider>(
-      builder: (context, postProvider, child) => FutureBuilder(
-          future: postProvider.getPost([0, 1, 2, 3], "s"),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Text('Bài viết không tồn tại!');
-            }
-            if (snapshot.hasData) {
-              return ListView(
-                padding: const EdgeInsets.only(top: 5),
-                shrinkWrap: true,
-                children: [
-                  ...postProvider.listPost.map((e) => PostCard(post: e))
-                ],
-              );
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          }),
+      builder: (context, postProvider, child) {
+        if(postProvider.listAllPost.isNotEmpty){
+          return ListView(
+            padding: const EdgeInsets.only(top: 5),
+            shrinkWrap: true,
+            children: [
+              ...postProvider.listAllPost.map((e) => PostCard(post: e))
+            ],
+          );
+        }
+        else{
+          return const Center(child: CircularProgressIndicator());
+        }
+      } ,
     );
   }
+  Widget roommate(BuildContext context) {
+    return Consumer<PostProvider>(
+      builder: (context, postProvider, child) {
+        if(postProvider.listRoommate.isNotEmpty){
+          return ListView(
+            padding: const EdgeInsets.only(top: 5),
+            shrinkWrap: true,
+            children: [
+              ...postProvider.listRoommate.map((e) => PostCard(post: e))
+            ],
+          );
+        }
+        else{
+          return const Center(child: Text('Không có bài viết!'));
+        }
+      } ,
+    );
+  }
+  Widget transfer(BuildContext context) {
+    return Consumer<PostProvider>(
+      builder: (context, postProvider, child) {
+        if(postProvider.listTransfer.isNotEmpty){
+          return ListView(
+            padding: const EdgeInsets.only(top: 5),
+            shrinkWrap: true,
+            children: [
+              ...postProvider.listTransfer.map((e) => PostCard(post: e))
+            ],
+          );
+        }
+        else{
+          return const Center(child: Text('Không có bài viết!'));
+        }
+      } ,
+    );
+  }
+  Widget others(BuildContext context) {
+    return Consumer<PostProvider>(
+      builder: (context, postProvider, child) {
+        if(postProvider.listOther.isNotEmpty){
+          return ListView(
+            padding: const EdgeInsets.only(top: 5),
+            shrinkWrap: true,
+            children: [
+              ...postProvider.listOther.map((e) => PostCard(post: e))
+            ],
+          );
+        }
+        else{
+          return const Center(child: Text('Không có bài viết!'));
+        }
+      } ,
+    );
+  }
+
 }

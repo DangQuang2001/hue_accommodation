@@ -1,12 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hue_accommodation/constants/route_name.dart';
+import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/comment_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import '../../models/post.dart';
 import '../../view_models/post_provider.dart';
 import '../../view_models/user_provider.dart';
+import '../components/slide_route.dart';
+import '../messages/message_detail.dart';
 
 class PostDetailPage extends StatefulWidget {
   final Post post;
@@ -24,6 +28,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   late bool isLike;
   late int likeCount;
   final ScrollController _scrollController = ScrollController();
+  bool isReplied = false;
+  String _replyPrefix = '';
+  String commentId = "";
 
   @override
   void initState() {
@@ -39,11 +46,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   void dispose() {
     _textController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
-
-  String _replyPrefix = '';
-  String commentId = "";
 
   void onReply(String username) {
     setState(() {
@@ -78,59 +83,107 @@ class _PostDetailPageState extends State<PostDetailPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               color: Theme.of(context).colorScheme.onBackground,
-              height: 50,
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      textAlignVertical: TextAlignVertical.bottom,
-                      autofocus: true,
-                      focusNode: _focusNode,
-                      controller: _textController,
-                      decoration: InputDecoration(
-                        enabled: true,
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(40),
-                            borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.5))),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(40),
-                            borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.5))),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.6),
-                        hintText: 'Enter a comment...',
-                      ),
+                  _replyPrefix != ""
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 20.0, bottom: 0),
+                          child: Row(
+                            children: [
+                              Text('Bạn đang trả lời $_replyPrefix'),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _replyPrefix = "";
+                                      commentId = "";
+                                      _textController.clear();
+                                    });
+                                  },
+                                  child: Text(
+                                    'Hủy',
+                                    style: GoogleFonts.readexPro(
+                                        color: Colors.blue),
+                                  ))
+                            ],
+                          ),
+                        )
+                      : const Text(''),
+                  SizedBox(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            textAlignVertical: TextAlignVertical.bottom,
+                            autofocus: true,
+                            focusNode: _focusNode,
+                            controller: _textController,
+                            decoration: InputDecoration(
+                              enabled: true,
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey.withOpacity(0.5))),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey.withOpacity(0.5))),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.6),
+                              hintText: 'Enter a comment...',
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: () async {
+                            if (_textController.text.trim() != "" &&
+                                _replyPrefix == "" &&
+                                commentId == "") {
+                              await commentProvider.addComment(
+                                  widget.post.id,
+                                  userProvider.userCurrent!.id,
+                                  _textController.text,
+                                  "text");
+                              _focusNode.unfocus();
+                              _textController.clear();
+                              _scrollController.animateTo(
+                                  _scrollController.position.maxScrollExtent,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.linear);
+                            }
+                            if (_textController.text.trim() != "" &&
+                                _replyPrefix != "" &&
+                                commentId != "" &&
+                                isReplied == false) {
+                              commentProvider.createReplyComment(
+                                  commentId,
+                                  userProvider.userCurrent!.id,
+                                  _textController.text,
+                                  "Text");
+                              _textController.clear();
+                              _focusNode.unfocus();
+                            }
+                            if (_textController.text.trim() != "" &&
+                                _replyPrefix != "" &&
+                                commentId != "" &&
+                                isReplied == true) {
+                              commentProvider.addReplyComment(
+                                  commentId,
+                                  userProvider.userCurrent!.id,
+                                  _textController.text,
+                                  "Text");
+                              _textController.clear();
+                              _focusNode.unfocus();
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () async {
-                      if (_textController.text.trim() != "" &&
-                          _replyPrefix == "" &&
-                          commentId == "") {
-                        await commentProvider.addComment(
-                            widget.post.id,
-                            userProvider.userCurrent!.id,
-                            _textController.text,
-                            "text");
-                        _focusNode.unfocus();
-                        _textController.clear();
-                        _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.linear);
-                      }
-                      if (_textController.text.trim() != "" &&
-                          _replyPrefix != "" &&
-                          commentId != "") {
-                        commentProvider.createReplyComment(
-                            commentId,
-                            userProvider.userCurrent!.id,
-                            _textController.text,
-                            "Text");
-                      }
-                    },
                   ),
                 ],
               ),
@@ -142,31 +195,167 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      alignment: Alignment.bottomCenter,
-      width: MediaQuery.of(context).size.width,
-      height: 80,
-      decoration:
-          BoxDecoration(color: Theme.of(context).colorScheme.onBackground),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_back,
-                size: 30,
-                color: Theme.of(context).iconTheme.color,
-              )),
-          IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.message_outlined,
-                size: 30,
-                color: Theme.of(context).iconTheme.color,
-              )),
-        ],
+    return Consumer3<UserProvider, ChatProvider, PostProvider>(
+      builder: (context, userProvider, chatProvider, postProvider, child) =>
+          Container(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        alignment: Alignment.bottomCenter,
+        width: MediaQuery.of(context).size.width,
+        height: 80,
+        decoration:
+            BoxDecoration(color: Theme.of(context).colorScheme.onBackground),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(
+                  Icons.arrow_back,
+                  size: 30,
+                  color: Theme.of(context).iconTheme.color,
+                )),
+            IconButton(
+                onPressed: () {
+                  _focusNode.unfocus();
+                  showModalBottomSheet<void>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        padding: const EdgeInsets.only(left: 20),
+                        height: 160,
+                        color: Theme.of(context).colorScheme.onBackground,
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              widget.post.userId != userProvider.userCurrent!.id
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await chatProvider.checkRoom([
+                                              userProvider.userCurrent!.id,
+                                              widget.post.userId
+                                            ]);
+
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.of(context).push(
+                                                slideRightToLeft(ChatScreen(
+                                                    isNewRoom:
+                                                        chatProvider.isNewRoom,
+                                                    roomId: chatProvider
+                                                            .isNewRoom
+                                                        ? ""
+                                                        : chatProvider.roomId,
+                                                    infoUserRoom: chatProvider
+                                                        .infoUserRoom)));
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                  Icons.message_outlined),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                'Nhắn tin cho chủ bài viết',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displayMedium,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        IconButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            icon: const Icon(Icons.exit_to_app))
+                                      ],
+                                    )
+                                  : Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      GestureDetector(
+                                          onTap: () async {
+                                            await postProvider.deletePost(
+                                                widget.post.id,
+                                                userProvider.userCurrent!.id);
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.popUntil(
+                                                context,
+                                                ModalRoute.withName(
+                                                    RouteName.blogSale));
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.delete_outline,
+                                                color: Colors.redAccent,
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                'Xóa bài viết',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .displayMedium!
+                                                    .copyWith(
+                                                        color: Colors.redAccent),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      IconButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          icon: const Icon(Icons.exit_to_app))
+                                    ],
+                                  ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await postProvider.hiddenPost(widget.post.id,
+                                      userProvider.userCurrent!.id);
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.popUntil(context,
+                                      ModalRoute.withName(RouteName.blogSale));
+                                },
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.hide_image_outlined),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Ẩn bài viết',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.more_horiz_outlined,
+                  size: 30,
+                )),
+          ],
+        ),
       ),
     );
   }
@@ -490,12 +679,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               children: [
                                 IconButton(
                                     onPressed: () {
-                                      if (choose != indexX && e['replyCommentId'] != null) {
+                                      if (choose != indexX &&
+                                          e['replyCommentId'] != null) {
                                         setState(() {
                                           choose = indexX;
                                           onReply(e['userId']['name']);
                                           commentId = e['_id'];
-                                          commentProvider.getReplyComment(e['_id'], 10, 10);
+                                          isReplied = true;
+                                          commentProvider.getReplyComment(
+                                              e['_id'], 10, 10, []);
                                         });
                                       } else {
                                         setState(() {
@@ -505,16 +697,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                           commentId = "";
                                         });
                                       }
-                                      if(e['replyCommentId'] == null){
+                                      if (e['replyCommentId'] == null) {
                                         commentId = e['_id'];
                                         onReply(e['userId']['name']);
+                                        isReplied = false;
                                       }
                                     },
                                     icon: const Icon(Icons.comment_outlined)),
                                 Opacity(
                                   opacity: 0.7,
                                   child: Text(
-                                    e['replyCommentId'] == null ? "0" : (e['replyCommentId']['comment']as List).length.toString(),
+                                    e['replyCommentId'] == null
+                                        ? "0"
+                                        : (e['replyCommentId']['comment']
+                                                as List)
+                                            .length
+                                            .toString(),
                                     style: Theme.of(context)
                                         .textTheme
                                         .displayMedium,
@@ -567,7 +765,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       Opacity(
                                           opacity: 0.5,
                                           child: Text(
-                                            '1m ago',
+                                            time_ago.format(
+                                                DateTime.parse(e['createdAt']),
+                                                locale: 'en_short',
+                                                clock: DateTime.now()),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .displaySmall,
@@ -595,70 +796,78 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ),
                           );
                         },
-                        body: Column(
-                          children: [
-                            ...commentProvider.listReply.map((e) => Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 40, bottom: 20),
-                                  padding: const EdgeInsets.only(left: 10),
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
+                        body: Container(
+                          margin: const EdgeInsets.only(left: 40),
+                          padding: const EdgeInsets.only(left: 20),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.onBackground,
+                              border: Border(
+                                  left: BorderSide(
+                                      color: Colors.grey.withOpacity(0.4)))),
+                          child: Column(
+                            children: [
+                              ...commentProvider.listReply.map((e) => Container(
+                                    margin: const EdgeInsets.only(bottom: 30),
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onBackground,
-                                      border: Border(
-                                          left: BorderSide(
-                                              color: Colors.grey
-                                                  .withOpacity(0.4)))),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
-                                            child: CachedNetworkImage(
-                                              imageUrl: e['userId']['image'],
-                                              width: 30,
-                                              height: 30,
-                                              fit: BoxFit.cover,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              child: CachedNetworkImage(
+                                                imageUrl: e['userId']['image'],
+                                                width: 30,
+                                                height: 30,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
-                                          ),
-                                          spaceW,
-                                          Text(
-                                            e['userId']['name'],
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .displayMedium,
-                                          ),
-                                          spaceW,
-                                          spaceW,
-                                          spaceW,
-                                          Icon(
-                                            Icons.access_time_outlined,
-                                            size: 18,
-                                            color: Theme.of(context)
-                                                .iconTheme
-                                                .color!
-                                                .withOpacity(0.5),
-                                          ),
-                                          spaceW,
-                                          Opacity(
-                                              opacity: 0.5,
-                                              child: Text(
-                                                '1m ago',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .displaySmall,
-                                              )),
-                                        ],
-                                      ),
-                                      spaceH,
-                                      Row(
-                                        children: [
-                                          Opacity(
+                                            spaceW,
+                                            Text(
+                                              e['userId']['name'],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displayMedium,
+                                            ),
+                                            spaceW,
+                                            spaceW,
+                                            spaceW,
+                                            Icon(
+                                              Icons.access_time_outlined,
+                                              size: 18,
+                                              color: Theme.of(context)
+                                                  .iconTheme
+                                                  .color!
+                                                  .withOpacity(0.5),
+                                            ),
+                                            spaceW,
+                                            Opacity(
+                                                opacity: 0.5,
+                                                child: Text(
+                                                  time_ago.format(
+                                                      DateTime.parse(
+                                                          e['createdAt']),
+                                                      locale: 'en_short',
+                                                      clock: DateTime.now()),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displaySmall,
+                                                )),
+                                          ],
+                                        ),
+                                        spaceH,
+                                        SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Opacity(
                                             opacity: 0.7,
                                             child: Text(
                                               e['content'],
@@ -669,12 +878,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                                   .displayMedium,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ))
-                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                            ],
+                          ),
                         ));
                   })
                 ],

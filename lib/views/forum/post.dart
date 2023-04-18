@@ -1,15 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/views/forum/post_detail.dart';
+import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import '../../models/post.dart';
 import '../../view_models/post_provider.dart';
 import '../../view_models/user_provider.dart';
+import '../components/slide_route.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
+
   const PostCard({Key? key, required this.post}) : super(key: key);
 
   @override
@@ -37,12 +41,12 @@ class _PostCardState extends State<PostCard> {
     Widget spaceW = const SizedBox(
       width: 5,
     );
-    return Consumer2<PostProvider, UserProvider>(
-      builder: (context, postProvider, userProvider, child) => GestureDetector(
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PostDetailPage(post: widget.post))),
+    return Consumer3<PostProvider, UserProvider, ChatProvider>(
+      builder: (context, postProvider, userProvider, chatProvider, child) =>
+          GestureDetector(
+        onTap: () => Navigator.of(context).push(slideRightToLeft(PostDetailPage(
+          post: widget.post,
+        ))),
         child: Container(
           margin: const EdgeInsets.only(bottom: 7),
           width: MediaQuery.of(context).size.width,
@@ -53,12 +57,9 @@ class _PostCardState extends State<PostCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PostDetailPage(
-                                post: widget.post,
-                              ))),
+                  onTap: () => Navigator.of(context).push(slideRightToLeft(PostDetailPage(
+                    post: widget.post,
+                  ))),
                   child: Text(
                     widget.post.title.toString(),
                     maxLines: 2,
@@ -102,11 +103,27 @@ class _PostCardState extends State<PostCard> {
                           style: Theme.of(context).textTheme.displaySmall,
                         )),
                     const Spacer(),
-                    const Icon(
-                      Icons.chat,
-                      color: Colors.blue,
-                      size: 25,
-                    ),
+                    widget.post.userId==userProvider.userCurrent!.id?const Text('') :IconButton(
+                        onPressed: () async {
+                          await chatProvider.checkRoom([
+                            userProvider.userCurrent!.id,
+                            widget.post.userId
+                          ]);
+
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).push(slideRightToLeft(
+                              ChatScreen(
+                                  isNewRoom: chatProvider.isNewRoom,
+                                  roomId: chatProvider.isNewRoom
+                                      ? ""
+                                      : chatProvider.roomId,
+                                  infoUserRoom: chatProvider.infoUserRoom)));
+                        },
+                        icon: const Icon(
+                          Icons.chat,
+                          color: Colors.blue,
+                          size: 25,
+                        )),
                     spaceW
                   ],
                 ),
@@ -114,12 +131,9 @@ class _PostCardState extends State<PostCard> {
                 widget.post.imageUrls!.isEmpty
                     ? const SizedBox()
                     : InkWell(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PostDetailPage(
-                                      post: widget.post,
-                                    ))),
+                        onTap: () => Navigator.of(context).push(slideRightToLeft(PostDetailPage(
+                          post: widget.post,
+                        ))),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(5),
                           child: CachedNetworkImage(
@@ -167,12 +181,9 @@ class _PostCardState extends State<PostCard> {
                     spaceW,
                     spaceW,
                     IconButton(
-                        onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PostDetailPage(
-                                      post: widget.post,
-                                    ))),
+                        onPressed: () => Navigator.of(context).push(slideRightToLeft(PostDetailPage(
+                          post: widget.post,
+                        ))),
                         icon: Icon(
                           Icons.chat_bubble_outline,
                           color: Theme.of(context).iconTheme.color,
