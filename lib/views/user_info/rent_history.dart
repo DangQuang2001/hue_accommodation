@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import "package:dismissible_page/dismissible_page.dart";
 import 'package:provider/provider.dart';
 
 import '../../view_models/rent_provider.dart';
@@ -25,22 +24,9 @@ class _RentHistoryState extends State<RentHistory> {
 
   @override
   Widget build(BuildContext context) {
-    return DismissiblePage(
-      onDismissed: () => Navigator.of(context).pop(),
-      // Start of the optional properties
-      isFullScreen: true,
-      direction: DismissiblePageDismissDirection.startToEnd,
-      minScale: 1,
-      minRadius: 0,
-      maxTransformValue: 0.8,
-      dismissThresholds: const {
-        DismissiblePageDismissDirection.startToEnd: 0.5,
-      },
-      reverseDuration: const Duration(milliseconds: 10),
-      child: Scaffold(
-        body: Column(
-          children: [appBar(context), content(context)],
-        ),
+    return Scaffold(
+      body: Column(
+        children: [appBar(context), content(context)],
       ),
     );
   }

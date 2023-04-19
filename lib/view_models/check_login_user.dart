@@ -26,7 +26,6 @@ void checkLoginUser(UserProvider userProvider, FcmTokenProvider fcmToken,
       fcmToken.isCheckDevice == false) {
     (() async {
       final String? currentToken = await FirebaseMessaging.instance.getToken();
-
       fcmToken.isCheckDeviceToken(currentToken!);
     })();
   }

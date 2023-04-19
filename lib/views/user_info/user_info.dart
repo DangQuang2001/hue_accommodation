@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dismissible_page/dismissible_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -472,10 +471,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   Widget itemNavigator(BuildContext context, IconData icon, String name,String page,int duration) {
     return InkWell(
-      onTap: ()=>context.pushTransparentRoute(
-
-        const RentHistory(),
-      ),
+      onTap: ()=>Navigator.pushNamed(context, page),
       child: SlideInRight(
         delay: const Duration(milliseconds: 200),
         duration: Duration(milliseconds: duration),
@@ -711,27 +707,4 @@ class MyPainter extends CustomPainter {
   }
 }
 
-// class SwipeablePageRoute<T> extends MaterialPageRoute<T> {
-//   SwipeablePageRoute({required WidgetBuilder builder})
-//       : super(builder: builder);
-//
-//   @override
-//   Widget buildTransitions(BuildContext context, Animation<double> animation,
-//       Animation<double> secondaryAnimation, Widget child) {
-//     final bool isInitialRoute = ModalRoute.of(context) == this;
-//     final Animation<Offset> customAnimation = Tween<Offset>(
-//
-//       begin: const Offset(1.0, 0.0),
-//       end: Offset.zero,
-//     ).animate(CurvedAnimation(
-//
-//       parent: animation,
-//       curve: Curves.easeInOutQuint,
-//     ));
-//
-//     return SlideTransition(
-//       position: customAnimation,
-//       child: child,
-//     );
-//   }
-// }
+

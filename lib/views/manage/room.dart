@@ -22,7 +22,6 @@ class _RoomManageState extends State<RoomManage> {
   void initState() {
 // TODO: implement initState
     super.initState();
-
     Provider.of<RoomProvider>(context, listen: false).getListRemove(
         Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
   }

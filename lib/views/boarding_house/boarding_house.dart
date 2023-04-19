@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,13 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:http/http.dart' as http;
-import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/views/boarding_house/filter_house.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../models/room.dart';
+import '../components/slide_route.dart';
 import 'boarding_house_detail.dart';
 
 class BoardingHousePage extends StatefulWidget {
@@ -25,18 +23,13 @@ class BoardingHousePage extends StatefulWidget {
 
 class _BoardingHousePageState extends State<BoardingHousePage>
     with SingleTickerProviderStateMixin {
-  List<String> imageList = [
-    'https://blogcdn.muaban.net/wp-content/uploads/2022/12/26172116/thiet-ke-phong-tro-30m2.jpg',
-    'https://mogi.vn/news/wp-content/uploads/2022/04/phong-tro-gac-lung-dep.jpg',
-    'https://blogcdn.muaban.net/wp-content/uploads/2022/12/26172116/thiet-ke-phong-tro-30m2.jpg',
-  ];
   List<Room> listRoom = [];
-  int skip = 3;
-  int limit = 2;
-  bool _isLoadMoreRunning = false;
 
+  Timer? _timer;
+  int currentPage = 0;
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
+  final PageController _pageController = PageController(initialPage: 0);
   final _selectedColor = const Color(0xff1a73e8);
   final _unselectedColor = const Color(0xff5f6368);
   final _tabs = [
@@ -46,10 +39,6 @@ class _BoardingHousePageState extends State<BoardingHousePage>
     const Tab(text: 'Motel House'),
     const Tab(text: 'Whole house'),
   ];
-
-  final PageController _pageController = PageController(initialPage: 0);
-  Timer? _timer;
-  int currentPage = 0;
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
@@ -63,25 +52,13 @@ class _BoardingHousePageState extends State<BoardingHousePage>
     });
   }
 
-  void _stopTimer() {
-    _timer?.cancel();
-    _timer = null;
-  }
-
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     var roomProvider = Provider.of<RoomProvider>(context, listen: false);
-
     if (roomProvider.listMiniFirstLoad.isEmpty) {
-      (() async {
-        await roomProvider.getTopRating(5);
-        await roomProvider.lazyLoadingMotel("", [1, 2, 3], 0, 20);
-        await roomProvider.lazyLoadingMini("", [1, 2, 3], 0, 5);
-        await roomProvider.lazyLoadingWhole("", [1, 2, 3], 0, 20);
-      })();
+      roomProvider.getDataFirstTime();
     }
-
     _startTimer();
     super.initState();
   }
@@ -91,7 +68,8 @@ class _BoardingHousePageState extends State<BoardingHousePage>
     super.dispose();
     _tabController.dispose();
     _scrollController.dispose();
-    _stopTimer();
+    _timer?.cancel();
+    _timer = null;
   }
 
   @override
@@ -104,41 +82,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollInfo is ScrollEndNotification &&
                 scrollInfo.metrics.extentAfter == 0) {
-              if (_isLoadMoreRunning == false &&
-                  roomProvider.hasNextPage == true) {
-                skip += 2;
-                (() async {
-                  setState(() {
-                    _isLoadMoreRunning = true;
-                  });
-                  final response = await http.post(
-                      Uri.parse('$url/api/motelhouse/lazyloading'),
-                      headers: <String, String>{
-                        'Content-Type': 'application/json; charset=UTF-8'
-                      },
-                      body: jsonEncode(<String, dynamic>{
-                        "searchValue": "",
-                        "category": [1],
-                        "skip": skip,
-                        "limit": limit
-                      }));
-                  var jsonObject = jsonDecode(response.body);
-
-                  if (jsonObject.isNotEmpty) {
-                    var listObject = jsonObject as List;
-                    List<Room> listLoadMore =
-                        listObject.map((e) => Room.fromJson(e)).toList();
-                    roomProvider.listMiniFirstLoad.addAll(listLoadMore);
-                  } else {
-                    setState(() {
-                      roomProvider.hasNextPage = false;
-                    });
-                  }
-                  setState(() {
-                    _isLoadMoreRunning = false;
-                  });
-                })();
-              }
+              roomProvider.lazyLoading();
             }
             return true;
           },
@@ -179,9 +123,8 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                       ),
                     ),
                   ),
-                  actions:const [
-
-                     SizedBox(
+                  actions: const [
+                    SizedBox(
                       width: 30,
                     )
                   ],
@@ -210,7 +153,6 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                     ),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
-
                       collapseMode: CollapseMode.parallax,
                       background: Padding(
                         padding: const EdgeInsets.only(top: 90.0),
@@ -254,23 +196,6 @@ class _BoardingHousePageState extends State<BoardingHousePage>
               ),
             ),
           ),
-          // SizedBox(
-          //   width: MediaQuery.of(context).size.width * 2 / 3,
-          //   height: 45,
-          //   child: TextField(
-          //     obscureText: true,
-          //     decoration: InputDecoration(
-          //       enabledBorder: OutlineInputBorder(
-          //         borderSide: BorderSide.none,
-          //         borderRadius: BorderRadius.circular(45),
-          //       ),
-          //       filled: true,
-          //       fillColor: Colors.grey.withOpacity(0.15),
-          //       border: const OutlineInputBorder(),
-          //       labelText: 'Tuy Ly Vuong, Thua Thien Hue',
-          //     ),
-          //   ),
-          // ),
           Hero(
             tag: "Boarding Houses",
             child: Text(
@@ -320,12 +245,9 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: roomProvider.listMiniFirstLoad.length,
                     itemBuilder: (context, index) => GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BoardingHouseDetail(
-                                      motel: roomProvider
-                                          .listMiniFirstLoad[index]))),
+                          onTap: () => Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(
+                              motel: roomProvider
+                                  .listMiniFirstLoad[index]))),
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 5),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -497,7 +419,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                             ),
                           ),
                         )),
-                if (_isLoadMoreRunning == true)
+                if (roomProvider.isLoadMoreRunning == true)
                   Container(
                     margin: const EdgeInsets.only(bottom: 5),
                     padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -559,7 +481,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                       ),
                     ),
                   ),
-                if (_isLoadMoreRunning == true)
+                if (roomProvider.isLoadMoreRunning == true)
                   Container(
                     margin: const EdgeInsets.only(bottom: 5),
                     padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -634,12 +556,9 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: roomProvider.listMotelFirstLoad.length,
                     itemBuilder: (context, index) => GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BoardingHouseDetail(
-                                      motel: roomProvider
-                                          .listMotelFirstLoad[index]))),
+                          onTap: () => Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(
+                              motel: roomProvider
+                                  .listMotelFirstLoad[index]))),
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 5),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -686,7 +605,6 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                             height: MediaQuery.of(context)
                                                 .size
                                                 .height,
-
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -825,12 +743,9 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: roomProvider.listWholeFirstLoad.length,
                     itemBuilder: (context, index) => GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BoardingHouseDetail(
-                                      motel: roomProvider
-                                          .listWholeFirstLoad[index]))),
+                          onTap: () => Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(
+                              motel: roomProvider
+                                  .listWholeFirstLoad[index]))),
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 5),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -1030,7 +945,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
 
   Widget hot(BuildContext context) {
     return Consumer<RoomProvider>(
-      builder: (context, roomProvider, child) =>  Column(
+      builder: (context, roomProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -1053,11 +968,12 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                   width: 20,
                 ),
                 ...roomProvider.listTopRating.map((e) => GestureDetector(
-                  onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context)=>BoardingHouseDetail(motel: e))),
-                  child: SlideInRight(
-                    delay: const Duration(milliseconds: 200),
-                    duration: const Duration(milliseconds: 300),
-                    child: Container(
+                      onTap: () => Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(
+                          motel:e))),
+                      child: SlideInRight(
+                        delay: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 300),
+                        child: Container(
                           padding: const EdgeInsets.all(5),
                           margin: const EdgeInsets.only(right: 10),
                           width: 230,
@@ -1114,18 +1030,21 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                       e.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style:
-                                          Theme.of(context).textTheme.displayMedium,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
                                     ),
                                     const SizedBox(
                                       height: 10,
                                     ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Icon(
                                           Icons.location_on_rounded,
-                                          color: Theme.of(context).iconTheme.color,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
                                           size: 20,
                                         ),
                                         const SizedBox(
@@ -1149,8 +1068,8 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                             ],
                           ),
                         ),
-                  ),
-                ))
+                      ),
+                    ))
               ],
             ),
           ),
@@ -1181,7 +1100,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>const FilterHouse(typeName: 1))),
+                onTap: () => Navigator.of(context).push(slideRightToLeft(const FilterHouse(typeName: 1))),
                 child: SlideInRight(
                   delay: const Duration(milliseconds: 200),
                   duration: const Duration(milliseconds: 200),
@@ -1215,7 +1134,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                 ),
               ),
               InkWell(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>const FilterHouse(typeName: 2))),
+                onTap: () => Navigator.of(context).push(slideRightToLeft(const FilterHouse(typeName: 2))),
                 child: SlideInRight(
                   delay: const Duration(milliseconds: 200),
                   duration: const Duration(milliseconds: 300),
@@ -1249,8 +1168,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                 ),
               ),
               InkWell(
-                onTap: () =>
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>const FilterHouse(typeName: 3))),
+                onTap: () => Navigator.of(context).push(slideRightToLeft(const FilterHouse(typeName: 3))),
                 child: SlideInRight(
                   delay: const Duration(milliseconds: 200),
                   duration: const Duration(milliseconds: 400),

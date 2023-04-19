@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 
+import '../models/favourite.dart';
+
 class FavouriteProvider extends ChangeNotifier {
   bool isCheckFavourite = false;
 
@@ -27,20 +29,23 @@ class FavouriteProvider extends ChangeNotifier {
             'Content-Type': 'application/json; charset=UTF-8'
           },
           body: jsonEncode(<String, dynamic>{"roomId": id, "userId": userId}));
+      getFavourite(userId);
     } catch (e) {
       // Handle any exceptions that may be thrown
       print('Error remove favourite: $e');
     }
   }
 
-  Future<void> getPost(String userId) async {
+  Future<List<Favourite>> getFavourite(String userId) async {
     try {
       final response =
           await http.get(Uri.parse('$url/api/favourite/get-favourite/$userId'));
       var jsonObject = jsonDecode(response.body);
       var listObject = jsonObject as List;
+      return listObject.map((e) => Favourite.fromJson(e)).toList();
     } catch (e) {
       print('Error get favourite: $e');
+      return [];
     }
   }
 

@@ -113,7 +113,7 @@ class _RemoveRoomPageState extends State<RemoveRoomPage> {
                         SlidableAction(
                           onPressed: (context) {
                             _dialogBuilder(
-                                context, value.listRemove[index].id);
+                                context, value.listRemove[index].id,userProvider.userCurrent!.id);
                           },
                           backgroundColor: const Color(0xFFFE4A49),
                           foregroundColor: Colors.white,
@@ -202,7 +202,7 @@ class _RemoveRoomPageState extends State<RemoveRoomPage> {
     );
   }
 
-  Future<void> _dialogBuilder(BuildContext context, String id) {
+  Future<void> _dialogBuilder(BuildContext context, String id,String userId) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -247,8 +247,12 @@ class _RemoveRoomPageState extends State<RemoveRoomPage> {
                     ),
                     Consumer<RoomProvider>(
                       builder: (context, value, child) => InkWell(
-                        onTap: () {
-
+                        onTap: ()async {
+                          await value.deleteRoom(id);
+                          await value.getListRemove(userId);
+                          setState(() {
+                            Navigator.pop(context);
+                          });
                         },
                         child: Container(
                           width: 100,

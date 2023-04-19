@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 List<String> listFurnishing = <String>['Full', 'Less'];
 List<String> listTypeRoom = <String>[
@@ -25,57 +24,14 @@ class _AddRoomPageState extends State<AddRoomPage> {
   String dropdownFurnishingValue = listFurnishing.first;
   String dropdownTypeRoomValue = listTypeRoom.first;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  List<AssetEntity> _images = [];
-  List<String> listImageUrl = [];
-  bool _isLoading = false;
-
   String? title;
   String? description;
   String? address;
   double? area;
   double? price;
-
-  Future<void> _selectImages() async {
-    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
-        pickerConfig: const AssetPickerConfig(
-          maxAssets: 10,
-          requestType: RequestType.image,
-          selectedAssets: [],
-        ));
-    setState(() {
-      _images = result!;
-    });
-  }
+  bool _isLoading = false;
 
 
-
-
-  Future<void> _uploadImages() async {
-    setState(() {
-      _isLoading = true;
-    });
-    final storage = FirebaseStorage.instance;
-    for (var asset in _images) {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference reference = storage.ref().child('images').child(fileName);
-      final File? file = await asset.file;
-      if (file != null) {
-        UploadTask task = reference.putFile(file);
-        await task.whenComplete(() => null);
-        String imageUrl = await reference.getDownloadURL();
-        listImageUrl.add(imageUrl);
-
-        // rest of the code here
-      } else {
-        // handle error, e.g. file is null
-      }
-    }
-
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,46 +50,38 @@ class _AddRoomPageState extends State<AddRoomPage> {
           ),
         ),
         _isLoading
-            ? Center(
-                child: Container(
-                alignment: Alignment.center,
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onBackground,
-                    borderRadius: BorderRadius.circular(20)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator()),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Creating..',
-                      style: Theme.of(context).textTheme.displayLarge,
-                    )
-                  ],
-                ),
-              ))
+            ? Positioned(
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: LoadingAnimationWidget.inkDrop(
+              color: Colors.white,
+              size: 100,
+            ),
+          ),
+        )
             : Container(),
       ]),
       floatingActionButton: Consumer<UserProvider>(
         builder: (context, userProvider, child) =>  FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
-              if(_images.isNotEmpty){
+              if(roomProvider.images.isNotEmpty){
                 (()async{
-                  await _uploadImages();
-                  roomProvider.createRoom(userProvider.userCurrent!.id,userProvider.userCurrent!.name,userProvider.userCurrent!.image,title!, description!, address!, area!, dropdownFurnishingValue, price!, dropdownTypeRoomValue, listImageUrl);
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  await roomProvider.uploadImages();
+                  roomProvider.createRoom(userProvider.userCurrent!.id,userProvider.userCurrent!.name,userProvider.userCurrent!.image,title!, description!, address!, area!, dropdownFurnishingValue, price!, dropdownTypeRoomValue, roomProvider.listImageUrl);
+                  setState(() {
+                    _isLoading = false;
+                  });
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 })();
               }
-
             }
           },
           backgroundColor: Theme.of(context).colorScheme.onBackground,
@@ -459,62 +407,64 @@ class _AddRoomPageState extends State<AddRoomPage> {
   }
 
   Widget multiImageUploadScreen(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      width: MediaQuery.of(context).size.width,
-      height: 300,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () => _selectImages(),
-            child: Container(
-              width: 130,
-              height: 40,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10), color: Colors.blue),
-              child: Center(
-                child: Text(
-                  'Choose Image',
-                  style: GoogleFonts.readexPro(color: Colors.white),
+    return Consumer<RoomProvider>(
+      builder: (context, roomProvider, child) => Container(
+        margin: const EdgeInsets.only(top: 20),
+        width: MediaQuery.of(context).size.width,
+        height: 300,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () => roomProvider.selectImages(context),
+              child: Container(
+                width: 130,
+                height: 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10), color: Colors.blue),
+                child: Center(
+                  child: Text(
+                    'Choose Image',
+                    style: GoogleFonts.readexPro(color: Colors.white),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Expanded(
-            child: _images.isEmpty
-                ? const Text('')
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _images.length,
-                    itemBuilder: (context, index) {
-                      return FutureBuilder<File?>(
-                        future: _images[index].file,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<File?> snapshot) {
-                          if (snapshot.hasData) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 10.0),
-                              child: Image.file(
-                                snapshot.data!,
-                                width: 200,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          } else if (snapshot.hasError) {
-                            return const Text('Error loading image');
-                          } else {
-                            return const CircularProgressIndicator();
-                          }
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: roomProvider.images.isEmpty
+                  ? const Text('')
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: roomProvider.images.length,
+                      itemBuilder: (context, index) {
+                        return FutureBuilder<File?>(
+                          future: roomProvider.images[index].file,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<File?> snapshot) {
+                            if (snapshot.hasData) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10.0),
+                                child: Image.file(
+                                  snapshot.data!,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return const Text('Error loading image');
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

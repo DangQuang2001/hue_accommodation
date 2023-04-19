@@ -24,16 +24,8 @@ class _MessagePageState extends State<MessagePage> {
     super.initState();
     var chatProvider = Provider.of<ChatProvider>(context, listen: false);
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
-
       chatProvider.getRoomChat(userProvider.userCurrent!.id);
-
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
-      }
     });
   }
 

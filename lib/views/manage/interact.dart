@@ -80,8 +80,8 @@ class _InteractManageState extends State<InteractManage> {
   }
 
   Widget info(BuildContext context) {
-    return Consumer<RentProvider>(
-      builder: (context, rentProvider, child) =>  Padding(
+    return  Consumer<RentProvider>(
+      builder: (context, rentProvider, child) => (rentProvider.listWaiting.isNotEmpty || rentProvider.listConfirm.isNotEmpty ||rentProvider.listUnConfirm.isNotEmpty)? Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +189,7 @@ class _InteractManageState extends State<InteractManage> {
             ),
           ],
         ),
-      ),
+      ):const SizedBox(),
     );
   }
 

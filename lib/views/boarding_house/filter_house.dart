@@ -1,15 +1,9 @@
-import 'dart:convert';
-
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:http/http.dart' as http;
-import 'package:hue_accommodation/constants/server_url.dart';
-
-import '../../models/room.dart';
 import '../../view_models/room_provider.dart';
 import 'boarding_house_detail.dart';
 
@@ -29,9 +23,6 @@ class _FilterHouseState extends State<FilterHouse> {
   SingingCharacter? _character = SingingCharacter.newPost;
   RangeValues _currentRangeValues = const RangeValues(0, 5000000);
   List<String> listSelected = [];
-  int skip = 3;
-  int limit = 2;
-  bool _isLoadMoreRunning = false;
   bool isLoading = false;
 
   void _onCategorySelected(bool selected, String name) {
@@ -49,11 +40,12 @@ class _FilterHouseState extends State<FilterHouse> {
   @override
   void initState() {
     var roomProvider = Provider.of<RoomProvider>(context, listen: false);
-
     if (roomProvider.typeName != widget.typeName) {
       isLoading = true;
       roomProvider.typeName = widget.typeName;
-      roomProvider.hasNextPage = true;
+      roomProvider.hasNextPageFilter = true;
+      roomProvider.isLoadMoreRunningFilter = false;
+      roomProvider.skipFilter = 2;
       (() async {
         await roomProvider.filterRoom("", widget.typeName, 0, 5);
         setState(() {
@@ -161,43 +153,7 @@ class _FilterHouseState extends State<FilterHouse> {
                     onNotification: (ScrollNotification scrollInfo) {
                       if (scrollInfo is ScrollEndNotification &&
                           scrollInfo.metrics.extentAfter == 0) {
-                        if (_isLoadMoreRunning == false &&
-                            roomProvider.hasNextPage == true) {
-                          skip += 2;
-                          (() async {
-                            setState(() {
-                              _isLoadMoreRunning = true;
-                            });
-                            final response = await http.post(
-                                Uri.parse('$url/api/motelhouse/filter'),
-                                headers: <String, String>{
-                                  'Content-Type':
-                                      'application/json; charset=UTF-8'
-                                },
-                                body: jsonEncode(<String, dynamic>{
-                                  "searchValue": "",
-                                  "typeName": widget.typeName,
-                                  "skip": skip,
-                                  "limit": limit
-                                }));
-                            var jsonObject = jsonDecode(response.body);
-
-                            if (jsonObject.isNotEmpty) {
-                              var listObject = jsonObject as List;
-                              List<Room> listLoadMore = listObject
-                                  .map((e) => Room.fromJson(e))
-                                  .toList();
-                              roomProvider.listRent.addAll(listLoadMore);
-                            } else {
-                              setState(() {
-                                roomProvider.hasNextPage = false;
-                              });
-                            }
-                            setState(() {
-                              _isLoadMoreRunning = false;
-                            });
-                          })();
-                        }
+                       roomProvider.lazyLoadingFilter(widget.typeName);
                       }
                       return true;
                     },
@@ -413,7 +369,7 @@ class _FilterHouseState extends State<FilterHouse> {
                                     ),
                                   ),
                                 )),
-                        if (_isLoadMoreRunning == true)
+                        if (roomProvider.isLoadMoreRunningFilter == true)
                           Container(
                             margin: const EdgeInsets.only(bottom: 5),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),
@@ -497,7 +453,7 @@ class _FilterHouseState extends State<FilterHouse> {
                               ),
                             ),
                           ),
-                        if (_isLoadMoreRunning == true)
+                        if (roomProvider.isLoadMoreRunningFilter == true)
                           Container(
                             margin: const EdgeInsets.only(bottom: 5),
                             padding: const EdgeInsets.only(bottom: 10, top: 10),

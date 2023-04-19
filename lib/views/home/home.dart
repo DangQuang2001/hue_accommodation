@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
     'https://mogi.vn/news/wp-content/uploads/2022/04/phong-tro-gac-lung-dep.jpg',
     'https://blogcdn.muaban.net/wp-content/uploads/2022/12/26172116/thiet-ke-phong-tro-30m2.jpg',
   ];
-
   @override
   initState() {
     super.initState();

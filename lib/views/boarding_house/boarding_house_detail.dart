@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hue_accommodation/view_models/chat_provider.dart';
+import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/boarding_house/rent_now.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -17,7 +18,7 @@ import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:location/location.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:provider/provider.dart';
-import 'dart:ui' as ui;
+
 
 import '../../models/room.dart';
 import '../../view_models/favourite_provider.dart';
@@ -43,25 +44,14 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   Location location = Location();
   final List<Marker> _maker = <Marker>[];
 
-  Future<BitmapDescriptor> getMarkerIconFromUrl(String imageUrl) async {
-    final image =
-        CachedNetworkImageProvider(imageUrl, maxHeight: 150, maxWidth: 150);
-    final completer = Completer<ui.Image>();
-    final listener = ImageStreamListener(
-        (ImageInfo info, bool _) => completer.complete(info.image));
-    final stream = image.resolve(ImageConfiguration.empty);
-    stream.addListener(listener);
-    final uiImage = await completer.future;
-    final byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
-    final bytes = byteData!.buffer.asUint8List();
-    return BitmapDescriptor.fromBytes(bytes);
-  }
 
   @override
   void initState() {
     super.initState();
     var favouriteProvider =
         Provider.of<FavouriteProvider>(context, listen: false);
+    var roomProvider =
+    Provider.of<RoomProvider>(context, listen: false);
     (() async {
       await favouriteProvider.checkFavourite(widget.motel.roomId,
           Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
@@ -74,9 +64,9 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
 
       final GoogleMapController controller = await _controller.future;
 
-      final BitmapDescriptor motelIcon = await getMarkerIconFromUrl(
+      final BitmapDescriptor motelIcon = await roomProvider.getMarkerIconFromUrl(
           'https://cdn-icons-png.flaticon.com/512/2763/2763838.png');
-      final BitmapDescriptor myLocation = await getMarkerIconFromUrl(
+      final BitmapDescriptor myLocation = await roomProvider.getMarkerIconFromUrl(
           'https://cdn-icons-png.flaticon.com/512/1673/1673221.png');
       _maker.add(Marker(
           markerId: const MarkerId('3'),
@@ -204,9 +194,9 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                     borderRadius: BorderRadius.circular(10),
                                     color: Colors.grey.withOpacity(0.5)),
                                 child: isCheckFavourite
-                                    ? const Icon(
+                                    ?  Icon(
                                         Icons.favorite_rounded,
-                                        color: Colors.redAccent,
+                                        color: Colors.redAccent.withOpacity(0.9),
                                       )
                                     : const Icon(
                                         Icons.favorite_border_outlined,

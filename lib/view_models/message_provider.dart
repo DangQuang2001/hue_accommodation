@@ -9,8 +9,8 @@ class ChatController {
   late String roomIdReplace;
   late String roomIdReplaceFirst;
   late List listJoinRoom;
-  StreamController<Map<String, dynamic>>? _messageController;
 
+  StreamController<Map<String, dynamic>>? _messageController;
   Stream<Map<String, dynamic>> get messages => _messageController!.stream;
 
   late IO.Socket _socket;

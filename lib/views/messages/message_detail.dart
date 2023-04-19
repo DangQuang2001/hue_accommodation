@@ -34,8 +34,6 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     isNewRooms = widget.isNewRoom;
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-
-
     var chatProvider = Provider.of<ChatProvider>(context, listen: false);
     (()async{
       if(userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']){
@@ -61,7 +59,6 @@ class _ChatScreenState extends State<ChatScreen> {
         })();
       }
     })();
-
   }
 
   @override

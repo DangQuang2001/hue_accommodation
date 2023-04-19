@@ -117,8 +117,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   setState(() {
                     isPost = true;
                   });
-                  // ignore: use_build_context_synchronously
-                  Navigator.pop(context);
+                  setState(() {
+                    Navigator.pop(context);
+                  });
                 } else {
                   final snackBar = SnackBar(
                     backgroundColor: Colors.redAccent,

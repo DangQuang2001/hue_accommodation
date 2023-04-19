@@ -6,9 +6,8 @@ import 'package:hue_accommodation/view_models/post_provider.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/forum/create_post.dart';
 import 'package:hue_accommodation/views/forum/post.dart';
-import 'package:hue_accommodation/views/messages/message.dart';
 import 'package:provider/provider.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+
 
 import '../../view_models/user_provider.dart';
 
@@ -38,26 +37,8 @@ class _ForumPageState extends State<ForumPage>
     _tabController = TabController(length: 4, vsync: this);
     var postProvider = Provider.of<PostProvider>(context, listen: false);
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-    postProvider.getPost([0, 1, 2], userProvider.userCurrent!.id);
-    postProvider.getPost([0], userProvider.userCurrent!.id);
-    postProvider.getPost([1], userProvider.userCurrent!.id);
-    postProvider.getPost([2], userProvider.userCurrent!.id);
+    postProvider.getAllData(userProvider.userCurrent!.id);
     super.initState();
-
-  }
-
-  List<AssetEntity> _images = [];
-
-  Future<void> _selectImages() async {
-    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
-        pickerConfig: const AssetPickerConfig(
-          maxAssets: 10,
-          requestType: RequestType.image,
-          selectedAssets: [],
-        ));
-    setState(() {
-      _images = result!;
-    });
   }
 
   @override
@@ -74,8 +55,8 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer2<UserProvider,ChatProvider>(
-      builder: (context, userProvider,chatProvider, child) => Container(
+    return Consumer3<UserProvider,ChatProvider,PostProvider>(
+      builder: (context, userProvider,chatProvider,postProvider, child) => Container(
         height: 160,
         width: MediaQuery.of(context).size.width,
         color: Theme.of(context).colorScheme.onBackground,
@@ -114,7 +95,7 @@ class _ForumPageState extends State<ForumPage>
                       ),
                       Stack(children: [
                         GestureDetector(
-                          onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>Layout(selectedIndex: 1,))),
+                          onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>const Layout(selectedIndex: 1,))),
                           child: Container(
                             alignment: Alignment.center,
                             width: 50,
@@ -190,13 +171,13 @@ class _ForumPageState extends State<ForumPage>
                   ),
                   IconButton(
                       onPressed: () async {
-                        await _selectImages();
+                        await postProvider.selectImages(context);
                         // ignore: use_build_context_synchronously
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => CreatePostPage(
-                                      images: _images,
+                                      images: postProvider.images,
                                     )));
                       },
                       icon: const Icon(

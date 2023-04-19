@@ -1,11 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/models/room.dart';
+import 'dart:ui' as ui;
+
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class RoomProvider extends ChangeNotifier {
+  bool isLoadMoreRunning = false;
+  bool isLoadMoreRunningFilter = false;
   List<Room> listRoom = [];
   List<Room> listRoomHost = [];
   List<Room> listRemove = [];
@@ -17,9 +27,12 @@ class RoomProvider extends ChangeNotifier {
   List<Room> listSearch = [];
   List<Room> listMain = [];
   int typeName = 0;
-
+  int skip = 3;
+  int skipFilter = 3;
+  int limit = 2;
   int listRemoveLength = 0;
   bool hasNextPage = true;
+  bool hasNextPageFilter = true;
 
   Future<bool> createRoom(
       String hostID,
@@ -82,6 +95,7 @@ class RoomProvider extends ChangeNotifier {
         }));
 
     if (response.statusCode == 200) {
+      getListRoomHost(hostID);
       await createNotification(
           title, jsonDecode(response.body)['id'], hostID, imageHost, hostName);
 
@@ -393,5 +407,143 @@ class RoomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-// Future<bool> deleteRoom()
+Future<bool> deleteRoom(String id)async{
+  final response =
+      await http.delete(Uri.parse('$url/api/motelhouse/delete/$id'));
+  if (response.statusCode == 200) {
+    return true;
+  }
+  return false;
+}
+
+  getDataFirstTime() async{
+    await getTopRating(5);
+    await lazyLoadingMotel("", [1, 2, 3], 0, 20);
+    await lazyLoadingMini("", [1, 2, 3], 0, 5);
+    await lazyLoadingWhole("", [1, 2, 3], 0, 20);
+  }
+
+  lazyLoading() async{
+    if (isLoadMoreRunning == false &&
+        hasNextPage == true) {
+      skip += 2;
+      (() async {
+
+          isLoadMoreRunning = true;
+          notifyListeners();
+        final response = await http.post(
+            Uri.parse('$url/api/motelhouse/lazyloading'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: jsonEncode(<String, dynamic>{
+              "searchValue": "",
+              "category": [1],
+              "skip": skip,
+              "limit": limit
+            }));
+        var jsonObject = jsonDecode(response.body);
+
+        if (jsonObject.isNotEmpty) {
+          var listObject = jsonObject as List;
+          List<Room> listLoadMore =
+          listObject.map((e) => Room.fromJson(e)).toList();
+          listMiniFirstLoad.addAll(listLoadMore);
+        } else {
+            hasNextPage = false;
+            notifyListeners();
+        }
+
+          isLoadMoreRunning = false;
+          notifyListeners();
+      })();
+    }
+  }
+
+  lazyLoadingFilter(int typeName)async{
+    if (isLoadMoreRunningFilter == false &&
+        hasNextPageFilter == true) {
+      skipFilter += 2;
+      (() async {
+        isLoadMoreRunningFilter = true;
+          notifyListeners();
+        final response = await http.post(
+            Uri.parse('$url/api/motelhouse/filter'),
+            headers: <String, String>{
+              'Content-Type':
+              'application/json; charset=UTF-8'
+            },
+            body: jsonEncode(<String, dynamic>{
+              "searchValue": "",
+              "typeName": typeName,
+              "skip": skipFilter,
+              "limit": limit
+            }));
+        var jsonObject = jsonDecode(response.body);
+
+        if (jsonObject.isNotEmpty) {
+          var listObject = jsonObject as List;
+          List<Room> listLoadMore = listObject
+              .map((e) => Room.fromJson(e))
+              .toList();
+          listRent.addAll(listLoadMore);
+        } else {
+            hasNextPageFilter = false;
+            notifyListeners();
+        }
+        isLoadMoreRunningFilter = false;
+        notifyListeners();
+
+
+      })();
+    }
+  }
+
+  Future<BitmapDescriptor> getMarkerIconFromUrl(String imageUrl) async {
+    final image =
+    CachedNetworkImageProvider(imageUrl, maxHeight: 150, maxWidth: 150);
+    final completer = Completer<ui.Image>();
+    final listener = ImageStreamListener(
+            (ImageInfo info, bool _) => completer.complete(info.image));
+    final stream = image.resolve(ImageConfiguration.empty);
+    stream.addListener(listener);
+    final uiImage = await completer.future;
+    final byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
+    final bytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(bytes);
+  }
+
+  List<AssetEntity> images = [];
+  List<String> listImageUrl = [];
+  Future<void> selectImages(BuildContext context) async {
+    images = [];
+    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
+        pickerConfig: const AssetPickerConfig(
+          maxAssets: 10,
+          requestType: RequestType.image,
+          selectedAssets: [],
+        ));
+      images = result!;
+      notifyListeners();
+  }
+  Future<void> uploadImages() async {
+    listImageUrl = [];
+    final storage = FirebaseStorage.instance;
+    for (var asset in images) {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference = storage.ref().child('roomImage').child(fileName);
+      final File? file = await asset.file;
+      if (file != null) {
+        UploadTask task = reference.putFile(file);
+        await task.whenComplete(() => null);
+        String imageUrl = await reference.getDownloadURL();
+        listImageUrl.add(imageUrl);
+        notifyListeners();
+        // rest of the code here
+      } else {
+        // handle error, e.g. file is null
+      }
+    }
+  }
+
 }

@@ -61,7 +61,8 @@ class PostProvider extends ChangeNotifier {
           "tag": tag,
           "imageUrls": listImageUrl,
           "likedBy": [],
-          "isHidden": []
+          "isHidden": [],
+          "isHiddenHost":false
         }));
 
     if (response.statusCode == 200) {
@@ -109,7 +110,18 @@ class PostProvider extends ChangeNotifier {
       print('Error get post: $e');
     }
   }
-
+  Future<List<Post>> getPostById(String userId) async {
+    try {
+      final response = await http.get(
+          Uri.parse('$url/api/post/get-post-by-userId/$userId'));
+      var jsonObject = jsonDecode(response.body);
+      var listObject = jsonObject as List;
+      return listObject.map((e) => Post.fromJson(e)).toList();
+    } catch (e) {
+      print('Error get post: $e');
+      return [];
+    }
+  }
   Future<void> likePost(String id, String userId) async {
     try {
       await http.post(Uri.parse('$url/api/post/like-post'),
@@ -123,7 +135,6 @@ class PostProvider extends ChangeNotifier {
       print('Error liking post: $e');
     }
   }
-
   Future<void> dislikePost(String id, String userId) async {
     try {
       await http.post(Uri.parse('$url/api/post/dislike-post'),
@@ -136,7 +147,6 @@ class PostProvider extends ChangeNotifier {
       print('Error dislike post: $e');
     }
   }
-
   Future<void> hiddenPost(String id, String userId) async {
     try {
       await http.post(Uri.parse('$url/api/post/hidden-post'),
@@ -144,6 +154,21 @@ class PostProvider extends ChangeNotifier {
             'Content-Type': 'application/json; charset=UTF-8'
           },
           body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      getPost([0,1,2], userId);
+      getPost([0], userId);
+      getPost([1], userId);
+      getPost([2], userId);
+    } catch (e) {
+      print('Error dislike post: $e');
+    }
+  }
+  Future<void> hiddenHost(String id, bool isHiddenHost,String userId) async {
+    try {
+      await http.post(Uri.parse('$url/api/post/hidden-post-by-host'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{"id": id, "isHiddenHost": isHiddenHost}));
       getPost([0,1,2], userId);
       getPost([0], userId);
       getPost([1], userId);
@@ -162,5 +187,25 @@ class PostProvider extends ChangeNotifier {
     } catch (e) {
       print('Error dislike post: $e');
     }
+  }
+  // Lấy data khi vào diễn đàn
+  getAllData(String userId){
+    getPost([0, 1, 2], userId);
+    getPost([0], userId);
+    getPost([1], userId);
+    getPost([2], userId);
+  }
+
+  List<AssetEntity> images = [];
+
+  Future<void> selectImages(BuildContext context) async {
+    images=[];
+    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
+        pickerConfig: const AssetPickerConfig(
+          maxAssets: 10,
+          requestType: RequestType.image,
+          selectedAssets: [],
+        ));
+      images = result!;
   }
 }

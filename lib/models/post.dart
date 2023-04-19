@@ -13,7 +13,7 @@ class Post {
   List<String>? imageUrls;
   List<String>? likedBy;
   DateTime createdAt;
-
+  bool isHiddenHost;
   Post(
       {required this.id,
       required this.title,
@@ -28,7 +28,8 @@ class Post {
       required this.tag,
       this.imageUrls,
       this.likedBy,
-      required this.createdAt});
+      required this.createdAt,
+      required this.isHiddenHost});
 
   factory Post.fromJson(Map<String, dynamic> json) {
     List<dynamic> imageUrlsJson = json['imageUrls'];
@@ -48,6 +49,7 @@ class Post {
         tag: json['tag'],
         imageUrls: imageUrlsJson.map((url) => url.toString()).toList(),
         likedBy: likedByJson.map((userId) => userId.toString()).toList(),
-        createdAt: DateTime.parse(json['createdAt']));
+        createdAt: DateTime.parse(json['createdAt']),
+        isHiddenHost:json['isHiddenHost']);
   }
 }
