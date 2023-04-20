@@ -4,6 +4,8 @@ import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
+
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
 
@@ -41,7 +43,7 @@ class _NotificationPageState extends State<NotificationPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Notification',
+                S.of(context).notification_title,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               userProvider.userCurrent != null
@@ -51,7 +53,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             .deleteNotification(userProvider.userCurrent!.id);
                       },
                       child: Text(
-                        'Delete all',
+                        S.of(context).notification_delete,
                         style: GoogleFonts.readexPro(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
@@ -78,7 +80,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 )
               : notificationProvider.listNotification.isEmpty
                   ? Text(
-                      "No notifications!",
+                      S.of(context).notification_status,
                       style: Theme.of(context).textTheme.displayMedium,
                     )
                   : Column(

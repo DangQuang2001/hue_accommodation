@@ -8,6 +8,8 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
+
 List<String> listFurnishing = <String>['Full', 'Less'];
 List<String> listTypeRoom = <String>[
   'Mini House',
@@ -144,7 +146,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
           Hero(
             tag: "EditRoom",
             child: Text(
-              '     Edit Room    ',
+              '  ${S.of(context).edit_room_title}',
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
@@ -165,7 +167,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Title',
+              S.of(context).add_room_name,
               style: Theme.of(context).textTheme.displayLarge,
             ),
             const SizedBox(
@@ -198,7 +200,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
               height: 10,
             ),
             Text(
-              'Description',
+              S.of(context).add_room_description,
               style: Theme.of(context).textTheme.displayLarge,
             ),
             const SizedBox(
@@ -225,7 +227,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
               height: 10,
             ),
             Text(
-              'Address',
+              S.of(context).add_room_address,
               style: Theme.of(context).textTheme.displayLarge,
             ),
             const SizedBox(
@@ -258,7 +260,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Area',
+                      S.of(context).add_room_area,
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     const SizedBox(
@@ -292,7 +294,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Furnishing ',
+                      S.of(context).add_room_furnishing,
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     const SizedBox(
@@ -346,7 +348,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Price',
+                      S.of(context).add_room_price,
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     const SizedBox(
@@ -376,7 +378,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Type Room ',
+                      S.of(context).add_room_type_room,
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     const SizedBox(
@@ -424,7 +426,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
               height: 10,
             ),
             Text(
-              'Room Images',
+              S.of(context).add_room_room_image,
               style: Theme.of(context).textTheme.displayLarge,
             ),
             multiImageUploadScreen(context)

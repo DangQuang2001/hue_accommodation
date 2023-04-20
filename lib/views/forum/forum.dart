@@ -9,6 +9,7 @@ import 'package:hue_accommodation/views/forum/post.dart';
 import 'package:provider/provider.dart';
 
 
+import '../../generated/l10n.dart';
 import '../../view_models/user_provider.dart';
 
 class ForumPage extends StatefulWidget {
@@ -24,12 +25,12 @@ class _ForumPageState extends State<ForumPage>
   final _selectedColor = const Color(0xff1a73e8);
   final _unselectedColor = const Color(0xff5f6368);
   final _tabs = [
-    const Tab(
-      text: 'All Discussion',
+     Tab(
+      text: S.current.forum_all,
     ),
-    const Tab(text: 'Roommate'),
-    const Tab(text: 'Transfer of property'),
-    const Tab(text: 'Others'),
+     Tab(text: S.current.forum_roommate),
+     Tab(text: S.current.forum_transfer),
+     Tab(text: S.current.forum_other),
   ];
 
   @override
@@ -75,7 +76,7 @@ class _ForumPageState extends State<ForumPage>
                       const SizedBox(
                         width: 5,
                       ),
-                      Text('Forum',
+                      Text(S.of(context).forum_title,
                           style: Theme.of(context).textTheme.headlineLarge),
                     ],
                   ),
@@ -163,7 +164,7 @@ class _ForumPageState extends State<ForumPage>
                             MaterialPageRoute(
                                 builder: (context) => const CreatePostPage())),
                         child: Text(
-                          'Post something for forum?',
+                          S.of(context).forum_post_something,
                           style: Theme.of(context).textTheme.displaySmall,
                         ),
                       ),

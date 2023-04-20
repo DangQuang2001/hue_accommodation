@@ -13,6 +13,7 @@ import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
 
 
+import '../../generated/l10n.dart';
 import '../../models/room.dart';
 import '../../view_models/chat_provider.dart';
 
@@ -211,7 +212,6 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           alignment: Alignment.topLeft,
                           padding: const EdgeInsets.only(left: 40),
-                          width: 250,
                           height: 45,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                               const SizedBox(
                                 height: 3,
                               ),
-                              Text("Welcome to Hue Accommodation",
+                              Text(S.of(context).home_page_title,
                                   style: GoogleFonts.readexPro(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
@@ -330,7 +330,7 @@ class _HomePageState extends State<HomePage> {
                         child: Row(
                           children: [
                             Text(
-                              'QRCode',
+                              S.of(context).home_page_qrcode,
                               style: Theme.of(context).textTheme.displaySmall,
                             ),
                             const SizedBox(
@@ -368,14 +368,14 @@ class _HomePageState extends State<HomePage> {
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/3010/3010995.png",
-                        "Motel House",
+                        S.of(context).home_page_motel,
                         RouteName.boardinghouse,
                         true,
                         300),
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/3820/3820134.png",
-                        "Forum",
+                        S.of(context).home_page_forum,
                         RouteName.blogSale,
                         userProvider.userCurrent != null,
                         400),
@@ -404,14 +404,14 @@ class _HomePageState extends State<HomePage> {
                                 buttonLinkSmall(
                                     context,
                                     "https://cdn-icons-png.flaticon.com/512/384/384999.png",
-                                    "SuperMarket",
+                                    S.of(context).home_page_super_market,
                                     RouteName.home,
                                     300,
                                     true),
                                 buttonLinkSmall(
                                     context,
                                     "https://cdn-icons-png.flaticon.com/512/4320/4320350.png",
-                                    "Hospital",
+                                    S.of(context).home_page_hospital,
                                     RouteName.home,
                                     400,
                                     true),
@@ -423,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                             buttonLinkSmall(
                                 context,
                                 "https://cdn-icons-png.flaticon.com/512/1261/1261143.png",
-                                "Household Goods",
+                                S.of(context).home_page_household_goods,
                                 RouteName.home,
                                 500,
                                 true),
@@ -432,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Text(
-                      'Extension',
+                      S.of(context).home_page_extension,
                       style: Theme.of(context).textTheme.displayMedium,
                     )
                   ],
@@ -468,7 +468,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Manage", style: Theme.of(context).textTheme.displayLarge),
+            Text(S.of(context).home_page_manage, style: Theme.of(context).textTheme.displayLarge),
             const SizedBox(
               height: 20,
             ),
@@ -479,21 +479,21 @@ class _HomePageState extends State<HomePage> {
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/4757/4757351.png",
-                    "Room",
+                    S.of(context).home_page_room,
                     RouteName.roomManage,
                     300,
                     false),
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/9155/9155818.png",
-                    "Rent",
+                    S.of(context).home_page_rent,
                     RouteName.interactManage,
                     400,
                     false),
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/2783/2783924.png",
-                    "Statistical",
+                    S.of(context).home_page_statistical,
                     RouteName.statisticalManage,
                     500,
                     false),

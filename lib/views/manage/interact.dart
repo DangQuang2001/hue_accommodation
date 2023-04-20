@@ -4,6 +4,7 @@ import 'package:hue_accommodation/view_models/rent_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
 import '../../models/rent.dart';
 
 class InteractManage extends StatefulWidget {
@@ -64,12 +65,9 @@ class _InteractManageState extends State<InteractManage> {
               ),
             ),
           ),
-          Hero(
-            tag: "Rent",
-            child: Text(
-              '     Rent Management    ',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
+          Text(
+            '     ${S.of(context).manage_rent_title}    ',
+            style: Theme.of(context).textTheme.headlineLarge,
           ),
           const SizedBox(
             width: 30,
@@ -89,7 +87,7 @@ class _InteractManageState extends State<InteractManage> {
             ExpansionTile(
               initiallyExpanded: rentProvider.listWaiting.isNotEmpty,
               title: Text(
-                'Waiting',
+                S.of(context).manage_rent_waiting,
                 style: Theme.of(context)
                     .textTheme
                     .displayLarge!
@@ -123,7 +121,7 @@ class _InteractManageState extends State<InteractManage> {
             ExpansionTile(
               initiallyExpanded: rentProvider.listConfirm.isNotEmpty,
               title: Text(
-                'Confirmed',
+                S.of(context).manage_rent_confirmed,
                 style: Theme.of(context)
                     .textTheme
                     .displayLarge!
@@ -159,7 +157,7 @@ class _InteractManageState extends State<InteractManage> {
             ExpansionTile(
               initiallyExpanded: rentProvider.listUnConfirm.isNotEmpty,
               title: Text(
-                'UnConfirmed',
+                S.of(context).manage_rent_UnConfirmed,
                 style: Theme.of(context)
                     .textTheme
                     .displayLarge!
@@ -241,7 +239,7 @@ class _InteractManageState extends State<InteractManage> {
                       height: 5,
                     ),
                     Text(
-                      'User',
+                      S.of(context).rent_now_user,
                       style: GoogleFonts.readexPro(
                           color: Colors.grey, fontWeight: FontWeight.w300),
                     )
@@ -262,7 +260,7 @@ class _InteractManageState extends State<InteractManage> {
                   width: 5,
                 ),
                 Text(
-                  'Rent date:',
+                  S.of(context).rent_now_rent_date,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -284,14 +282,14 @@ class _InteractManageState extends State<InteractManage> {
             Row(
               children: [
                 Icon(
-                  Icons.location_on_outlined,
+                  Icons.numbers_outlined,
                   color: Theme.of(context).iconTheme.color,
                 ),
                 const SizedBox(
                   width: 5,
                 ),
                 Text(
-                  'Number:',
+                  S.of(context).manage_rent_number,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -299,7 +297,7 @@ class _InteractManageState extends State<InteractManage> {
                 ),
                 Expanded(
                   child: Text(
-                    "${item.numberDaysRented}days rental",
+                    "${item.numberDaysRented}${S.of(context).manage_day_rent}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.readexPro(
@@ -322,7 +320,7 @@ class _InteractManageState extends State<InteractManage> {
                   width: 5,
                 ),
                 Text(
-                  'Boarding house:',
+                  S.of(context).rent_now_boarding_house,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -357,7 +355,7 @@ class _InteractManageState extends State<InteractManage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Rent Detail",
+                        S.of(context).manage_rent_detail,
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),
                       IconButton(
@@ -390,7 +388,7 @@ class _InteractManageState extends State<InteractManage> {
                               height: 5,
                             ),
                             Text(
-                              'User',
+                              S.of(context).rent_now_user,
                               style: GoogleFonts.readexPro(
                                   color: Colors.grey, fontWeight: FontWeight.w300),
                             )
@@ -411,7 +409,7 @@ class _InteractManageState extends State<InteractManage> {
                           width: 5,
                         ),
                         Text(
-                          'Rent date:',
+                          S.of(context).rent_now_rent_date,
                           style: Theme.of(context).textTheme.displayMedium,
                         ),
                         const SizedBox(
@@ -433,14 +431,14 @@ class _InteractManageState extends State<InteractManage> {
                     Row(
                       children: [
                         Icon(
-                          Icons.location_on_outlined,
+                          Icons.numbers_outlined,
                           color: Theme.of(context).iconTheme.color,
                         ),
                         const SizedBox(
                           width: 5,
                         ),
                         Text(
-                          'Number:',
+                          S.of(context).manage_rent_number,
                           style: Theme.of(context).textTheme.displayMedium,
                         ),
                         const SizedBox(
@@ -467,7 +465,7 @@ class _InteractManageState extends State<InteractManage> {
                           width: 5,
                         ),
                         Text(
-                          'Boarding house:',
+                          S.of(context).rent_now_boarding_house,
                           style: Theme.of(context).textTheme.displayMedium,
                         ),
                         const SizedBox(
@@ -498,7 +496,7 @@ class _InteractManageState extends State<InteractManage> {
                               width: 5,
                             ),
                             Text(
-                              'Phone:',
+                              S.of(context).rent_now_phone,
                               style: Theme.of(context).textTheme.displayMedium,
                             ),
                             const SizedBox(
@@ -534,7 +532,7 @@ class _InteractManageState extends State<InteractManage> {
                           width: 5,
                         ),
                         Text(
-                          'Note:',
+                          S.of(context).rent_now_note,
                           style: Theme.of(context).textTheme.displayMedium,
                         ),
                         const SizedBox(

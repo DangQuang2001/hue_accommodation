@@ -13,6 +13,8 @@ import 'dart:ui' as ui;
 
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+import '../services/room_api.dart';
+
 class RoomProvider extends ChangeNotifier {
   bool isLoadMoreRunning = false;
   bool isLoadMoreRunningFilter = false;
@@ -497,6 +499,10 @@ Future<bool> deleteRoom(String id)async{
 
       })();
     }
+  }
+
+  Future<void> reviewRoom(String roomId,String userId,double rating,String comment,List<String> images)async{
+    await RoomApi.reviewRoom(roomId, userId, rating, comment, images);
   }
 
   Future<BitmapDescriptor> getMarkerIconFromUrl(String imageUrl) async {

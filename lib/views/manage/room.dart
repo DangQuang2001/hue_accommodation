@@ -5,9 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/models/room.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
+import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:hue_accommodation/views/manage/edit_room.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
 import '../../view_models/room_provider.dart';
 
 class RoomManage extends StatefulWidget {
@@ -56,12 +59,9 @@ class _RoomManageState extends State<RoomManage> {
               ),
             ),
           ),
-          Hero(
-            tag: "Room",
-            child: Text(
-              '     Room Management    ',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
+          Text(
+            '      ${S.of(context).manage_room_title}    ',
+            style: Theme.of(context).textTheme.headlineLarge,
           ),
           const SizedBox(
             width: 30,
@@ -137,7 +137,7 @@ class _RoomManageState extends State<RoomManage> {
                   width: 5,
                 ),
                 Text(
-                  'Join date:',
+                  S.of(context).manage_room_join_date,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -162,7 +162,7 @@ class _RoomManageState extends State<RoomManage> {
                   width: 5,
                 ),
                 Text(
-                  'Address:',
+                  S.of(context).manage_room_address,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -191,7 +191,7 @@ class _RoomManageState extends State<RoomManage> {
                   width: 5,
                 ),
                 Text(
-                  'Feedback chat:',
+                  S.of(context).manage_room_feedback,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
                 const SizedBox(
@@ -219,7 +219,7 @@ class _RoomManageState extends State<RoomManage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Posted',
+                  S.of(context).manage_room_posted,
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
                 Row(
@@ -227,28 +227,25 @@ class _RoomManageState extends State<RoomManage> {
                     InkWell(
                       onTap: () =>
                           Navigator.pushNamed(context, RouteName.addRoom),
-                      child: Hero(
-                        tag: 'AddRoom',
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onBackground,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Colors.grey.withOpacity(0.1)
-                                        : Colors.transparent,
-                                    blurRadius: 7,
-                                    offset: const Offset(2, 2))
-                              ]),
-                          child: Center(
-                            child: Icon(
-                              Icons.add_home_outlined,
-                              color: Theme.of(context).iconTheme.color,
-                            ),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.onBackground,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Colors.grey.withOpacity(0.1)
+                                      : Colors.transparent,
+                                  blurRadius: 7,
+                                  offset: const Offset(2, 2))
+                            ]),
+                        child: Center(
+                          child: Icon(
+                            Icons.add_home_outlined,
+                            color: Theme.of(context).iconTheme.color,
                           ),
                         ),
                       ),
@@ -334,155 +331,158 @@ class _RoomManageState extends State<RoomManage> {
                               shrinkWrap: true,
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 15),
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onBackground,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            blurRadius: 7,
-                                            offset: const Offset(0, 2))
-                                      ]),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15),
-                                    child: Slidable(
-                                      key: const ValueKey(0),
+                                return GestureDetector(
+                                  onTap: ()=>Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(motel: snapshot.data![index]))),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 15),
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onBackground,
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey.withOpacity(0.1),
+                                              blurRadius: 7,
+                                              offset: const Offset(0, 2))
+                                        ]),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(15),
+                                      child: Slidable(
+                                        key: const ValueKey(0),
 
-                                      // The start action pane is the one at the left or the top side.
-                                      endActionPane: ActionPane(
-                                        // A motion is a widget used to control how the pane animates.
-                                        motion: const ScrollMotion(),
+                                        // The start action pane is the one at the left or the top side.
+                                        endActionPane: ActionPane(
+                                          // A motion is a widget used to control how the pane animates.
+                                          motion: const ScrollMotion(),
 
-                                        // A pane can dismiss the Slidable.
-                                        // dismissible: DismissiblePane(onDismissed: () {}),
+                                          // A pane can dismiss the Slidable.
+                                          // dismissible: DismissiblePane(onDismissed: () {}),
 
-                                        // All actions are defined in the children parameter.
-                                        children: [
-                                          // A SlidableAction can have an icon and/or a label.
+                                          // All actions are defined in the children parameter.
+                                          children: [
+                                            // A SlidableAction can have an icon and/or a label.
 
-                                          SlidableAction(
-                                            onPressed: (context) {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          EditRoomPage(
-                                                              room: snapshot
-                                                                      .data![
-                                                                  index])));
-                                            },
-                                            backgroundColor:
-                                                const Color(0xFF2170CA),
-                                            foregroundColor: Colors.white,
-                                            icon: Icons.edit,
-                                            label: 'Update',
-                                          ),
-                                          SlidableAction(
-                                            onPressed: (context) {
-                                              _dialogBuilder(context,
-                                                  snapshot.data![index].id);
-                                            },
-                                            backgroundColor:
-                                                const Color(0xFFFE4A49),
-                                            foregroundColor: Colors.white,
-                                            icon: Icons.delete,
-                                            label: 'Delete',
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              child: CachedNetworkImage(
-                                                imageUrl:
-                                                    snapshot.data![index].image,
-                                                width: 85,
-                                                height: 85,
-                                                fit: BoxFit.cover,
-                                              )),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    snapshot.data![index].name,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .displayMedium,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        snapshot.data![index]
-                                                                        .adParams[
-                                                                    'deposit'] ==
-                                                                null
-                                                            ? "0"
-                                                            : snapshot
-                                                                    .data![index]
-                                                                    .adParams[
-                                                                'deposit']['value'],
-                                                        style: GoogleFonts
-                                                            .readexPro(
-                                                                color: Colors
-                                                                    .orangeAccent,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                                fontSize: 17),
-                                                      ),
-                                                      const Icon(
-                                                        Icons
-                                                            .attach_money_outlined,
-                                                        color:
-                                                            Colors.orangeAccent,
-                                                        size: 20,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    snapshot.data![index]
-                                                            .adParams['address']
-                                                        ['value'],
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style:
-                                                        GoogleFonts.readexPro(
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.w300,
-                                                            color: Colors.grey),
-                                                  )
-                                                ],
-                                              ),
+                                            SlidableAction(
+                                              onPressed: (context) {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditRoomPage(
+                                                                room: snapshot
+                                                                        .data![
+                                                                    index])));
+                                              },
+                                              backgroundColor:
+                                                  const Color(0xFF2170CA),
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.edit,
+                                              label: 'Update',
                                             ),
-                                          )
-                                        ],
+                                            SlidableAction(
+                                              onPressed: (context) {
+                                                _dialogBuilder(context,
+                                                    snapshot.data![index].id);
+                                              },
+                                              backgroundColor:
+                                                  const Color(0xFFFE4A49),
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.delete,
+                                              label: 'Delete',
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      snapshot.data![index].image,
+                                                  width: 85,
+                                                  height: 85,
+                                                  fit: BoxFit.cover,
+                                                )),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      snapshot.data![index].name,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayMedium,
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          snapshot.data![index]
+                                                                          .adParams[
+                                                                      'deposit'] ==
+                                                                  null
+                                                              ? "0"
+                                                              : snapshot
+                                                                      .data![index]
+                                                                      .adParams[
+                                                                  'deposit']['value'],
+                                                          style: GoogleFonts
+                                                              .readexPro(
+                                                                  color: Colors
+                                                                      .orangeAccent,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w300,
+                                                                  fontSize: 17),
+                                                        ),
+                                                        const Icon(
+                                                          Icons
+                                                              .attach_money_outlined,
+                                                          color:
+                                                              Colors.orangeAccent,
+                                                          size: 20,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      snapshot.data![index]
+                                                              .adParams['address']
+                                                          ['value'],
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight.w300,
+                                                              color: Colors.grey),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

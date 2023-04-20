@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../generated/l10n.dart';
 import '../../view_models/room_provider.dart';
 import 'boarding_house_detail.dart';
 
@@ -634,7 +635,7 @@ class _FilterHouseState extends State<FilterHouse> {
                       borderRadius: BorderRadius.circular(50)),
                   child: Center(
                     child: Text(
-                      'Apply',
+                      S.of(context).boardinghouse_filer_apply,
                       style: GoogleFonts.readexPro(
                           fontSize: 20,
                           color: Colors.white,
@@ -656,7 +657,7 @@ class _FilterHouseState extends State<FilterHouse> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 20.0, bottom: 5),
-          child: Text("SORT",
+          child: Text(S.of(context).boardinghouse_filer_sort,
               style: GoogleFonts.readexPro(
                   color: Colors.grey,
                   fontSize: 18,
@@ -676,7 +677,7 @@ class _FilterHouseState extends State<FilterHouse> {
                     width: 10,
                   ),
                   Text(
-                    "New post",
+                    S.of(context).boardinghouse_filer_new_post,
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -707,7 +708,7 @@ class _FilterHouseState extends State<FilterHouse> {
                     width: 10,
                   ),
                   Text(
-                    "Min price",
+                    S.of(context).boardinghouse_filer_min_price,
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -735,7 +736,7 @@ class _FilterHouseState extends State<FilterHouse> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 20.0, bottom: 5),
-          child: Text("CONVENIENT",
+          child: Text(S.of(context).boardinghouse_filer_convenient,
               style: GoogleFonts.readexPro(
                   color: Colors.grey,
                   fontSize: 18,
@@ -755,7 +756,7 @@ class _FilterHouseState extends State<FilterHouse> {
                     width: 10,
                   ),
                   Text(
-                    "Wifi",
+                    S.of(context).boardinghouse_filer_wifi,
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -782,7 +783,7 @@ class _FilterHouseState extends State<FilterHouse> {
                     width: 10,
                   ),
                   Text(
-                    "Air conditioning",
+                    S.of(context).boardinghouse_filer_air_condition,
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -806,7 +807,7 @@ class _FilterHouseState extends State<FilterHouse> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 20.0, bottom: 5),
-          child: Text("PRICE",
+          child: Text(S.of(context).boardinghouse_filer_price,
               style: GoogleFonts.readexPro(
                   color: Colors.grey,
                   fontSize: 18,
@@ -821,7 +822,7 @@ class _FilterHouseState extends State<FilterHouse> {
               Row(
                 children: [
                   Text(
-                    'Min:',
+                    '${S.of(context).boardinghouse_filer_min}:',
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
                   const SizedBox(
@@ -835,7 +836,7 @@ class _FilterHouseState extends State<FilterHouse> {
               Row(
                 children: [
                   Text(
-                    'Max:',
+                    '${S.of(context).boardinghouse_filer_max}:',
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
                   const SizedBox(

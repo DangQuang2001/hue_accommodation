@@ -20,6 +20,7 @@ import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:provider/provider.dart';
 
 
+import '../../generated/l10n.dart';
 import '../../models/room.dart';
 import '../../view_models/favourite_provider.dart';
 
@@ -459,7 +460,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [listImage(context), info(context), map(context)],
+                  children: [listImage(context), info(context), map(context),review(context)],
                 ),
               ),
             ),
@@ -570,7 +571,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                     width: 5,
                   ),
                   Text(
-                    '2 Beds',
+                    '2 ${S.of(context).boardinghouse_detail_bed}',
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -582,7 +583,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                     width: 5,
                   ),
                   Text(
-                    '1 Bath',
+                    '1 ${S.of(context).boardinghouse_detail_bath}',
                     style: Theme.of(context).textTheme.displayMedium,
                   )
                 ],
@@ -605,7 +606,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
             height: 20,
           ),
           Text(
-            'Description',
+            S.of(context).boardinghouse_detail_description,
             style: Theme.of(context).textTheme.displayLarge,
           ),
           Padding(
@@ -635,7 +636,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
 
   Widget map(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 60.0),
+      padding: const EdgeInsets.only(bottom: 10.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 350,
@@ -718,7 +719,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                     Opacity(
                         opacity: 0.6,
                         child: Text(
-                          'Total Price',
+                          S.of(context).boardinghouse_detail_total_price,
                           style: Theme.of(context).textTheme.displaySmall,
                         )),
                     Row(
@@ -798,7 +799,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                               ]),
                           child: Center(
                             child: Text(
-                              'Rent Now',
+                              S.of(context).boardinghouse_detail_rent_now,
                               style: GoogleFonts.readexPro(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -856,6 +857,98 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
               ]),
             ));
       },
+    );
+  }
+
+  Widget review(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 100),
+      padding: const EdgeInsets.all(20),
+      width: MediaQuery.of(context).size.width,
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Review',style: Theme.of(context).textTheme.displayLarge,),
+          const SizedBox(height: 20,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: CachedNetworkImage(
+                      imageUrl: "https://kynguyenlamdep.com/wp-content/uploads/2022/06/anh-gai-xinh-cuc-dep.jpg",
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  SizedBox(
+                    width:
+                    MediaQuery.of(context).size.width - 105,
+                    height: 50,
+                    child: Column(
+                      mainAxisAlignment:
+                      MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                      children: [
+                        Text("Be Ao hong",
+                            style: Theme.of(context).textTheme.displayMedium),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Text('4.5',style: Theme.of(context).textTheme.displayMedium,),
+                                const Icon(Icons.star,color: Colors.orange,size: 20,)
+                              ],
+                            ),
+                            Text(
+                              "1 ngày trước",
+                              style:Theme.of(context).textTheme.displaySmall ,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text('Phong xanh sạch đẹp',
+              style: Theme.of(context).textTheme.displayMedium),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: [
+              ...[0,2,3].map((e) => Container(
+                margin: const EdgeInsets.only(right: 5),
+                width: 100,
+                height: 100,
+                child: AspectRatio(
+                  aspectRatio: 1 / 1,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Image.network('https://kynguyenlamdep.com/wp-content/uploads/2022/06/anh-gai-xinh-cuc-dep.jpg',fit: BoxFit.cover,)),
+                ),
+              ))
+            ],
+          )
+        ],
+      ),
     );
   }
 }
