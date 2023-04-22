@@ -131,7 +131,15 @@
   "manage_rent_UnConfirmed": "UnConfirmed",
   "manage_rent_detail": "Rent detail",
   "manage_rent_number": "Number of days:",
-  "manage_day_rent": "days rental"
+  "manage_day_rent": "days rental",
+
+
+  "qr_code_scan": "Scan a code",
+  "qr_code_scan_success": "Scanned Success",
+  "qr_code_detail": "Detail",
+  "qr_code_review": "Review",
+  "qr_code_review_title": "Review",
+  "qr_code_review_send": "SEND"
 
 
 

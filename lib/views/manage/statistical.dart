@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StatisticalManage extends StatefulWidget {
   const StatisticalManage({Key? key}) : super(key: key);
@@ -9,120 +10,152 @@ class StatisticalManage extends StatefulWidget {
 }
 
 class _StatisticalManageState extends State<StatisticalManage> {
+  late TooltipBehavior _tooltipBehavior;
+
+  late List<SalesData1> _salesData;
+
+  @override
+  void initState() {
+    _salesData = <SalesData1>[
+      SalesData1('Jan', 35, 25, ),
+      SalesData1('Feb', 28, 22, ),
+      SalesData1('Mar', 34, 20, ),
+      SalesData1('Apr', 32, 23, ),
+      SalesData1('May', 40, 26, ),
+    ];
+
+    _tooltipBehavior = TooltipBehavior(enable: true);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Center(
-        child: GestureDetector(
-          onTap: () => _dialogBuilder(context),
-          child: Text("Show Dialog"),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            appBar(context),
+            numberRent(context),
+            revenue(context),
+          ],
+        ),
+      ) ,
+    );
+  }
+
+  Widget appBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: const BoxDecoration(),
+              child: const Center(
+                child: Icon(
+                  Icons.arrow_back_outlined,
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            '     Statistical    ',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          const SizedBox(
+            width: 30,
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget numberRent(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 450,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SfCartesianChart(
+
+            primaryXAxis: CategoryAxis(
+              visibleMaximum: 3,
+            ),
+            // Chart title
+            // Enable legend
+            legend: Legend(isVisible: true),
+            // Enable tooltip
+            tooltipBehavior: _tooltipBehavior,
+
+            series: <LineSeries<SalesData, String>>[
+              LineSeries<SalesData, String>(
+                  name: "number of renters",
+                  dataSource:  <SalesData>[
+                    SalesData('Jan', 0),
+                    SalesData('Feb', 1),
+                    SalesData('Mar', 9),
+                    SalesData('Apr', 10),
+                    SalesData('May', 0)
+                  ],
+                  xValueMapper: (SalesData sales, _) => sales.year,
+                  yValueMapper: (SalesData sales, _) => sales.sales,
+                  // Enable data label
+                  dataLabelSettings: const DataLabelSettings(isVisible: true)
+              )
+            ]
         ),
       ),
     );
   }
 
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            title: Center(
-                child: Text(
-              "Scanned Success",
-              style: GoogleFonts.readexPro(color: Colors.green),
-            )),
-            content: SizedBox(
-              width: 400,
-              height: 400,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.network(
-                        'https://antimatter.vn/wp-content/uploads/2022/10/hinh-nen-gai-xinh.jpg',
-                        height: 170,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Phong tro Tuy Ly Vuong',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.readexPro(
-                        fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    '102 Tuy ly vuong',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.readexPro(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.grey),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(20),
-                            width: 70,
-                            height: 70,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Image.network(
-                                'https://cdn-icons-png.flaticon.com/512/1150/1150643.png'),
-                          ),
-                          Text(
-                            'Detail',
-                            style: GoogleFonts.readexPro(
-                                fontSize: 17, fontWeight: FontWeight.w400),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 70,
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(20),
-                            width: 70,
-                            height: 70,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Image.network(
-                                'https://cdn-icons-png.flaticon.com/512/2065/2065224.png'),
-                          ),
-                          Text(
-                            'Review',
-                            style: GoogleFonts.readexPro(
-                                fontSize: 17, fontWeight: FontWeight.w400),
-                          )
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ));
-      },
+  Widget revenue(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 450,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SfCartesianChart(
+          primaryXAxis: CategoryAxis(),
+          legend: Legend(isVisible: true),
+          title: ChartTitle(text: 'Revenue'),
+          tooltipBehavior: TooltipBehavior(enable: true),
+          series: <ChartSeries<SalesData1, String>>[
+            StackedBarSeries<SalesData1, String>(
+
+              dataSource: _salesData,
+              xValueMapper: (SalesData1 sales, _) => sales.month,
+              yValueMapper: (SalesData1 sales, _) => sales.sales1,
+              name: 'Expense',
+            ),
+            StackedBarSeries<SalesData1, String>(
+              dataSource: _salesData,
+              xValueMapper: (SalesData1 sales, _) => sales.month,
+              yValueMapper: (SalesData1 sales, _) => sales.sales2,
+              name: 'Revenue',
+            ),
+
+          ],
+        ),
+      ),
     );
+
   }
+
+}
+class SalesData {
+  SalesData(this.year, this.sales);
+  final String year;
+  final double sales;
+}
+class SalesData1 {
+  SalesData1(this.month, this.sales1, this.sales2);
+
+  final String month;
+  final double sales1;
+  final double sales2;
 }

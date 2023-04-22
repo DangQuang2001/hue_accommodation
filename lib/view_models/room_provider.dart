@@ -13,6 +13,8 @@ import 'dart:ui' as ui;
 
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+import '../models/review.dart';
+import '../services/provinces_api.dart';
 import '../services/room_api.dart';
 
 class RoomProvider extends ChangeNotifier {
@@ -505,6 +507,10 @@ Future<bool> deleteRoom(String id)async{
     await RoomApi.reviewRoom(roomId, userId, rating, comment, images);
   }
 
+  Future<List<Review>> getReview(String roomId)async {
+    return await RoomApi.getReview(roomId);
+  }
+
   Future<BitmapDescriptor> getMarkerIconFromUrl(String imageUrl) async {
     final image =
     CachedNetworkImageProvider(imageUrl, maxHeight: 150, maxWidth: 150);
@@ -550,6 +556,10 @@ Future<bool> deleteRoom(String id)async{
         // handle error, e.g. file is null
       }
     }
+  }
+
+  Future<List> getCity()async{
+    return await ProvincesApi.getCity();
   }
 
 }

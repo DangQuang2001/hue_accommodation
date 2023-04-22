@@ -861,93 +861,123 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget review(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 100),
-      padding: const EdgeInsets.all(20),
-      width: MediaQuery.of(context).size.width,
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Review',style: Theme.of(context).textTheme.displayLarge,),
-          const SizedBox(height: 20,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return Consumer<RoomProvider>(
+      builder: (context, roomProvider, child) =>  FutureBuilder(
+        future: roomProvider.getReview(widget.motel.roomId),
+        builder: (context, snapshot) {
+          if(snapshot.hasError){
+            return Center(
+              child: Text(snapshot.error.toString()),
+            );
+          }
+          if(snapshot.hasData){
+            return Padding(
+              padding: const EdgeInsets.only(left:20,right: 20,bottom: 70),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: CachedNetworkImage(
-                      imageUrl: "https://kynguyenlamdep.com/wp-content/uploads/2022/06/anh-gai-xinh-cuc-dep.jpg",
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  SizedBox(
-                    width:
-                    MediaQuery.of(context).size.width - 105,
-                    height: 50,
-                    child: Column(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: [
-                        Text("Be Ao hong",
-                            style: Theme.of(context).textTheme.displayMedium),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                  Text('Review',style: Theme.of(context).textTheme.displayLarge,),
+
+                  ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) => Container(
+                        margin: const EdgeInsets.only(bottom: 40),
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('4.5',style: Theme.of(context).textTheme.displayMedium,),
-                                const Icon(Icons.star,color: Colors.orange,size: 20,)
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: CachedNetworkImage(
+                                        imageUrl: snapshot.data![index].user.image,
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 15,
+                                    ),
+                                    SizedBox(
+                                      width:
+                                      MediaQuery.of(context).size.width - 105,
+                                      height: 50,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Text(snapshot.data![index].user.name,
+                                              style: Theme.of(context).textTheme.displayMedium),
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(snapshot.data![index].rating.toString(),style: Theme.of(context).textTheme.displayMedium,),
+                                                  const Icon(Icons.star,color: Colors.orange,size: 20,)
+                                                ],
+                                              ),
+                                              Text(
+                                                snapshot.data![index].createdAt.toString().split(" ")[0],
+                                                style:Theme.of(context).textTheme.displaySmall ,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
-                            Text(
-                              "1 ngày trước",
-                              style:Theme.of(context).textTheme.displaySmall ,
+                            const SizedBox(
+                              height: 10,
                             ),
+                            Text(snapshot.data![index].comment,
+                                style: Theme.of(context).textTheme.displayMedium),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              children: [
+                                ...snapshot.data![index].images.map((e) => Container(
+                                  margin: const EdgeInsets.only(right: 5),
+                                  width: 100,
+                                  height: 100,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Image.network(e,fit: BoxFit.cover,)),
+                                  ),
+                                ))
+                              ],
+                            )
                           ],
                         ),
-                      ],
-                    ),
-                  ),
+                      )),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Text('Phong xanh sạch đẹp',
-              style: Theme.of(context).textTheme.displayMedium),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              ...[0,2,3].map((e) => Container(
-                margin: const EdgeInsets.only(right: 5),
-                width: 100,
-                height: 100,
-                child: AspectRatio(
-                  aspectRatio: 1 / 1,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.network('https://kynguyenlamdep.com/wp-content/uploads/2022/06/anh-gai-xinh-cuc-dep.jpg',fit: BoxFit.cover,)),
-                ),
-              ))
-            ],
-          )
-        ],
+            );
+          }
+          else{
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+
       ),
     );
   }

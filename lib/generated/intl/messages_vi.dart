@@ -173,6 +173,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "profile_rent": MessageLookupByLibrary.simpleMessage("Đã thuê"),
         "profile_save": MessageLookupByLibrary.simpleMessage("Lưu"),
         "profile_title": MessageLookupByLibrary.simpleMessage("Trang cá nhân"),
+        "qr_code_detail": MessageLookupByLibrary.simpleMessage("Chi tiết"),
+        "qr_code_review": MessageLookupByLibrary.simpleMessage("Đánh giá"),
+        "qr_code_review_send": MessageLookupByLibrary.simpleMessage("GỬI"),
+        "qr_code_review_title":
+            MessageLookupByLibrary.simpleMessage("Đánh giá"),
+        "qr_code_scan": MessageLookupByLibrary.simpleMessage("Quét mã"),
+        "qr_code_scan_success":
+            MessageLookupByLibrary.simpleMessage("Quét thành công"),
         "rent_now_boarding_house":
             MessageLookupByLibrary.simpleMessage("Nhà thuê:"),
         "rent_now_day": MessageLookupByLibrary.simpleMessage("Ngày"),

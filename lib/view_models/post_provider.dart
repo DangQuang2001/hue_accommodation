@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/models/post.dart';
+import 'package:hue_accommodation/services/post_api.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class PostProvider extends ChangeNotifier {
@@ -42,29 +43,7 @@ class PostProvider extends ChangeNotifier {
         }
       }
     }
-
-    final response = await http.post(Uri.parse('$url/api/post/create'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": DateTime.now().millisecondsSinceEpoch.toString(),
-          "title": title,
-          "caption": caption,
-          "userId": userId,
-          "hostName": hostName,
-          "avatar": avatar,
-          "likesCount": 0,
-          "commentsCount": 0,
-          "roomId": roomId ?? "",
-          "roomName": roomName ?? "",
-          "tag": tag,
-          "imageUrls": listImageUrl,
-          "likedBy": [],
-          "isHidden": [],
-          "isHiddenHost":false
-        }));
-
+    final response = await PostApi.createPost(title, caption, userId, hostName, avatar, roomId, roomName, tag, listImage, listImageUrl);
     if (response.statusCode == 200) {
       getPost([tag], userId);
       getPost([0,1,2], userId);
@@ -72,121 +51,63 @@ class PostProvider extends ChangeNotifier {
     if (response.statusCode == 403) {
       print(response.body);
     }
-
     return true;
   }
 
   Future<void> getPost(List<int> tag, String userId) async {
-    try {
-      final response = await http.post(
-          Uri.parse('$url/api/post/get-all-post-by-tag'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: jsonEncode(<String, dynamic>{
-            "tag": tag,
-            "isHidden": userId,
-          }));
-      var jsonObject = jsonDecode(response.body);
-      var listObject = jsonObject as List;
+      final data = await PostApi.getPost(tag, userId);
       if(tag[0]==0 && tag.length==1){
-        listRoommate = listObject.map((e) => Post.fromJson(e)).toList();
+        listRoommate = data;
         notifyListeners();
       }
       else if(tag[0]==1){
-        listTransfer = listObject.map((e) => Post.fromJson(e)).toList();
+        listTransfer = data;
         notifyListeners();
       }
       else if(tag[0]==2){
-        listOther  = listObject.map((e) => Post.fromJson(e)).toList();
+        listOther  = data;
         notifyListeners();
       }
       else{
-        listAllPost = listObject.map((e) => Post.fromJson(e)).toList();
+        listAllPost = data;
         notifyListeners();
       }
-
-    } catch (e) {
-      print('Error get post: $e');
-    }
   }
   Future<List<Post>> getPostById(String userId) async {
-    try {
-      final response = await http.get(
-          Uri.parse('$url/api/post/get-post-by-userId/$userId'));
-      var jsonObject = jsonDecode(response.body);
-      var listObject = jsonObject as List;
-      return listObject.map((e) => Post.fromJson(e)).toList();
-    } catch (e) {
-      print('Error get post: $e');
-      return [];
-    }
+      return await PostApi.getPostById(userId);
   }
+
   Future<void> likePost(String id, String userId) async {
-    try {
-      await http.post(Uri.parse('$url/api/post/like-post'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      await PostApi.likePost(id, userId);
       getPost([0,1,2], userId);
-    } catch (e) {
-      // Handle any exceptions that may be thrown
-      print('Error liking post: $e');
-    }
   }
   Future<void> dislikePost(String id, String userId) async {
-    try {
-      await http.post(Uri.parse('$url/api/post/dislike-post'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      await PostApi.dislikePost(id, userId);
       getPost([0,1,2], userId);
-    } catch (e) {
-      print('Error dislike post: $e');
-    }
   }
+
   Future<void> hiddenPost(String id, String userId) async {
-    try {
-      await http.post(Uri.parse('$url/api/post/hidden-post'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: jsonEncode(<String, dynamic>{"id": id, "userId": userId}));
+      await PostApi.hiddenPost(id, userId);
       getPost([0,1,2], userId);
       getPost([0], userId);
       getPost([1], userId);
       getPost([2], userId);
-    } catch (e) {
-      print('Error dislike post: $e');
-    }
   }
+
   Future<void> hiddenHost(String id, bool isHiddenHost,String userId) async {
-    try {
-      await http.post(Uri.parse('$url/api/post/hidden-post-by-host'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: jsonEncode(<String, dynamic>{"id": id, "isHiddenHost": isHiddenHost}));
+      await PostApi.hiddenHost(id, isHiddenHost, userId);
       getPost([0,1,2], userId);
       getPost([0], userId);
       getPost([1], userId);
       getPost([2], userId);
-    } catch (e) {
-      print('Error dislike post: $e');
-    }
   }
+
   Future<void> deletePost(String id, String userId) async {
-    try {
-      await http.get(Uri.parse('$url/api/post/delete-post/$id'));
+      await PostApi.deletePost(id, userId);
       getPost([0,1,2], userId);
       getPost([0], userId);
       getPost([1], userId);
       getPost([2], userId);
-    } catch (e) {
-      print('Error dislike post: $e');
-    }
   }
   // Lấy data khi vào diễn đàn
   getAllData(String userId){
@@ -197,7 +118,6 @@ class PostProvider extends ChangeNotifier {
   }
 
   List<AssetEntity> images = [];
-
   Future<void> selectImages(BuildContext context) async {
     images=[];
     List<AssetEntity>? result = await AssetPicker.pickAssets(context,

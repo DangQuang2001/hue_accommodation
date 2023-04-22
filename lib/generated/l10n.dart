@@ -1179,6 +1179,66 @@ class S {
       args: [],
     );
   }
+
+  /// `Scan a code`
+  String get qr_code_scan {
+    return Intl.message(
+      'Scan a code',
+      name: 'qr_code_scan',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scanned Success`
+  String get qr_code_scan_success {
+    return Intl.message(
+      'Scanned Success',
+      name: 'qr_code_scan_success',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Detail`
+  String get qr_code_detail {
+    return Intl.message(
+      'Detail',
+      name: 'qr_code_detail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review`
+  String get qr_code_review {
+    return Intl.message(
+      'Review',
+      name: 'qr_code_review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review`
+  String get qr_code_review_title {
+    return Intl.message(
+      'Review',
+      name: 'qr_code_review_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `SEND`
+  String get qr_code_review_send {
+    return Intl.message(
+      'SEND',
+      name: 'qr_code_review_send',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

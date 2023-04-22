@@ -175,6 +175,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "profile_rent": MessageLookupByLibrary.simpleMessage("Rented"),
         "profile_save": MessageLookupByLibrary.simpleMessage("Save"),
         "profile_title": MessageLookupByLibrary.simpleMessage("Profile"),
+        "qr_code_detail": MessageLookupByLibrary.simpleMessage("Detail"),
+        "qr_code_review": MessageLookupByLibrary.simpleMessage("Review"),
+        "qr_code_review_send": MessageLookupByLibrary.simpleMessage("SEND"),
+        "qr_code_review_title": MessageLookupByLibrary.simpleMessage("Review"),
+        "qr_code_scan": MessageLookupByLibrary.simpleMessage("Scan a code"),
+        "qr_code_scan_success":
+            MessageLookupByLibrary.simpleMessage("Scanned Success"),
         "rent_now_boarding_house":
             MessageLookupByLibrary.simpleMessage("Boarding house:"),
         "rent_now_day": MessageLookupByLibrary.simpleMessage("Days"),

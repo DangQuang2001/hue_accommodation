@@ -11,6 +11,7 @@ import 'package:hue_accommodation/views/qr_code/review_room.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import '../../generated/l10n.dart';
 import '../login_register/auth_service.dart';
 
 class QRCodeScanner extends StatefulWidget {
@@ -126,7 +127,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                 borderRadius: BorderRadius.circular(10)),
             child: Center(
                 child: Text(
-              'Scan a code',
+              S.of(context).qr_code_scan,
               style: GoogleFonts.readexPro(
                   color: Colors.white,
                   fontWeight: FontWeight.w300,
@@ -167,7 +168,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
           builder: (context, roomProvider, userProvider, child) => AlertDialog(
               title: Center(
                   child: Text(
-                "Scanned Success",
+                    S.of(context).qr_code_scan_success,
                 style: GoogleFonts.readexPro(color: Colors.green),
               )),
               content: Container(
@@ -240,7 +241,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                                     ),
                                   ),
                                   Text(
-                                    'Detail',
+                                    S.of(context).qr_code_detail,
                                     style: GoogleFonts.readexPro(
                                         fontSize: 17,
                                         fontWeight: FontWeight.w400),
@@ -294,7 +295,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                                     ),
                                   ),
                                   Text(
-                                    'Review',
+                                    S.of(context).qr_code_review,
                                     style: GoogleFonts.readexPro(
                                         fontSize: 17,
                                         fontWeight: FontWeight.w400),

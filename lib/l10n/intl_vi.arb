@@ -132,6 +132,14 @@
   "manage_rent_UnConfirmed": "Hủy",
   "manage_rent_detail": "Chi tiết đơn thuê",
   "manage_rent_number": "Số ngày:",
-  "manage_day_rent": "Ngày"
+  "manage_day_rent": "Ngày",
+
+
+  "qr_code_scan": "Quét mã",
+  "qr_code_scan_success": "Quét thành công",
+  "qr_code_detail": "Chi tiết",
+  "qr_code_review": "Đánh giá",
+  "qr_code_review_title": "Đánh giá",
+  "qr_code_review_send": "GỬI"
 
 }

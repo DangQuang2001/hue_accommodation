@@ -28,12 +28,10 @@ class _AddRoomPageState extends State<AddRoomPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? title;
   String? description;
-  String? address;
+  String address="Address";
   double? area;
   double? price;
   bool _isLoading = false;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,42 +39,73 @@ class _AddRoomPageState extends State<AddRoomPage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Stack(children: [
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              appBar(context),
-              infoRoom(context),
-            ],
-          ),
-        ),
-        _isLoading
-            ? Positioned(
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: LoadingAnimationWidget.inkDrop(
-              color: Colors.white,
-              size: 100,
+      body: GestureDetector(
+        onTap: (){
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                appBar(context),
+                typeRoom(context),
+                Container(
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  color: Theme.of(context).colorScheme.onBackground,
+                  child: Text(
+                    'INFO ROOM',
+                    style: GoogleFonts.readexPro(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 1.5),
+                  ),
+                ),
+                infoRoom(context),
+              ],
             ),
           ),
-        )
-            : Container(),
-      ]),
+          _isLoading
+              ? Positioned(
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: LoadingAnimationWidget.inkDrop(
+                      color: Colors.white,
+                      size: 100,
+                    ),
+                  ),
+                )
+              : Container(),
+        ]),
+      ),
       floatingActionButton: Consumer<UserProvider>(
-        builder: (context, userProvider, child) =>  FloatingActionButton(
+        builder: (context, userProvider, child) => FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState?.validate() ?? false) {
-              if(roomProvider.images.isNotEmpty){
-                (()async{
+              if (roomProvider.images.isNotEmpty) {
+                (() async {
                   setState(() {
                     _isLoading = true;
                   });
                   await roomProvider.uploadImages();
-                  roomProvider.createRoom(userProvider.userCurrent!.id,userProvider.userCurrent!.name,userProvider.userCurrent!.image,title!, description!, address!, area!, dropdownFurnishingValue, price!, dropdownTypeRoomValue, roomProvider.listImageUrl);
+                  roomProvider.createRoom(
+                      userProvider.userCurrent!.id,
+                      userProvider.userCurrent!.name,
+                      userProvider.userCurrent!.image,
+                      title!,
+                      description!,
+                      address!,
+                      area!,
+                      dropdownFurnishingValue,
+                      price!,
+                      dropdownTypeRoomValue,
+                      roomProvider.listImageUrl);
                   setState(() {
                     _isLoading = false;
                   });
@@ -136,18 +165,14 @@ class _AddRoomPageState extends State<AddRoomPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              S.of(context).add_room_name,
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
             TextFormField(
-                initialValue: '',
+                style:Theme.of(context).textTheme.displayMedium,
                 decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  labelText:S.of(context).add_room_name,
+                  labelStyle: GoogleFonts.readexPro(fontSize: 18,color: Colors.grey),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
                 validator: (value) {
@@ -163,65 +188,45 @@ class _AddRoomPageState extends State<AddRoomPage> {
                   if (!regex.hasMatch(value)) {
                     return "Tên không được chứa ký tự đặc biệt!";
                   }
-                  title=value;
+                  title = value;
                   return null;
                 }),
+
+
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            Text(
-              S.of(context).add_room_description,
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextFormField(
-                initialValue: '',
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+            SizedBox(
+              height: 150,
+              child: TextFormField(
+                textAlignVertical: TextAlignVertical.top,
+                  maxLines: null,
+                  expands: true,
+                  decoration: InputDecoration(
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText:S.of(context).add_room_description,
+                    labelStyle: GoogleFonts.readexPro(fontSize: 18,color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
                   ),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Vui lòng nhập mô tả";
-                  }
-                  if (value!.length < 2) {
-                    return "Mô tả quá ngắn!";
-                  }
-                  description=value;
-                  return null;
-                }),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              S.of(context).add_room_address,
-              style: Theme.of(context).textTheme.displayLarge,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Vui lòng nhập mô tả";
+                    }
+                    if (value!.length < 2) {
+                      return "Mô tả quá ngắn!";
+                    }
+                    description = value;
+                    return null;
+                  }),
             ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            TextFormField(
-                initialValue: '',
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Vui lòng nhập địa chỉ";
-                  }
-                  if (value!.length < 2) {
-                    return "Địa chỉ quá ngắn!";
-                  }
-                  address=value;
-                  return null;
-                }),
+            chooseAddress(context),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
             Row(
               children: [
@@ -250,7 +255,7 @@ class _AddRoomPageState extends State<AddRoomPage> {
                           if (double.parse(value!) < 0) {
                             return "Diện tích không được âm";
                           }
-                          area=double.parse(value);
+                          area = double.parse(value);
                           return null;
                         }),
                   ],
@@ -334,7 +339,7 @@ class _AddRoomPageState extends State<AddRoomPage> {
                           if (value!.isEmpty) {
                             return "Giá tiền không được để trống!";
                           }
-                          price=double.parse(value);
+                          price = double.parse(value);
                           return null;
                         }),
                   ],
@@ -420,7 +425,8 @@ class _AddRoomPageState extends State<AddRoomPage> {
                 width: 130,
                 height: 40,
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10), color: Colors.blue),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.blue),
                 child: Center(
                   child: Text(
                     'Choose Image',
@@ -463,6 +469,271 @@ class _AddRoomPageState extends State<AddRoomPage> {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget typeRoom(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet<void>(
+          context: context,
+          isDismissible: true,
+          builder: (BuildContext context) {
+            return Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  color: Colors.blue,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            color: Colors.white,
+                            size: 20,
+                          )),
+                      Text(
+                        'Type Room',
+                        style: GoogleFonts.readexPro(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(
+                        width: 40,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  color: Theme.of(context).colorScheme.background,
+                  child: Text(
+                    'SELECTED',
+                    style: GoogleFonts.readexPro(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 1.5),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.house_outlined),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            dropdownTypeRoomValue,
+                            style: Theme.of(context).textTheme.displayMedium,
+                          ),
+                        ],
+                      ),
+                      const Icon(
+                        Icons.check,
+                        color: Colors.green,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  color: Theme.of(context).colorScheme.background,
+                  child: Text(
+                    'OTHERS',
+                    style: GoogleFonts.readexPro(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 1.5),
+                  ),
+                ),
+                ...listTypeRoom.map((e) {
+                  if (e != dropdownTypeRoomValue) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          dropdownTypeRoomValue = e;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20.0),
+                        decoration: const BoxDecoration(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.warehouse_outlined),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  e,
+                                  style:
+                                      Theme.of(context).textTheme.displayMedium,
+                                ),
+                              ],
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 15,
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      height: 0,
+                    );
+                  }
+                })
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        width: MediaQuery.of(context).size.width,
+        height: 60,
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 1),
+            borderRadius: BorderRadius.circular(5)),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(S.of(context).add_room_type_room,
+                      style: GoogleFonts.readexPro(
+                        color: Colors.grey,
+                      )),
+                  Text(
+                    dropdownTypeRoomValue,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  )
+                ],
+              ),
+              const Icon(
+                Icons.arrow_drop_down_outlined,
+                size: 30,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  Widget chooseAddress(BuildContext context) {
+    return Consumer<RoomProvider>(
+      builder: (context, roomProvider, child) =>  GestureDetector(
+        onTap: () {
+          showModalBottomSheet<void>(
+            context: context,
+            isDismissible: true,
+            builder: (BuildContext context) {
+              return Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    color: Colors.blue,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_outlined,
+                              color: Colors.white,
+                              size: 20,
+                            )),
+                        Text(
+                          'Choose City',
+                          style: GoogleFonts.readexPro(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(
+                          width: 40,
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: FutureBuilder(
+                        future: roomProvider.getCity(),
+                        builder: (context, snapshot) {
+                          if(snapshot.hasError){
+                            return const Text('Có gì đó sai sai!');
+                          }
+                          if(snapshot.hasData){
+                            return ListView.builder(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) =>Text(snapshot.data![index]['name'],style: GoogleFonts.readexPro(),));
+                          }
+                          else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },),
+                  )
+
+
+                ],
+              );
+            },
+          );
+        },
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 60,
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1),
+              borderRadius: BorderRadius.circular(5)),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  address,
+                  style: GoogleFonts.readexPro(fontSize: 18,color: Colors.grey),
+                ),
+                const Icon(
+                  Icons.arrow_drop_down_outlined,
+                  size: 30,
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

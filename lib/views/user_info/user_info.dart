@@ -15,7 +15,7 @@ import 'package:hue_accommodation/view_models/language_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/theme_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
-import 'package:hue_accommodation/views/user_info/rent_history.dart';
+import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -35,36 +35,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   List<String> listImageUrl = [];
   bool _isloading = false;
 
-  Future<void> _selectImages() async {
-    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
-        pickerConfig: const AssetPickerConfig(
-          maxAssets: 1,
-          requestType: RequestType.image,
-          selectedAssets: [],
-        ));
-    setState(() {
-      _images = result!;
-    });
-  }
 
-  Future<void> _uploadImages() async {
-    final storage = FirebaseStorage.instance;
-    for (var asset in _images) {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference reference = storage.ref().child('images').child(fileName);
-      final File? file = await asset.file;
-      if (file != null) {
-        UploadTask task = reference.putFile(file);
-        await task.whenComplete(() => null);
-        String imageUrl = await reference.getDownloadURL();
-        listImageUrl.add(imageUrl);
-
-        // rest of the code here
-      } else {
-        // handle error, e.g. file is null
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,12 +132,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () => Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        AuthService().handleAuthState()),
-                                (route) => false),
+                            onTap: () => Navigator.of(context).push(slideRightToLeft(AuthService().handleAuthState())),
                             child: Container(
                               width: 100,
                               height: 45,
@@ -741,6 +707,36 @@ class _UserInfoPageState extends State<UserInfoPage> {
         );
       },
     );
+  }
+  Future<void> _selectImages() async {
+    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
+        pickerConfig: const AssetPickerConfig(
+          maxAssets: 1,
+          requestType: RequestType.image,
+          selectedAssets: [],
+        ));
+    setState(() {
+      _images = result!;
+    });
+  }
+
+  Future<void> _uploadImages() async {
+    final storage = FirebaseStorage.instance;
+    for (var asset in _images) {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference = storage.ref().child('images').child(fileName);
+      final File? file = await asset.file;
+      if (file != null) {
+        UploadTask task = reference.putFile(file);
+        await task.whenComplete(() => null);
+        String imageUrl = await reference.getDownloadURL();
+        listImageUrl.add(imageUrl);
+
+        // rest of the code here
+      } else {
+        // handle error, e.g. file is null
+      }
+    }
   }
 }
 

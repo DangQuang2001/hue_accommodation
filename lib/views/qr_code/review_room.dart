@@ -9,6 +9,7 @@ import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
 import '../../models/room.dart';
 import '../../view_models/room_provider.dart';
 
@@ -95,7 +96,7 @@ class _ReviewRoomState extends State<ReviewRoom> {
             ),
           ),
           Text(
-            '     Review    ',
+            S.of(context).qr_code_review_title,
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           const SizedBox(
@@ -224,7 +225,7 @@ class _ReviewRoomState extends State<ReviewRoom> {
                         Navigator.pop(context);
                       });
                     }
-                  }, child:  Text('SEND',style: GoogleFonts.readexPro(color: Colors.white,letterSpacing: 1.5,fontSize: 20))))
+                  }, child:  Text(S.of(context).qr_code_review_send,style: GoogleFonts.readexPro(color: Colors.white,letterSpacing: 1.5,fontSize: 20))))
 
             ],
           ),
