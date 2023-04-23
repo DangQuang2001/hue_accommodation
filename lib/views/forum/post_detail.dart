@@ -6,6 +6,7 @@ import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/comment_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
+import '../../generated/l10n.dart';
 import '../../models/post.dart';
 import '../../view_models/post_provider.dart';
 import '../../view_models/user_provider.dart';
@@ -134,7 +135,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       color: Colors.grey.withOpacity(0.5))),
                               filled: true,
                               fillColor: Colors.white.withOpacity(0.6),
-                              hintText: 'Enter a comment...',
+                              hintText: S.of(context).forum_enter_comment,
                             ),
                           ),
                         ),
@@ -298,7 +299,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                                 width: 10,
                                               ),
                                               Text(
-                                                'Xóa bài viết',
+                                                S.of(context).forum_delete,
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .displayMedium!
@@ -332,7 +333,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       width: 10,
                                     ),
                                     Text(
-                                      'Ẩn bài viết',
+                                      S.of(context).forum_hidden,
                                       style: Theme.of(context)
                                           .textTheme
                                           .displayMedium,
@@ -656,7 +657,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Comment',
+                S.of(context).forum_comment,
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               ExpansionPanelList(

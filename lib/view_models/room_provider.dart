@@ -13,6 +13,10 @@ import 'dart:ui' as ui;
 
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+import '../models/review.dart';
+import '../services/provinces_api.dart';
+import '../services/room_api.dart';
+
 class RoomProvider extends ChangeNotifier {
   bool isLoadMoreRunning = false;
   bool isLoadMoreRunningFilter = false;
@@ -407,30 +411,28 @@ class RoomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-Future<bool> deleteRoom(String id)async{
-  final response =
-      await http.delete(Uri.parse('$url/api/motelhouse/delete/$id'));
-  if (response.statusCode == 200) {
-    return true;
+  Future<bool> deleteRoom(String id) async {
+    final response =
+        await http.delete(Uri.parse('$url/api/motelhouse/delete/$id'));
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
   }
-  return false;
-}
 
-  getDataFirstTime() async{
+  getDataFirstTime() async {
     await getTopRating(5);
     await lazyLoadingMotel("", [1, 2, 3], 0, 20);
     await lazyLoadingMini("", [1, 2, 3], 0, 5);
     await lazyLoadingWhole("", [1, 2, 3], 0, 20);
   }
 
-  lazyLoading() async{
-    if (isLoadMoreRunning == false &&
-        hasNextPage == true) {
+  lazyLoading() async {
+    if (isLoadMoreRunning == false && hasNextPage == true) {
       skip += 2;
       (() async {
-
-          isLoadMoreRunning = true;
-          notifyListeners();
+        isLoadMoreRunning = true;
+        notifyListeners();
         final response = await http.post(
             Uri.parse('$url/api/motelhouse/lazyloading'),
             headers: <String, String>{
@@ -447,31 +449,29 @@ Future<bool> deleteRoom(String id)async{
         if (jsonObject.isNotEmpty) {
           var listObject = jsonObject as List;
           List<Room> listLoadMore =
-          listObject.map((e) => Room.fromJson(e)).toList();
+              listObject.map((e) => Room.fromJson(e)).toList();
           listMiniFirstLoad.addAll(listLoadMore);
         } else {
-            hasNextPage = false;
-            notifyListeners();
+          hasNextPage = false;
+          notifyListeners();
         }
 
-          isLoadMoreRunning = false;
-          notifyListeners();
+        isLoadMoreRunning = false;
+        notifyListeners();
       })();
     }
   }
 
-  lazyLoadingFilter(int typeName)async{
-    if (isLoadMoreRunningFilter == false &&
-        hasNextPageFilter == true) {
+  lazyLoadingFilter(int typeName) async {
+    if (isLoadMoreRunningFilter == false && hasNextPageFilter == true) {
       skipFilter += 2;
       (() async {
         isLoadMoreRunningFilter = true;
-          notifyListeners();
+        notifyListeners();
         final response = await http.post(
             Uri.parse('$url/api/motelhouse/filter'),
             headers: <String, String>{
-              'Content-Type':
-              'application/json; charset=UTF-8'
+              'Content-Type': 'application/json; charset=UTF-8'
             },
             body: jsonEncode(<String, dynamic>{
               "searchValue": "",
@@ -483,28 +483,34 @@ Future<bool> deleteRoom(String id)async{
 
         if (jsonObject.isNotEmpty) {
           var listObject = jsonObject as List;
-          List<Room> listLoadMore = listObject
-              .map((e) => Room.fromJson(e))
-              .toList();
+          List<Room> listLoadMore =
+              listObject.map((e) => Room.fromJson(e)).toList();
           listRent.addAll(listLoadMore);
         } else {
-            hasNextPageFilter = false;
-            notifyListeners();
+          hasNextPageFilter = false;
+          notifyListeners();
         }
         isLoadMoreRunningFilter = false;
         notifyListeners();
-
-
       })();
     }
   }
 
+  Future<void> reviewRoom(String roomId, String userId, double rating,
+      String comment, List<String> images) async {
+    await RoomApi.reviewRoom(roomId, userId, rating, comment, images);
+  }
+
+  Future<List<Review>> getReview(String roomId) async {
+    return await RoomApi.getReview(roomId);
+  }
+
   Future<BitmapDescriptor> getMarkerIconFromUrl(String imageUrl) async {
     final image =
-    CachedNetworkImageProvider(imageUrl, maxHeight: 150, maxWidth: 150);
+        CachedNetworkImageProvider(imageUrl, maxHeight: 150, maxWidth: 150);
     final completer = Completer<ui.Image>();
     final listener = ImageStreamListener(
-            (ImageInfo info, bool _) => completer.complete(info.image));
+        (ImageInfo info, bool _) => completer.complete(info.image));
     final stream = image.resolve(ImageConfiguration.empty);
     stream.addListener(listener);
     final uiImage = await completer.future;
@@ -523,9 +529,10 @@ Future<bool> deleteRoom(String id)async{
           requestType: RequestType.image,
           selectedAssets: [],
         ));
-      images = result!;
-      notifyListeners();
+    images = result!;
+    notifyListeners();
   }
+
   Future<void> uploadImages() async {
     listImageUrl = [];
     final storage = FirebaseStorage.instance;
@@ -546,4 +553,21 @@ Future<bool> deleteRoom(String id)async{
     }
   }
 
+  Future<List> getCity() async {
+    return await ProvincesApi.getCity();
+  }
+
+  List listDistrict = [];
+  Future<void> getDistricts(int code) async {
+    listDistrict = [];
+    listDistrict = (await ProvincesApi.getDistrict(code))['districts'];
+    notifyListeners();
+  }
+
+  List listWard = [];
+  Future<void> getWards(int code) async {
+    listWard = [];
+    listWard = (await ProvincesApi.getWards(code))['wards'];
+    notifyListeners();
+  }
 }

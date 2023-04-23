@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
-import 'package:hue_accommodation/views/login_register/login.dart';
 import 'package:provider/provider.dart';
+
+import '../components/slide_route.dart';
+import 'choose_role.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -149,19 +151,19 @@ class _RegisterPageState extends State<RegisterPage> {
                         validator: (value) {
                           // add email validation
 
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            }
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }
 
-                            bool emailValid = RegExp(r"""
+                          bool emailValid = RegExp(r"""
 ^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+""")
-                                .hasMatch(value);
-                            if (!emailValid) {
-                              return 'Please enter a valid email';
-                            }
+                              .hasMatch(value);
+                          if (!emailValid) {
+                            return 'Please enter a valid email';
+                          }
 
-                            email = value;
-                            return null;
+                          email = value;
+                          return null;
                         },
                         decoration: InputDecoration(
                           enabledBorder: UnderlineInputBorder(
@@ -298,10 +300,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
                       // do something
-                      (()async{
-                        if(await userProvider.checkIsmail(email)){
-
-                          await userProvider.createUser(name, email, password,"","", false, true);
+                      (() async {
+                        if (await userProvider.checkIsmail(email)) {
+                          await userProvider.createUser(
+                              name,
+                              email,
+                              password,
+                              "https://www.seekpng.com/png/detail/966-9665317_placeholder-image-person-jpg.png",
+                              "",
+                              false,
+                              false);
                           final snackBar = SnackBar(
                             backgroundColor: Colors.green,
                             content: const Text('Dang ky thanh cong!'),
@@ -316,9 +324,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           // ignore: use_build_context_synchronously
-                          Navigator.pop(context);
-                        }
-                        else {
+                          Navigator.of(context).push(slideBottomToTop( ChooseRolePage(email: email,)));
+                        } else {
                           final snackBar = SnackBar(
                             backgroundColor: Colors.redAccent,
                             content: const Text('Email da ton tai!'),
@@ -330,10 +337,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           );
 
-                           // ignore: use_build_context_synchronously
-                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
-
                       })();
                     }
                   },
@@ -427,10 +433,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 width: 5,
               ),
               InkWell(
-                onTap: () => Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                    (route) => false),
+                onTap: () => Navigator.pop(context),
                 child: Text(
                   "Login",
                   style: GoogleFonts.readexPro(

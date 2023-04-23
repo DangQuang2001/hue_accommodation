@@ -1,4 +1,3 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
+
+import '../../generated/l10n.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -53,7 +54,7 @@ class _MessagePageState extends State<MessagePage> {
           Hero(
             tag: "Messages",
             child: Text(
-              'Messages ',
+              S.of(context).message_title,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
@@ -92,7 +93,7 @@ class _MessagePageState extends State<MessagePage> {
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(50.0),
               ),
-              hintText: 'Search..',
+              hintText: S.of(context).message_search,
               hintStyle: Theme.of(context).textTheme.headlineSmall),
         ),
       ),
@@ -206,7 +207,7 @@ class _MessagePageState extends State<MessagePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        "${time_ago.format(DateTime.parse(roomChat['_id']['message'][0]['createdAt']), locale: 'en_short', clock: DateTime.now())} ago",
+                        "${time_ago.format(DateTime.parse(roomChat['_id']['message'][0]['createdAt']), locale: 'en_short', clock: DateTime.now())} ${S.of(context).message_ago}",
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       (roomChat['_id']['readBy'] as List)

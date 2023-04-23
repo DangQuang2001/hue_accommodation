@@ -1,7 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:flutter/material.dart';
+import 'package:hue_accommodation/services/rent_api.dart';
 
 import '../models/rent.dart';
 
@@ -23,29 +21,8 @@ class RentProvider extends ChangeNotifier {
       int numberDaysRented,
       int numberPeople,
       String notes) async {
-    final response = await http.post(Uri.parse('$url/api/rent/create'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": DateTime.now().millisecondsSinceEpoch.toString(),
-          "dateCreate": DateTime.now().toString(),
-          "hostID": hostID,
-          "userID": userID,
-          "name": name,
-          "image":image,
-          "roomImage":roomImage,
-          "phone": phone,
-          "roomID": roomID,
-          "roomName": roomName,
-          "numberDaysRented": numberDaysRented,
-          "numberPeople": numberPeople,
-          "note": notes,
-          "isConfirmed": 0,
-        }));
-
+    final response = await RentApi.createRent(hostID, userID, name, image, roomImage, phone, roomID, roomName, numberDaysRented, numberPeople, notes);
     if (response.statusCode == 200) {
-      var jsonObject = jsonDecode(response.body);
       isRent=true;
       notifyListeners();
     }
@@ -54,53 +31,42 @@ class RentProvider extends ChangeNotifier {
       isRent =false;
       notifyListeners();
     }
-
     return true;
   }
 
   Future<void> getListWaiting(String hostId,int isConfirmed) async {
-    final response = await http.get(Uri.parse('$url/api/rent/waiting/$hostId/$isConfirmed'));
-    var jsonObject = jsonDecode(response.body);
-    var listObject = jsonObject as List;
-    listWaiting = listObject.map((e) => Rent.fromJson(e)).toList();
+    final data = await RentApi.getListWaiting(hostId, isConfirmed);
+    listWaiting = data;
     notifyListeners();
-
   }
+
   Future<void> getListConfirm(String hostId,int isConfirmed) async {
-    final response = await http.get(Uri.parse('$url/api/rent/waiting/$hostId/$isConfirmed'));
-    var jsonObject = jsonDecode(response.body);
-    var listObject = jsonObject as List;
-    listConfirm = listObject.map((e) => Rent.fromJson(e)).toList();
+    final data = await RentApi.getListConfirm(hostId, isConfirmed);
+    listConfirm = data;
     notifyListeners();
     getListWaiting(hostId,0);
-
   }
+
   Future<void> getListUnConfirm(String hostId,int isConfirmed) async {
-    final response = await http.get(Uri.parse('$url/api/rent/waiting/$hostId/$isConfirmed'));
-    var jsonObject = jsonDecode(response.body);
-    var listObject = jsonObject as List;
-    listUnConfirm = listObject.map((e) => Rent.fromJson(e)).toList();
+    final data = await RentApi.getListUnConfirm(hostId, isConfirmed);
+    listUnConfirm = data;
     notifyListeners();
     getListWaiting(hostId,0);
-
   }
+
   Future<void> confirm(String hostId,String id) async {
-    await http.get(Uri.parse('$url/api/rent/confirm/$id'));
+    await RentApi.confirm(hostId, id);
     getListConfirm(hostId, 1);
-
   }
-  Future<void> unConfirm(String hostId,String id) async {
-    await http.get(Uri.parse('$url/api/rent/unconfirm/$id'));
-    getListUnConfirm(hostId, 2);
 
+  Future<void> unConfirm(String hostId,String id) async {
+    await RentApi.unConfirm(hostId, id);
+    getListUnConfirm(hostId, 2);
   }
 
   Future<void> getListRent(String userId) async {
-    final response = await http.get(Uri.parse('$url/api/rent/rentuser/$userId'));
-    var jsonObject = jsonDecode(response.body);
-    var listObject = jsonObject as List;
-    listRent = listObject.map((e) => Rent.fromJson(e)).toList();
+    final data = await RentApi.getListRent(userId);
+    listRent = data;
     notifyListeners();
-
   }
 }

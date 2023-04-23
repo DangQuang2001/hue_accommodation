@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import '../../generated/l10n.dart';
+
 class CreatePostPage extends StatefulWidget {
   final List<AssetEntity>? images;
 
@@ -22,7 +24,7 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   List<AssetEntity> imagesChoose = [];
   int tagSelect = 0;
-  String _selectedName = 'Choose Place!';
+  String _selectedName = S.current.forum_choose_place;
   String _selectRoomId = '';
   late List listNameRoom;
   String captions = "";
@@ -94,7 +96,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 },
                 icon: const Icon(Icons.arrow_back_outlined)),
             Text(
-              'CreatePost ',
+              S.of(context).forum_create,
               style: Theme.of(context).textTheme.displayLarge,
             ),
             InkWell(
@@ -185,7 +187,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             spaceH,
             Row(
               children: [
-                Text("Title:",
+                Text(S.of(context).forum_create_title,
                     style: GoogleFonts.readexPro(
                         fontSize: 17, fontWeight: FontWeight.w400)),
                 spaceW,
@@ -199,9 +201,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     textAlign: TextAlign.left,
                     style: const TextStyle(fontSize: 16),
                     cursorColor: Colors.blue,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your title...',
-                      hintStyle: TextStyle(color: Colors.grey),
+                    decoration:  InputDecoration(
+                      hintText: S.of(context).forum_type_title,
+                      hintStyle: const TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
                   ),
@@ -221,9 +223,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     textAlign: TextAlign.left,
                     style: const TextStyle(fontSize: 16),
                     cursorColor: Colors.blue,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your caption...',
-                      hintStyle: TextStyle(color: Colors.grey),
+                    decoration:  InputDecoration(
+                      hintText: S.of(context).forum_type_caption,
+                      hintStyle: const TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
                   ),
@@ -265,7 +267,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 tagSelect == 0 ? Colors.white : Colors.orange,
                           ),
                           Text(
-                            'Roommate',
+                            S.of(context).forum_roommate,
                             style: tagSelect == 0
                                 ? GoogleFonts.readexPro(color: Colors.white)
                                 : GoogleFonts.readexPro(color: Colors.orange),
@@ -297,7 +299,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 tagSelect == 1 ? Colors.white : Colors.orange,
                           ),
                           Text(
-                            'Transfer of property',
+                            S.of(context).forum_transfer,
                             style: tagSelect == 1
                                 ? GoogleFonts.readexPro(color: Colors.white)
                                 : GoogleFonts.readexPro(color: Colors.orange),
@@ -329,7 +331,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 tagSelect == 2 ? Colors.white : Colors.orange,
                           ),
                           Text(
-                            'Others',
+                            S.of(context).forum_other,
                             style: tagSelect == 2
                                 ? GoogleFonts.readexPro(color: Colors.white)
                                 : GoogleFonts.readexPro(color: Colors.orange),
@@ -645,7 +647,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             builder: (context, setState) => AlertDialog(
               title: Center(
                   child: Text(
-                'Choose Place',
+                    S.of(context).forum_choose_place,
                 style: Theme.of(context).textTheme.displayLarge,
               )),
               content: Container(

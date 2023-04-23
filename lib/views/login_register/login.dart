@@ -6,8 +6,8 @@ import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
-import 'package:hue_accommodation/views/login_register/register.dart';
 import 'package:provider/provider.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -211,8 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                       // do something
                       (() async {
                         await userProvider.login(email, password);
-                        notificationProvider.getListNotification(userProvider.userCurrent!.id);
-                        chatProvider.getRoomChat(userProvider.userCurrent!.id);
+
 
                         final snackBar = SnackBar(
                           backgroundColor: userProvider.isLogin == 1
@@ -220,9 +219,8 @@ class _LoginPageState extends State<LoginPage> {
                               : Colors.redAccent,
                           content: userProvider.isLogin == 1
                               ? const Text('Dang nhap thanh cong!')
-                              : userProvider.isLogin == 2
-                                  ? const Text('Tai khoan khong dung!')
-                                  : const Text('Mat khau khong dung!'),
+                              :
+                          const Text('Thong tin dang nhap khong chinh xac!'),
                           action: SnackBarAction(
                             label: 'Close',
                             onPressed: () {
@@ -232,8 +230,12 @@ class _LoginPageState extends State<LoginPage> {
                         );
                         // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushNamedAndRemoveUntil(context, RouteName.home,(route) => false,);
+                        if(userProvider.isLogin == 1){
+                          notificationProvider.getListNotification(userProvider.userCurrent!.id);
+                          chatProvider.getRoomChat(userProvider.userCurrent!.id);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pushNamedAndRemoveUntil(context, RouteName.home,(route) => false,);
+                        }
                       })();
                     }
                   },
@@ -336,10 +338,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: 5,
               ),
               InkWell(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegisterPage())),
+                onTap: () => Navigator.pushNamed(context, RouteName.register),
                 child: Text(
                   "Register",
                   style: GoogleFonts.readexPro(

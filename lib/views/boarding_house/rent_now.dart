@@ -5,6 +5,7 @@ import 'package:hue_accommodation/view_models/rent_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../generated/l10n.dart';
 import '../../models/room.dart';
 
 class RentNowPage extends StatefulWidget {
@@ -102,7 +103,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
           Hero(
             tag: "Rent Now",
             child: Text(
-              '     Rent Now    ',
+              '    ${S.of(context).rent_now_title}    ',
               style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
@@ -176,7 +177,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                             width: 5,
                           ),
                           Text(
-                            'Rent date:',
+                            S.of(context).rent_now_rent_date,
                             style: Theme.of(context).textTheme.displayMedium,
                           ),
                           const SizedBox(
@@ -213,7 +214,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                         width: 5,
                       ),
                       Text(
-                        'Number Days Rented:',
+                        S.of(context).rent_now_number_date,
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                       const SizedBox(
@@ -246,9 +247,9 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text(
-                        'days',
-                        style: TextStyle(
+                       Text(
+                        S.of(context).rent_now_day,
+                        style: const TextStyle(
                             fontSize: 17, fontWeight: FontWeight.w300),
                       ),
                       const SizedBox(
@@ -270,7 +271,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                         width: 5,
                       ),
                       Text(
-                        'Boarding house:',
+                        S.of(context).rent_now_boarding_house,
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                       const SizedBox(
@@ -298,7 +299,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                         width: 5,
                       ),
                       Text(
-                        'Phone:',
+                        S.of(context).rent_now_phone,
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                       const SizedBox(
@@ -346,7 +347,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                         width: 5,
                       ),
                       Text(
-                        'Number of people:',
+                        S.of(context).rent_now_number_of_people,
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                       const SizedBox(
@@ -402,7 +403,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                         width: 5,
                       ),
                       Text(
-                        'Notes:',
+                        S.of(context).rent_now_note,
                         style: Theme.of(context).textTheme.displayMedium,
                       ),
                       const SizedBox(
@@ -488,7 +489,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                             borderRadius: BorderRadius.circular(10)),
                         child: Center(
                           child: Text(
-                            'RENT',
+                            S.of(context).rent_now_rent,
                             style: GoogleFonts.readexPro(
                                 fontSize: 20,
                                 color: Colors.white,

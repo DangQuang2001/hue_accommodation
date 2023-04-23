@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/views/user_info/user_info.dart';
 import 'package:provider/provider.dart';
+import '../../generated/l10n.dart';
 import '../../view_models/user_provider.dart';
 
 class EditProfile extends StatefulWidget {
@@ -134,7 +135,7 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ),
                 Text(
-                  'Edit Profile',
+                  S.of(context).edit_profile_title,
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(
@@ -203,7 +204,7 @@ class _EditProfileState extends State<EditProfile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Name',
+                    S.of(context).edit_profile_name,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(
@@ -249,7 +250,7 @@ class _EditProfileState extends State<EditProfile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Email',
+                    S.of(context).edit_profile_email,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(
@@ -301,7 +302,7 @@ class _EditProfileState extends State<EditProfile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Address',
+                    S.of(context).edit_profile_address,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(
@@ -344,7 +345,7 @@ class _EditProfileState extends State<EditProfile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Phone',
+                    S.of(context).edit_profile_phone,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(
@@ -383,7 +384,7 @@ class _EditProfileState extends State<EditProfile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Password',
+                    S.of(context).edit_profile_password,
                     style:Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(

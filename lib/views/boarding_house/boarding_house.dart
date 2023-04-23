@@ -10,6 +10,7 @@ import 'package:hue_accommodation/views/boarding_house/filter_house.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../generated/l10n.dart';
 import '../../models/room.dart';
 import '../components/slide_route.dart';
 import 'boarding_house_detail.dart';
@@ -33,11 +34,11 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   final _selectedColor = const Color(0xff1a73e8);
   final _unselectedColor = const Color(0xff5f6368);
   final _tabs = [
-    const Tab(
-      text: 'Mini House',
+     Tab(
+      text: S.current.boardinghouse_mini_house,
     ),
-    const Tab(text: 'Motel House'),
-    const Tab(text: 'Whole house'),
+     Tab(text: S.current.boardinghouse_motel_house),
+     Tab(text: S.current.boardinghouse_whole_house),
   ];
 
   void _startTimer() {
@@ -101,7 +102,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                   title: Hero(
                     tag: "Boarding Houses",
                     child: Text(
-                      'Boarding Houses',
+                      S.of(context).boardinghouse_title,
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
                   ),
@@ -954,7 +955,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
               delay: const Duration(milliseconds: 200),
               duration: const Duration(milliseconds: 200),
               child: Text(
-                'Top Rating',
+                S.of(context).boardinghouse_top_rating,
                 style: Theme.of(context).textTheme.displayLarge,
               ),
             ),
@@ -1089,7 +1090,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
             delay: const Duration(milliseconds: 200),
             duration: const Duration(milliseconds: 200),
             child: Text(
-              "Explore",
+              S.of(context).boardinghouse_explore,
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
@@ -1126,7 +1127,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                         height: 5,
                       ),
                       Text(
-                        'Rent',
+                        S.of(context).boardinghouse_rent,
                         style: Theme.of(context).textTheme.displayMedium,
                       )
                     ],
@@ -1160,7 +1161,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                         height: 5,
                       ),
                       Text(
-                        'Buy',
+                        S.of(context).boardinghouse_buy,
                         style: Theme.of(context).textTheme.displayMedium,
                       )
                     ],
@@ -1194,7 +1195,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                         height: 5,
                       ),
                       Text(
-                        'Project',
+                        S.of(context).boardinghouse_project,
                         style: Theme.of(context).textTheme.displayMedium,
                       )
                     ],

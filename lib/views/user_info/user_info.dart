@@ -11,14 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/chat_provider.dart';
 import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
+import 'package:hue_accommodation/view_models/language_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/view_models/theme_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
-import 'package:hue_accommodation/views/user_info/rent_history.dart';
+import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../constants/route_name.dart';
+import '../../generated/l10n.dart';
 import '../login_register/auth_service.dart';
 
 class UserInfoPage extends StatefulWidget {
@@ -33,36 +35,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   List<String> listImageUrl = [];
   bool _isloading = false;
 
-  Future<void> _selectImages() async {
-    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
-        pickerConfig: const AssetPickerConfig(
-          maxAssets: 1,
-          requestType: RequestType.image,
-          selectedAssets: [],
-        ));
-    setState(() {
-      _images = result!;
-    });
-  }
 
-  Future<void> _uploadImages() async {
-    final storage = FirebaseStorage.instance;
-    for (var asset in _images) {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference reference = storage.ref().child('images').child(fileName);
-      final File? file = await asset.file;
-      if (file != null) {
-        UploadTask task = reference.putFile(file);
-        await task.whenComplete(() => null);
-        String imageUrl = await reference.getDownloadURL();
-        listImageUrl.add(imageUrl);
-
-        // rest of the code here
-      } else {
-        // handle error, e.g. file is null
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +58,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Profile',
+                  S.of(context).profile_title,
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 InkWell(
@@ -159,12 +132,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () => Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        AuthService().handleAuthState()),
-                                (route) => false),
+                            onTap: () => Navigator.of(context).push(slideRightToLeft(AuthService().handleAuthState())),
                             child: Container(
                               width: 100,
                               height: 45,
@@ -234,80 +202,167 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   Widget editing(BuildContext context) {
-    return Consumer4<FcmTokenProvider,UserProvider,NotificationProvider,ChatProvider>(
-      builder: (context, fcmTokenProvider,userProvider,notificationProvider,chatProvider, child) =>  SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20),
-                  child: SlideInRight(
-                    delay: const Duration(milliseconds: 200),
-                    duration: const Duration(milliseconds: 200),
-                    child: Text(
-                      'CONTENT',
-                      style: GoogleFonts.readexPro(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.grey,
-                          letterSpacing: 2),
-                    ),
+    return Consumer5<FcmTokenProvider, UserProvider, NotificationProvider,
+        ChatProvider, LanguageProvider>(
+      builder: (context, fcmTokenProvider, userProvider, notificationProvider,
+              chatProvider, languageProvider, child) =>
+          SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 30.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20),
+                child: SlideInRight(
+                  delay: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                      S.of(context).profile_content,
+                    style: GoogleFonts.readexPro(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey,
+                        letterSpacing: 2),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  color: Theme.of(context).colorScheme.onBackground,
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        itemNavigator(context, Icons.newspaper_rounded, 'Posts',RouteName.postHistory,200),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        itemNavigator(context, Icons.favorite_border_outlined,
-                            'Favourites',RouteName.favorite,300),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        itemNavigator(context, Icons.home_work_outlined,
-                            'Rented',RouteName.rentHistory,400),
-                      ],
-                    ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                color: Theme.of(context).colorScheme.onBackground,
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      itemNavigator(context, Icons.newspaper_rounded, S.of(context).profile_post,
+                          RouteName.postHistory, 200),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      itemNavigator(context, Icons.favorite_border_outlined,
+                          S.of(context).profile_favourite, RouteName.favorite, 300),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      itemNavigator(context, Icons.home_work_outlined, S.of(context).profile_rent,
+                          RouteName.rentHistory, 400),
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-                  child: SlideInRight(
-                    delay: const Duration(milliseconds: 200),
-                    duration: Duration(milliseconds: 200),
-                    child: Text(
-                      'PREFERENCE',
-                      style: GoogleFonts.readexPro(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.grey,
-                          letterSpacing: 2),
-                    ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+                child: SlideInRight(
+                  delay: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    S.of(context).profile_preference,
+                    style: GoogleFonts.readexPro(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey,
+                        letterSpacing: 2),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 10),
-                  color: Theme.of(context).colorScheme.onBackground,
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SlideInRight(
-                          delay: const Duration(milliseconds: 200),
-                          duration: const Duration(milliseconds: 200),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                color: Theme.of(context).colorScheme.onBackground,
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SlideInRight(
+                        delay: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 200),
+                        child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  height: 160,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            languageProvider.setLocale(
+                                                const Locale('en', 'US'));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            decoration: const BoxDecoration(),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://cdn-icons-png.flaticon.com/512/555/555417.png",
+                                                  width: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Text(
+                                                  S.of(context).profile_language_english,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displayLarge,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const Divider(
+                                          color: Colors.grey,
+                                        ),
+                                        GestureDetector(
+                                          onTap: (){
+                                            languageProvider.setLocale(
+                                                const Locale('vi', 'VN'));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            decoration: const BoxDecoration(),
+                                            child: Row(
+                                              children: [
+                                                CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://cdn-icons-png.flaticon.com/512/555/555515.png",
+                                                  width: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Text(
+                                                  S.of(context).profile_language_vietnamese,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displayLarge,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -322,7 +377,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                     width: 10,
                                   ),
                                   Text(
-                                    'Language',
+                                    S.of(context).profile_language,
                                     style: GoogleFonts.readexPro(
                                         fontSize: 17,
                                         fontWeight: FontWeight.w300,
@@ -333,145 +388,160 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   )
                                 ],
                               ),
-                              Image.network(
-                                'https://cdn-icons-png.flaticon.com/512/5975/5975456.png',
-                                width: 40,
-                                height: 25,
-                                fit: BoxFit.cover,
-                              )
+                              languageProvider.locale ==
+                                      const Locale('vi', 'VN')
+                                  ? Image.network(
+                                      'https://cdn-icons-png.flaticon.com/512/5975/5975456.png',
+                                      width: 40,
+                                      height: 25,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.network(
+                                      'https://cdn-icons-png.flaticon.com/512/555/555417.png',
+                                      width: 40,
+                                      height: 25,
+                                      fit: BoxFit.cover,
+                                    )
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        SlideInRight(
-                          delay: const Duration(milliseconds: 200),
-                          duration: const Duration(milliseconds: 300),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.dark_mode_outlined,
-                                    color: Theme.of(context).iconTheme.color,
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    'Dark mode',
-                                    style: GoogleFonts.readexPro(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w300,
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Colors.black54
-                                            : Colors.white),
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: 20,
-                                child: Transform.scale(
-                                  scale: 1.3,
-                                  child: Consumer<ThemeProvider>(
-                                    builder: (context, values, child) => Switch(
-                                      // This bool value toggles the switch.
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SlideInRight(
+                        delay: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 300),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.dark_mode_outlined,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  S.of(context).profile_dark_mode,
+                                  style: GoogleFonts.readexPro(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w300,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black54
+                                          : Colors.white),
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                              child: Transform.scale(
+                                scale: 1.3,
+                                child: Consumer<ThemeProvider>(
+                                  builder: (context, values, child) => Switch(
+                                    // This bool value toggles the switch.
 
-                                      value: !values.light,
-                                      activeColor: Colors.blue,
-                                      onChanged: (bool value) {
-                                        // This is called when the user toggles the switch.
-                                        setState(() {
-                                          if (values.light) {
-                                            values.setDarkMode();
-                                          } else {
-                                            values.setLightMode();
-                                          }
-                                        });
-                                      },
+                                    value: !values.light,
+                                    activeColor: Colors.blue,
+                                    onChanged: (bool value) {
+                                      // This is called when the user toggles the switch.
+                                      setState(() {
+                                        if (values.light) {
+                                          values.setDarkMode();
+                                        } else {
+                                          values.setLightMode();
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      userProvider.userCurrent == null
+                          ? Container(
+                              height: 0,
+                            )
+                          : InkWell(
+                              onTap: () async {
+                                if (!userProvider.userCurrent!.isGoogle) {
+                                  final String? currentToken =
+                                      await FirebaseMessaging.instance
+                                          .getToken();
+                                  await fcmTokenProvider.checkUserLogOut(
+                                      userProvider.userCurrent!.id,
+                                      currentToken!);
+                                  userProvider.userCurrent = null;
+                                  chatProvider.listRoomChat = [];
+                                  notificationProvider.countNotification = 0;
+                                  notificationProvider.listNotification = [];
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.pushNamedAndRemoveUntil(context,
+                                      RouteName.home, (route) => false);
+                                } else {
+                                  final String? currentToken =
+                                      await FirebaseMessaging.instance
+                                          .getToken();
+                                  await fcmTokenProvider.checkUserLogOut(
+                                      userProvider.userCurrent!.id,
+                                      currentToken!);
+                                  userProvider.userCurrent = null;
+                                  chatProvider.listRoomChat = [];
+                                  notificationProvider.countNotification = 0;
+                                  notificationProvider.listNotification = [];
+                                  // ignore: use_build_context_synchronously
+                                  AuthService().signOut(context);
+                                }
+                              },
+                              child: SlideInRight(
+                                delay: const Duration(milliseconds: 200),
+                                duration: const Duration(milliseconds: 400),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.logout_outlined,
+                                      color: Theme.of(context).iconTheme.color,
                                     ),
-                                  ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      S.of(context).profile_logout,
+                                      style: GoogleFonts.readexPro(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w300,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Colors.black54
+                                              : Colors.white),
+                                    )
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        userProvider.userCurrent == null
-                            ? Container(
-                                height: 0,
-                              )
-                            : InkWell(
-                                onTap: () async{
-                                  if (!userProvider.userCurrent!.isGoogle) {
-                                    final String? currentToken =
-                                    await FirebaseMessaging.instance.getToken();
-                                    await fcmTokenProvider.checkUserLogOut(userProvider.userCurrent!.id,currentToken!);
-                                    userProvider.userCurrent = null;
-                                    chatProvider.listRoomChat =[];
-                                    notificationProvider.countNotification=0;
-                                    notificationProvider.listNotification=[];
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.pushNamedAndRemoveUntil(context,
-                                        RouteName.home, (route) => false);
-                                  } else {
-                                    final String? currentToken =
-                                    await FirebaseMessaging.instance.getToken();
-                                    await fcmTokenProvider.checkUserLogOut(userProvider.userCurrent!.id,currentToken!);
-                                    userProvider.userCurrent = null;
-                                    chatProvider.listRoomChat =[];
-                                    notificationProvider.countNotification=0;
-                                    notificationProvider.listNotification=[];
-                                    // ignore: use_build_context_synchronously
-                                    AuthService().signOut(context);
-                                  }
-                                },
-                                child: SlideInRight(
-                                  delay: const Duration(milliseconds: 200),
-                                  duration: const Duration(milliseconds: 400),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.logout_outlined,
-                                        color: Theme.of(context).iconTheme.color,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Log out',
-                                        style: GoogleFonts.readexPro(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w300,
-                                            color: Theme.of(context).brightness ==
-                                                    Brightness.light
-                                                ? Colors.black54
-                                                : Colors.white),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                      ],
-                    ),
+                              ),
+                            )
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-
+      ),
     );
   }
 
-  Widget itemNavigator(BuildContext context, IconData icon, String name,String page,int duration) {
+  Widget itemNavigator(BuildContext context, IconData icon, String name,
+      String page, int duration) {
     return InkWell(
-      onTap: ()=>Navigator.pushNamed(context, page),
+      onTap: () => Navigator.pushNamed(context, page),
       child: SlideInRight(
         delay: const Duration(milliseconds: 200),
         duration: Duration(milliseconds: duration),
@@ -521,7 +591,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Change Avatar',
+                      S.of(context).profile_change_avatar,
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     TextButton(
@@ -529,7 +599,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         textStyle: Theme.of(context).textTheme.labelLarge,
                       ),
                       child: Text(
-                        'Change',
+                        S.of(context).profile_change,
                         style: GoogleFonts.readexPro(fontSize: 15),
                       ),
                       onPressed: () async {
@@ -541,7 +611,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       },
                     ),
                   ]),
-              content:Container(
+              content: Container(
                 alignment: Alignment.center,
                 height: 150,
                 child: FutureBuilder<File?>(
@@ -551,12 +621,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     if (snapshot.hasData) {
                       return ClipRRect(
                         borderRadius: BorderRadius.circular(150),
-                        child: _isloading?const CircularProgressIndicator() :Image.file(
-                          snapshot.data!,
-                          width: 150,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
+                        child: _isloading
+                            ? const CircularProgressIndicator()
+                            : Image.file(
+                                snapshot.data!,
+                                width: 150,
+                                height: 150,
+                                fit: BoxFit.cover,
+                              ),
                       );
                     } else if (snapshot.hasError) {
                       return const Text('Error loading image');
@@ -571,7 +643,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   style: TextButton.styleFrom(
                     textStyle: Theme.of(context).textTheme.labelLarge,
                   ),
-                  child: Text('Disable',
+                  child: Text(S.of(context).profile_disable,
                       style: GoogleFonts.readexPro(fontSize: 15)),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -582,51 +654,51 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     textStyle: Theme.of(context).textTheme.labelLarge,
                   ),
                   child:
-                      Text('Save', style: GoogleFonts.readexPro(fontSize: 15)),
+                      Text(S.of(context).profile_save, style: GoogleFonts.readexPro(fontSize: 15)),
                   onPressed: () async {
-                    setState((){
-                      _isloading=true;
+                    setState(() {
+                      _isloading = true;
                     });
                     await _uploadImages();
                     await userProvider.changeAvatar(
                         userProvider.userCurrent!.email, listImageUrl[0]);
-                    setState((){
-                      _isloading=false;
+                    setState(() {
+                      _isloading = false;
                     });
 
-                   if(userProvider.isUpdateAvatar){
-                     final snackBar = SnackBar(
-                       backgroundColor: Colors.green,
-                       content: const Text('Cap nhat avatar thanh cong!'),
-                       action: SnackBarAction(
-                         label: 'Close',
-                         onPressed: () {
-                           // Some code to undo the change.
-                         },
-                       ),
-                     );
+                    if (userProvider.isUpdateAvatar) {
+                      final snackBar = SnackBar(
+                        backgroundColor: Colors.green,
+                        content: const Text('Cap nhat avatar thanh cong!'),
+                        action: SnackBarAction(
+                          label: 'Close',
+                          onPressed: () {
+                            // Some code to undo the change.
+                          },
+                        ),
+                      );
 
-                     // ignore: use_build_context_synchronously
-                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                     // ignore: use_build_context_synchronously
-                     Navigator.pop(context);
-                   }else{
-                     final snackBar = SnackBar(
-                       backgroundColor: Colors.redAccent,
-                       content: const Text('Cap nhat avatar that bai!'),
-                       action: SnackBarAction(
-                         label: 'Close',
-                         onPressed: () {
-                           // Some code to undo the change.
-                         },
-                       ),
-                     );
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                    } else {
+                      final snackBar = SnackBar(
+                        backgroundColor: Colors.redAccent,
+                        content: const Text('Cap nhat avatar that bai!'),
+                        action: SnackBarAction(
+                          label: 'Close',
+                          onPressed: () {
+                            // Some code to undo the change.
+                          },
+                        ),
+                      );
 
-                     // ignore: use_build_context_synchronously
-                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                     // ignore: use_build_context_synchronously
-                     Navigator.pop(context);
-                   }
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                    }
                   },
                 ),
               ],
@@ -635,6 +707,36 @@ class _UserInfoPageState extends State<UserInfoPage> {
         );
       },
     );
+  }
+  Future<void> _selectImages() async {
+    List<AssetEntity>? result = await AssetPicker.pickAssets(context,
+        pickerConfig: const AssetPickerConfig(
+          maxAssets: 1,
+          requestType: RequestType.image,
+          selectedAssets: [],
+        ));
+    setState(() {
+      _images = result!;
+    });
+  }
+
+  Future<void> _uploadImages() async {
+    final storage = FirebaseStorage.instance;
+    for (var asset in _images) {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference = storage.ref().child('images').child(fileName);
+      final File? file = await asset.file;
+      if (file != null) {
+        UploadTask task = reference.putFile(file);
+        await task.whenComplete(() => null);
+        String imageUrl = await reference.getDownloadURL();
+        listImageUrl.add(imageUrl);
+
+        // rest of the code here
+      } else {
+        // handle error, e.g. file is null
+      }
+    }
   }
 }
 
@@ -706,5 +808,3 @@ class MyPainter extends CustomPainter {
     return true;
   }
 }
-
-

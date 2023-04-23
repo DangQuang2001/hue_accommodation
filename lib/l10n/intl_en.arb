@@ -1,0 +1,146 @@
+{
+  "language": "English",
+
+
+  "home_page_title": "Welcome to Hue Accommodation",
+  "home_page_motel": "Motel House",
+  "home_page_forum": "Forum",
+  "home_page_super_market": "SuperMarket",
+  "home_page_hospital": "Hospital",
+  "home_page_household_goods": "Household Goods",
+  "home_page_extension": "Extension",
+  "home_page_manage": "Manage",
+  "home_page_room": "Room",
+  "home_page_rent": "Rent",
+  "home_page_statistical": "Statistical",
+  "home_page_qrcode": "QR Code",
+
+
+  "message_title": "Messages",
+  "message_search": "Search..",
+  "message_ago": "ago",
+
+
+  "notification_title": "Notification",
+  "notification_delete": "Delete all",
+  "notification_status": "No notifications!",
+
+
+  "profile_title": "Profile",
+  "profile_content": "CONTENT",
+  "profile_preference": "PREFERENCE",
+  "profile_post": "Posts",
+  "profile_favourite": "Favourites",
+  "profile_rent": "Rented",
+  "profile_language": "Language",
+  "profile_dark_mode": "Dark mode",
+  "profile_logout": "Log out",
+  "profile_change_avatar": "Change Avatar",
+  "profile_change": "Change",
+  "profile_disable": "Disable",
+  "profile_save": "Save",
+  "profile_language_english": "English",
+  "profile_language_vietnamese": "Vietnamese",
+
+
+  "edit_profile_title": "Edit Profile",
+  "edit_profile_name": "Name",
+  "edit_profile_email": "Email",
+  "edit_profile_address": "Address",
+  "edit_profile_phone": "Phone",
+  "edit_profile_password": "Password",
+
+
+  "boardinghouse_title": "Boarding Houses",
+  "boardinghouse_explore": "Explore",
+  "boardinghouse_rent": "Rent",
+  "boardinghouse_buy": "Buy",
+  "boardinghouse_project": "Project",
+  "boardinghouse_top_rating": "Top Rating",
+  "boardinghouse_mini_house": "Mini House",
+  "boardinghouse_motel_house": "Motel House",
+  "boardinghouse_whole_house": "Whole House",
+  "boardinghouse_filer_new_post": "New post",
+  "boardinghouse_filer_min_price": "Min price",
+  "boardinghouse_filer_wifi": "Wifi",
+  "boardinghouse_filer_air_condition": "Air conditioning",
+  "boardinghouse_filer_price": "PRICE",
+  "boardinghouse_filer_sort": "SORT",
+  "boardinghouse_filer_convenient": "CONVENIENT",
+  "boardinghouse_filer_min": "Min",
+  "boardinghouse_filer_max": "Max",
+  "boardinghouse_filer_apply": "Apply",
+  "boardinghouse_filer_search": "Search",
+
+
+  "boardinghouse_detail_bed": "Beds",
+  "boardinghouse_detail_bath": "Bath",
+  "boardinghouse_detail_description": "Description",
+  "boardinghouse_detail_total_price": "Total Price",
+  "boardinghouse_detail_rent_now": "Rent Now",
+  "rent_now_title": "Rent Now",
+  "rent_now_user": "User",
+  "rent_now_host": "Host",
+  "rent_now_rent_date": "Rent date:",
+  "rent_now_number_date": "Number Days Rental:",
+  "rent_now_day": "Days",
+  "rent_now_boarding_house": "Boarding house:",
+  "rent_now_phone": "Phone:",
+  "rent_now_number_of_people": "Number of people:",
+  "rent_now_note": "Notes:",
+  "rent_now_rent": "RENT",
+
+
+  "manage_room_title": "Room Management",
+  "manage_room_join_date": "Join date:",
+  "manage_room_address": "Address:",
+  "manage_room_feedback": "Feedback chat:",
+  "manage_room_posted": "Posted",
+  "add_room_title": "Add Room",
+  "edit_room_title": "Add Room",
+  "add_room_name": "Title",
+  "add_room_description": "Description",
+  "add_room_address": "Address",
+  "add_room_area": "Area",
+  "add_room_price": "Price",
+  "add_room_furnishing": "Furnishing",
+  "add_room_type_room": "Type Room",
+  "add_room_room_image": "Room Images",
+
+
+  "forum_title": "Forum",
+  "forum_post_something": "Post something for forum?",
+  "forum_all": "All Discussion",
+  "forum_roommate": "Roommate",
+  "forum_transfer" :"Transfer of property",
+  "forum_other": "Others",
+  "forum_comment": "Comment",
+  "forum_enter_comment": "Enter a comment...",
+  "forum_delete": "Delete post",
+  "forum_hidden": "Hidden post",
+  "forum_create": "Create post",
+  "forum_create_title": "Title:",
+  "forum_type_title": "Type your title...",
+  "forum_type_caption": "Type your caption...",
+  "forum_choose_place": "Tag place",
+
+
+  "manage_rent_title": "Rent Management",
+  "manage_rent_waiting": "Waiting",
+  "manage_rent_confirmed": "Confirmed",
+  "manage_rent_UnConfirmed": "UnConfirmed",
+  "manage_rent_detail": "Rent detail",
+  "manage_rent_number": "Number of days:",
+  "manage_day_rent": "days rental",
+
+
+  "qr_code_scan": "Scan a code",
+  "qr_code_scan_success": "Scanned Success",
+  "qr_code_detail": "Detail",
+  "qr_code_review": "Review",
+  "qr_code_review_title": "Review",
+  "qr_code_review_send": "SEND"
+
+
+
+}

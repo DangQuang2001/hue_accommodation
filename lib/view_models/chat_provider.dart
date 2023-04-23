@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:hue_accommodation/constants/server_url.dart';
+import 'package:hue_accommodation/services/chat_api.dart';
 
 class ChatProvider extends ChangeNotifier {
   bool isGetChat = false;
@@ -16,19 +17,11 @@ class ChatProvider extends ChangeNotifier {
   List<Map<String, dynamic>> listMessage = [];
   List<Map<String, dynamic>> listRoomChat = [];
 
-
-
   Future<bool> checkRoom(List<String> userId) async {
     isNewRoom = true;
     roomId = "";
     infoUserRoom = [];
-    final response = await http.post(Uri.parse('$url/api/room-chat/check-room'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "userId": userId,
-        }));
+    final response = await ChatApi.checkRoom(userId);
     if (response.statusCode == 200) {
       isNewRoom = false;
       roomId = jsonDecode(response.body)['_id'].toString();
@@ -57,16 +50,7 @@ class ChatProvider extends ChangeNotifier {
         'my32lengthsupersecretnooneknows1'); //Giải mã mật khẩu
     final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    final response = await http.post(
-        Uri.parse('$url/api/room-chat/get-chat-detail'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(
-            <String, dynamic>{"roomId": roomId, "skip": skip, "limit": limit}));
-    final messages =
-        jsonDecode(response.body)[0]['message'].cast<Map<String, dynamic>>();
-
+    final messages = await ChatApi.getChatDetail(roomId, skip, limit);
     final decryptedMessages = messages.map((msg) {
       if (msg['content'] is String && msg['content'].isNotEmpty) {
         try {
@@ -89,16 +73,7 @@ class ChatProvider extends ChangeNotifier {
         'my32lengthsupersecretnooneknows1'); //Giải mã mật khẩu
     final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    final response = await http.post(
-        Uri.parse('$url/api/room-chat/get-chat-detail'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(
-            <String, dynamic>{"roomId": roomId, "skip": skip, "limit": limit}));
-    final messages =
-        jsonDecode(response.body)[0]['message'].cast<Map<String, dynamic>>();
-
+    final messages = await ChatApi.checkMessageIsInserted(roomId, skip, limit);
     final decryptedMessages = messages.map((msg) {
       if (msg['content'] is String && msg['content'].isNotEmpty) {
         try {
@@ -117,63 +92,48 @@ class ChatProvider extends ChangeNotifier {
 
   Future getRoomChat(String userId) async {
     countNewChat = 0;
-    try {
-      final response =
-          await http.get(Uri.parse('$url/api/room-chat/get-room-chat/$userId'));
-      if (response.statusCode == 200) {
-        final key = encrypt.Key.fromUtf8(
-            'my32lengthsupersecretnooneknows1'); //Giải mã mật khẩu
-        final iv = encrypt.IV.fromLength(16);
-        final encrypter = encrypt.Encrypter(encrypt.AES(key));
-        listRoomChat = jsonDecode(response.body).cast<Map<String, dynamic>>();
-        final decryptedMessages = listRoomChat.map((msg) {
-          if (msg['_id']['message'].isNotEmpty) {
-            try {
-              final encrypted = encrypt.Encrypted.fromBase64(msg['_id']['message'][0]['content']);
-              final decrypted = encrypter.decrypt(encrypted, iv: iv);
-              msg['_id']['message'][0]['content'] = decrypted;
-            } catch (e) {
-              // Handle decryption errors
-            }
-          }
-          return msg;
-        }).toList();
-        listRoomChat =decryptedMessages.cast<Map<String, dynamic>>();
-        if(countNewChat == 0){
-          for (var element in listRoomChat) {
-            if(!(element['_id']['readBy']as List).contains(userId)){
-              countNewChat = countNewChat +1;
-              notifyListeners();
-            }
-          }
+    final key = encrypt.Key.fromUtf8(
+        'my32lengthsupersecretnooneknows1'); //Giải mã mật khẩu
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final data = await ChatApi.getRoomChat(userId);
+    listRoomChat = data;
+    final decryptedMessages = listRoomChat.map((msg) {
+      if (msg['_id']['message'].isNotEmpty) {
+        try {
+          final encrypted =
+              encrypt.Encrypted.fromBase64(msg['_id']['message'][0]['content']);
+          final decrypted = encrypter.decrypt(encrypted, iv: iv);
+          msg['_id']['message'][0]['content'] = decrypted;
+        } catch (e) {
+          // Handle decryption errors
         }
-        isGetChat = true;
-        notifyListeners();
       }
-    } catch (error) {
-      print(error);
+      return msg;
+    }).toList();
+    listRoomChat = decryptedMessages.cast<Map<String, dynamic>>();
+    if (countNewChat == 0) {
+      for (var element in listRoomChat) {
+        if (!(element['_id']['readBy'] as List).contains(userId)) {
+          countNewChat = countNewChat + 1;
+          notifyListeners();
+        }
+      }
     }
+    isGetChat = true;
+    notifyListeners();
   }
 
   Future isReadMessage(String roomId, String userId) async {
-    await http.post(Uri.parse('$url/api/room-chat/is-read-message'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          'roomId': roomId,
-          'userId': userId
-        }));
+    await ChatApi.isReadMessage(roomId, userId);
     getRoomChat(userId);
   }
 
   Future isOnline(String userId) async {
-    final response = await http.get(Uri.parse('$url/api/fcmtoken/get-list-token-user/$userId'));
-    if(response.statusCode == 200){
-      if((jsonDecode(response.body) as List).isNotEmpty){
+    final data =await ChatApi.isOnline(userId);
+    if (data.isNotEmpty) {
         isUserOnline1 = true;
-        tokenUser = jsonDecode(response.body)[0];
-      }
+        tokenUser = data[0];
     }
   }
 }
