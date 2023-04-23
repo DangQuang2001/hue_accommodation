@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bottom_bar_matu/bottom_bar_matu.dart' as bottom_bar_matu;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,16 @@ import '../home/home.dart';
 import '../messages/message.dart';
 import '../user_info/user_info.dart';
 
+mixin AppCloser {
+  void closeApp() {
+    if (Platform.isAndroid) {
+      SystemNavigator.pop();
+    } else if (Platform.isIOS) {
+      exit(0);
+    }
+  }
+}
+
 class Layout extends StatefulWidget {
   final Widget? child;
   final int selectedIndex;
@@ -22,7 +34,8 @@ class Layout extends StatefulWidget {
   State<Layout> createState() => _LayoutState();
 }
 
-class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
+class _LayoutState extends State<Layout>
+    with SingleTickerProviderStateMixin, AppCloser {
   late TabController _tabController;
 
   int currentIndex = 0;
@@ -93,7 +106,8 @@ class _LayoutState extends State<Layout> with SingleTickerProviderStateMixin {
         body: WillPopScope(
       onWillPop: () async {
         if (_selectedIndex == 0) {
-          return true;
+          closeApp();
+          return false;
         } else {
           setState(() {
             _selectedIndex = 0;

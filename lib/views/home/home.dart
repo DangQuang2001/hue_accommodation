@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
@@ -12,10 +15,18 @@ import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
 
-
 import '../../models/room.dart';
 import '../../view_models/chat_provider.dart';
 
+mixin AppCloser {
+  void closeApp() {
+    if (Platform.isAndroid) {
+      SystemNavigator.pop();
+    } else if (Platform.isIOS) {
+      exit(0);
+    }
+  }
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,7 +35,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AppCloser {
   bool users = true;
   bool a = false;
   List<String> imageList = [
@@ -53,14 +64,13 @@ class _HomePageState extends State<HomePage> {
 
       chatProvider.getRoomChat(userProvider.userCurrent!.id);
       final helpSnackBar = SnackBar(
-        margin: const EdgeInsets.only(bottom: 1000,top:50),
+        margin: const EdgeInsets.only(bottom: 1000, top: 50),
         elevation: 0,
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         content: AwesomeSnackbarContent(
           title: 'Tin nhắn mới!',
-          message:
-          'Dang Quang đã gửi tin nhắn cho bạn!',
+          message: 'Dang Quang đã gửi tin nhắn cho bạn!',
           contentType: ContentType.help,
         ),
       );
@@ -76,25 +86,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
-      builder: (context, userProvider, child) => Scaffold(
-        backgroundColor: Colors.black,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: Theme.of(context).colorScheme.background,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                header(context),
-                body(context),
-                userProvider.userCurrent != null
-                    ? utilities(context)
-                    : const Text(''),
-                slider(context),
-                const SizedBox(
-                  height: 100,
-                )
-              ],
+      builder: (context, userProvider, child) => WillPopScope(
+        onWillPop: () async {
+          closeApp();
+          return false;
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Theme.of(context).colorScheme.background,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  header(context),
+                  body(context),
+                  userProvider.userCurrent != null
+                      ? utilities(context)
+                      : const Text(''),
+                  slider(context),
+                  const SizedBox(
+                    height: 100,
+                  )
+                ],
+              ),
             ),
           ),
         ),
