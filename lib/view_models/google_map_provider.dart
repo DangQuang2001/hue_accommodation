@@ -12,6 +12,7 @@ class GoogleMapProvider extends ChangeNotifier {
   Future placeAutocomplete(String query) async {
     final response = await GoogleMapApi.placeAutocomplete(query);
     if (response != null) {
+      print(response);
       PlaceAutocompleteResponse result =
           PlaceAutocompleteResponse.parseAutocompleteResult(response);
       if (result.predictions != null) {
@@ -19,6 +20,9 @@ class GoogleMapProvider extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+  Future searchPlace(String query) async {
+    final response = await GoogleMapApi.getSearchResultsFromQueryUsingMapbox(query);
   }
 
   Future<LatLng?> getLatLngFromAddress(String address) async {

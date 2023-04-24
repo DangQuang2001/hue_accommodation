@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../components/slide_route.dart';
+import 'auth_service.dart';
 import 'choose_role.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -353,98 +355,113 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget loginGoogle(BuildContext context) {
-    return Padding(
-      padding:
-          const EdgeInsets.only(top: 10, bottom: 10, left: 30.0, right: 30),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Divider(
-                  height: 10,
-                  thickness: 1,
-                  color: Colors.grey.withOpacity(0.4),
-                  indent: 5,
-                  endIndent: 20,
-                ),
-              ),
-              Text(
-                "OR",
-                style: GoogleFonts.readexPro(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.black54),
-              ),
-              Expanded(
-                child: Divider(
-                  height: 10,
-                  thickness: 1,
-                  color: Colors.grey.withOpacity(0.4),
-                  indent: 20,
-                  endIndent: 5,
-                ),
-              )
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 60,
-            decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) =>  Padding(
+        padding:
+            const EdgeInsets.only(top: 10, bottom: 10, left: 30.0, right: 30),
+        child: Column(
+          children: [
+            Row(
               children: [
-                Image.network(
-                  'https://cdn-icons-png.flaticon.com/512/2991/2991148.png',
-                  width: 30,
-                  height: 30,
+                Expanded(
+                  child: Divider(
+                    height: 10,
+                    thickness: 1,
+                    color: Colors.grey.withOpacity(0.4),
+                    indent: 5,
+                    endIndent: 20,
+                  ),
                 ),
                 Text(
-                  'Register with Google',
+                  "OR",
                   style: GoogleFonts.readexPro(
-                      fontSize: 16, fontWeight: FontWeight.w300),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black54),
                 ),
-                const SizedBox(
-                  height: 40,
-                  width: 20,
+                Expanded(
+                  child: Divider(
+                    height: 10,
+                    thickness: 1,
+                    color: Colors.grey.withOpacity(0.4),
+                    indent: 20,
+                    endIndent: 5,
+                  ),
                 )
               ],
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Already have an account?",
-                style: GoogleFonts.readexPro(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey),
+            const SizedBox(
+              height: 10,
+            ),
+            InkWell(
+              onTap: ()async{
+                await AuthService().signInWithGoogle(context);
+                if(userProvider.userCurrent!=null && userProvider.isNewAccount == false){
+                  // ignore: use_build_context_synchronously
+                  Navigator.pushNamedAndRemoveUntil(context, RouteName.home, (route) => false);
+                }
+                if(userProvider.userCurrent!=null && userProvider.isNewAccount == true){
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).push(slideBottomToTop(ChooseRolePage(email: userProvider.userCurrent!.email)));
+                }
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(15)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Image.network(
+                      'https://cdn-icons-png.flaticon.com/512/2991/2991148.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                    Text(
+                      'Register with Google',
+                      style: GoogleFonts.readexPro(
+                          fontSize: 16, fontWeight: FontWeight.w300),
+                    ),
+                    const SizedBox(
+                      height: 40,
+                      width: 20,
+                    )
+                  ],
+                ),
               ),
-              const SizedBox(
-                width: 5,
-              ),
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                child: Text(
-                  "Login",
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Already have an account?",
                   style: GoogleFonts.readexPro(
                       fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.blue),
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey),
                 ),
-              )
-            ],
-          )
-        ],
+                const SizedBox(
+                  width: 5,
+                ),
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Text(
+                    "Login",
+                    style: GoogleFonts.readexPro(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.blue),
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

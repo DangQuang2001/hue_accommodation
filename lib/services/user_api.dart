@@ -24,7 +24,7 @@ class UserApi{
   }
 
   // Create account for user
-  static Future<bool> createUser(String name, String email, String password,
+  static Future<User?> createUser(String name, String email, String password,
       String image, String phone, bool isGoogle, bool isHost) async {
     try{
       final response = await http.post(Uri.parse('$url/api/user/create'),
@@ -42,16 +42,16 @@ class UserApi{
             "isHost": isHost
           }));
       if (response.statusCode == 200) {
-        return true;
+        return User.fromJson(jsonDecode(response.body));
       }
       if (response.statusCode == 403) {
         print('Error: Khong them duoc user');
       }
-      return true;
+      return null;
     }
     catch(e){
       print('createUser error:$e');
-      return false;
+      return null;
     }
     }
     static Future<User?> updateUser(

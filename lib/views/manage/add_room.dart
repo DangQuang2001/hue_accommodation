@@ -933,7 +933,7 @@ class _AddRoomPageState extends State<AddRoomPage>
                   onChanged: (value) {
                     if (value.isNotEmpty) {
                       googleMapProvider
-                          .placeAutocomplete('$value,$ward,$district,$city');
+                          .searchPlace('$value,Vỹ Dạ, Huế, Thừa Thiên Huế');
                     } else {}
                   },
                   decoration: InputDecoration(

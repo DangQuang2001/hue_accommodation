@@ -57,13 +57,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (context) => AppLifecycleStateNotifier()),
       ],
-      child: Consumer2<LanguageProvider, ThemeProvider>(
-          builder: (context, languageProvider, themeObj, child) {
+      child: Consumer3<LanguageProvider, ThemeProvider,AppLifecycleStateNotifier>(
+          builder: (context, languageProvider, themeObj,lifecycle, child) {
         var fcmToken = Provider.of<FcmTokenProvider>(context, listen: false);
         var userProvider = Provider.of<UserProvider>(context, listen: false);
         var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-        var lifecycle =
-            Provider.of<AppLifecycleStateNotifier>(context, listen: false);
         var notificationProvider =
             Provider.of<NotificationProvider>(context, listen: false);
         (() async {

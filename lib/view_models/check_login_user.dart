@@ -11,8 +11,10 @@ void checkLoginUser(UserProvider userProvider, FcmTokenProvider fcmToken,
       userProvider.userCurrent == null &&
       fcmToken.isCheckUser == false) {
     (() async {
-      await userProvider
-          .checkIsmailGoogle(FirebaseAuth.instance.currentUser!.email!);
+      await userProvider.checkIsmailGoogle(
+          FirebaseAuth.instance.currentUser!.email!,
+          FirebaseAuth.instance.currentUser!.displayName!,
+          FirebaseAuth.instance.currentUser!.photoURL!);
       notificationProvider.getListNotification(userProvider.userCurrent!.id);
       chatProvider.getRoomChat(userProvider.userCurrent!.id);
       final String? currentToken = await FirebaseMessaging.instance.getToken();

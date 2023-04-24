@@ -8,6 +8,9 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:provider/provider.dart';
 
+import '../components/slide_route.dart';
+import 'choose_role.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -288,10 +291,10 @@ class _LoginPageState extends State<LoginPage> {
           Consumer3<UserProvider,NotificationProvider,ChatProvider>(
             builder: (context, userProvider,notificationProvider,chatProvider, child) =>  InkWell(
               onTap: ()  async {
-                await AuthService().signInWithGoogle();
-                await userProvider.checkIsmailGoogle(FirebaseAuth.instance.currentUser!.email!);
+                await AuthService().signInWithGoogle(context);
                 notificationProvider.getListNotification(userProvider.userCurrent!.id);
                 chatProvider.getRoomChat(userProvider.userCurrent!.id);
+                // ignore: use_build_context_synchronously
                 },
               child: Container(
                 width: MediaQuery.of(context).size.width,

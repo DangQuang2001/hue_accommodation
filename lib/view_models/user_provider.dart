@@ -5,18 +5,21 @@ import 'package:hue_accommodation/constants/server_url.dart';
 import '../models/user.dart';
 import '../services/user_api.dart';
 
-
 class UserProvider extends ChangeNotifier {
-
   User? userCurrent;
   int isLogin = 1;
   bool isUpdate = false;
   bool isUpdateAvatar = false;
+  bool isNewAccount = false;
 
-  Future<bool> createUser(String name, String email, String password,
+  Future<void> createUser(String name, String email, String password,
       String image, String phone, bool isGoogle, bool isHost) async {
-    return UserApi.createUser(name, email, password, image, phone, isGoogle, isHost);
+    final data = await UserApi.createUser(
+        name, email, password, image, phone, isGoogle, isHost);
+    userCurrent = data;
+    notifyListeners();
   }
+
   Future<bool> updateUser(
       String id,
       String name,
@@ -27,23 +30,23 @@ class UserProvider extends ChangeNotifier {
       String address,
       bool isGoogle,
       bool isHost) async {
-    final data =await UserApi.updateUser(id, name, email, password, image, phone, address, isGoogle, isHost);
-    if (data!= null) {
+    final data = await UserApi.updateUser(
+        id, name, email, password, image, phone, address, isGoogle, isHost);
+    if (data != null) {
       isUpdate = true;
-      notifyListeners();
       userCurrent = data;
-    }
-    else {
+      notifyListeners();
+    } else {
       isUpdate = false;
       notifyListeners();
     }
     return true;
   }
 
-  Future<void> updateRole(String email,bool isHost)async{
-    final data= await UserApi.updateRole(email, isHost);
-    if(data != null){
-      userCurrent =data;
+  Future<void> updateRole(String email, bool isHost) async {
+    final data = await UserApi.updateRole(email, isHost);
+    if (data != null) {
+      userCurrent = data;
       notifyListeners();
     }
   }
@@ -54,8 +57,7 @@ class UserProvider extends ChangeNotifier {
       isUpdateAvatar = true;
       userCurrent = data;
       notifyListeners();
-    }
-    else {
+    } else {
       isUpdateAvatar = false;
       notifyListeners();
     }
@@ -63,13 +65,12 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<bool> login(String email, String password) async {
-   final data = await UserApi.login(email, password);
+    final data = await UserApi.login(email, password);
     if (data != null) {
-     userCurrent = data;
+      userCurrent = data;
       isLogin = 1;
       notifyListeners();
-    }
-    else{
+    } else {
       isLogin = 2;
       notifyListeners();
     }
@@ -88,22 +89,18 @@ class UserProvider extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> checkIsmailGoogle(String mail) async {
+  Future<bool> checkIsmailGoogle(
+      String mail, String name, String photoURL) async {
     final data = await UserApi.checkIsmailGoogle(mail);
     if (data != null) {
+      isNewAccount = false;
       userCurrent = data;
       notifyListeners();
       return false;
-    }
-    else {
-      await createUser(
-          firebase_auth.FirebaseAuth.instance.currentUser!.displayName!,
-          firebase_auth.FirebaseAuth.instance.currentUser!.email!,
-          "",
-          firebase_auth.FirebaseAuth.instance.currentUser!.photoURL!,
-          "",
-          true,
-          true);
+    } else {
+      isNewAccount = true;
+      notifyListeners();
+      await createUser(name, mail, "", photoURL, "", true, true);
       return true;
     }
     return false;
