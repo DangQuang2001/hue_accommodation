@@ -10,6 +10,7 @@ import '../services/google_map_api.dart';
 class GoogleMapProvider extends ChangeNotifier {
   List<AutocompletePrediction> placePredictions = [];
   List<LatLng> polylineCoordinates = [];
+  List listPlace = [];
 
   Future placeAutocomplete(String query) async {
     final response = await GoogleMapApi.placeAutocomplete(query);
@@ -19,11 +20,14 @@ class GoogleMapProvider extends ChangeNotifier {
       if (result.predictions != null) {
         placePredictions = result.predictions!;
         notifyListeners();
+        getLatLngFromAddress('vietinbank, thừa thiên huế');
       }
     }
   }
+
   Future searchPlace(String query) async {
-    final response = await GoogleMapApi.getSearchResultsFromQueryUsingMapbox(query);
+    final response =
+        await GoogleMapApi.getSearchResultsFromQueryUsingMapbox(query);
   }
 
   Future<LatLng?> getLatLngFromAddress(String address) async {
@@ -38,13 +42,15 @@ class GoogleMapProvider extends ChangeNotifier {
     return null;
   }
 
-  void getPolyPoints(LatLng currentUserLocation, LatLng destination ) async {
+  void getPolyPoints(LatLng currentUserLocation, LatLng destination) async {
     polylineCoordinates = [];
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       'AIzaSyCFMB3KVGNeKYmIgcYh8Wv1At2_wyoTrMU',
       PointLatLng(currentUserLocation.latitude, currentUserLocation.longitude),
-      PointLatLng(destination.latitude, destination.longitude),travelMode: TravelMode.driving,);
+      PointLatLng(destination.latitude, destination.longitude),
+      travelMode: TravelMode.driving,
+    );
 
     if (result.points.isNotEmpty) {
       result.points.forEach((PointLatLng point) {
@@ -55,5 +61,34 @@ class GoogleMapProvider extends ChangeNotifier {
     }
   }
 
+  Future getPlace(String query) async {
+    List<Marker> markers = [];
+    final response = await GoogleMapApi.getPlace(query);
+    if (response != null) {
+      for (var result in response) {
+        // Lấy vị trí từ kết quả
+        LatLng position = LatLng(
+          result["geometry"]["location"]["lat"],
+          result["geometry"]["location"]["lng"],
+        );
 
+        // Tạo marker từ vị trí
+        Marker marker = Marker(
+          markerId: MarkerId(result["place_id"]),
+          position: position,
+          infoWindow: InfoWindow(
+            title: result["name"],
+            snippet: result["formatted_address"],
+          ),
+          icon: BitmapDescriptor.defaultMarker,
+        );
+
+        // Thêm marker vào Set
+        markers.add(marker);
+      }
+      listPlace = response;
+      notifyListeners();
+      return markers;
+    }
+  }
 }

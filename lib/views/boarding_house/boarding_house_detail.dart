@@ -60,11 +60,14 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
     super.initState();
     var favouriteProvider =
         Provider.of<FavouriteProvider>(context, listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     var googleMapProvider =
         Provider.of<GoogleMapProvider>(context, listen: false);
-    favouriteProvider.checkFavourite(widget.motel.roomId,
-        Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
-    isCheckFavourite = favouriteProvider.isCheckFavourite;
+    if (userProvider.userCurrent != null) {
+      favouriteProvider.checkFavourite(widget.motel.roomId,
+          Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
+      isCheckFavourite = favouriteProvider.isCheckFavourite;
+    }
     location.getLocation().then((location) async {
       final GoogleMapController controller = await _controller.future;
 
@@ -666,7 +669,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                   myLocationEnabled: true,
                   markers: Set.from(_maker),
                   onMapCreated: (GoogleMapController controller) {
-                    // _controller.complete(controller);
+                    _controller.complete(controller);
                   },
                 ),
               ),
@@ -724,26 +727,34 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width:MediaQuery.of(context).size.width,
+                                  width: MediaQuery.of(context).size.width,
                                   height: 500,
                                   child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(50),topRight: Radius.circular(50)),
+                                    borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(50),
+                                        topRight: Radius.circular(50)),
                                     child: GoogleMap(
                                       zoomControlsEnabled: false,
                                       polylines: {
                                         Polyline(
-                                            polylineId: const PolylineId("route"),
-                                            points: googleMapProvider.polylineCoordinates,
+                                            polylineId:
+                                                const PolylineId("route"),
+                                            points: googleMapProvider
+                                                .polylineCoordinates,
                                             color: Colors.blue,
                                             width: 5),
                                       },
-                                      initialCameraPosition: const CameraPosition(
-                                          target: LatLng(16.463713, 107.590866), zoom: 14.5),
+                                      initialCameraPosition:
+                                          const CameraPosition(
+                                              target:
+                                                  LatLng(16.463713, 107.590866),
+                                              zoom: 14.5),
                                       mapType: MapType.terrain,
                                       myLocationEnabled: true,
                                       markers: Set.from(_maker),
-                                      onMapCreated: (GoogleMapController controller) {
-                                        _controller.complete(controller);
+                                      onMapCreated:
+                                          (GoogleMapController controller) {
+                                        // _controller.complete(controller);
                                       },
                                     ),
                                   ),

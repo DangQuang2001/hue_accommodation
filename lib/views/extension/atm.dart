@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hue_accommodation/view_models/google_map_provider.dart';
 import 'package:location/location.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
-
+import 'package:provider/provider.dart';
 
 class ATMPage extends StatefulWidget {
   const ATMPage({super.key});
@@ -18,13 +19,6 @@ class _ATMPageState extends State<ATMPage> {
   int value = 1;
   @override
   late GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(45.521563, -122.677433);
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
   final Completer<GoogleMapController> _controller = Completer();
 
   // on below line we have specified camera position
@@ -34,39 +28,44 @@ class _ATMPageState extends State<ATMPage> {
   );
 
   // on below line we have created the list of markers
-  final List<Marker> _markers = <Marker>[];
+  late List<Marker> _markers = <Marker>[];
   Location location = Location();
+
+  void setCamera(LatLng location, MarkerId markerId) async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: location,
+      zoom: 14.4746,
+    )));
+    controller.showMarkerInfoWindow(markerId);
+  }
+
   @override
   void initState() {
     super.initState();
+    var googleMapProvider =
+        Provider.of<GoogleMapProvider>(context, listen: false);
 
-    (()async{
-
+    (() async {
       // marker added for hotels location
-
-      var currentLocation = await location.getLocation();
-      double latitude = double.parse(currentLocation.latitude.toString());
-      double longitude = double.parse(currentLocation.longitude.toString());
-      // specified current users location
-      CameraPosition cameraPosition = CameraPosition(
-        target: LatLng(latitude,longitude),
-        zoom: 14,
-      );
-
-      final GoogleMapController controller = await _controller.future;
-
-      @override
-      void dispose() {
-        controller.dispose();
-        // ignore: avoid_print
-        super.dispose();
-      }
-
+      // var currentLocation = await location.getLocation();
+      // double latitude = double.parse(currentLocation.latitude.toString());
+      // double longitude = double.parse(currentLocation.longitude.toString());
+      _markers =
+          await googleMapProvider.getPlace('ATM Vietinbank,ThuaThienHue');
+      // final GoogleMapController controller = await _controller.future;
       setState(() {});
     })();
-
   }
 
+  @override
+  void dispose() {
+    // controller.dispose();
+    // ignore: avoid_print
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -77,36 +76,42 @@ class _ATMPageState extends State<ATMPage> {
               padding: const EdgeInsets.only(top: 50),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    categories(context),
-                    map(context),
-                    listLocation(context)
-                  ],
-                ),
+              child: Column(
+                children: [
+                  categories(context),
+                  map(context),
+                  Expanded(
+                      child: SingleChildScrollView(
+                    child: listLocation(context),
+                  ))
+                ],
               ),
             ),
             Positioned(
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(onPressed: ()=> Navigator.pop(context), icon: const Icon(Icons.arrow_back,size: 30,)),
-                        Text(
-                          "ATM Location",
-                          style: Theme.of(context).textTheme.headlineLarge,
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        )
-                      ],
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 30,
+                        )),
+                    Text(
+                      "ATM Location",
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                  ),
-                ))
+                    const SizedBox(
+                      width: 30,
+                    )
+                  ],
+                ),
+              ),
+            ))
           ],
         ),
       ),
@@ -114,113 +119,120 @@ class _ATMPageState extends State<ATMPage> {
   }
 
   categories(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                value = 1;
-                FocusScope.of(context).requestFocus(FocusNode());
+    return Consumer<GoogleMapProvider>(
+      builder: (context, googleMapProvider, child) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  value = 1;
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  _markers = await googleMapProvider
+                      .getPlace('ATM Vietinbank,ThuaThienHue');
 
-                setState(() {});
-              },
-              child: Container(
-                padding: const EdgeInsets.only(
-                    top: 10, left: 20, right: 20, bottom: 10),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: value == 1
-                        ? Colors.blue
-                        : const Color.fromARGB(255, 231, 230, 230),
-                    borderRadius: BorderRadius.circular(5)),
-                child: Text(
-                  'VietinBank',
-                  style: GoogleFonts.readexPro(
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10, left: 20, right: 20, bottom: 10),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
                       color: value == 1
-                          ? Colors.white
-                          : const Color.fromARGB(255, 75, 75, 75)),
+                          ? Colors.blue
+                          : const Color.fromARGB(255, 231, 230, 230),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Text(
+                    'VietinBank',
+                    style: GoogleFonts.readexPro(
+                        color: value == 1
+                            ? Colors.white
+                            : const Color.fromARGB(255, 75, 75, 75)),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                value = 2;
-                FocusScope.of(context).requestFocus(FocusNode());
-
-                setState(() {});
-              },
-              child: Container(
-                padding: const EdgeInsets.only(
-                    top: 10, left: 20, right: 20, bottom: 10),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: value == 2
-                        ? Colors.blue
-                        : const Color.fromARGB(255, 231, 230, 230),
-                    borderRadius: BorderRadius.circular(5)),
-                child: Text(
-                  'VietComBank',
-                  style: GoogleFonts.readexPro(
+              GestureDetector(
+                onTap: () async {
+                  value = 2;
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  _markers = await googleMapProvider
+                      .getPlace('ATM VietComBank,ThuaThienHue');
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10, left: 20, right: 20, bottom: 10),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
                       color: value == 2
-                          ? Colors.white
-                          : const Color.fromARGB(255, 75, 75, 75)),
+                          ? Colors.blue
+                          : const Color.fromARGB(255, 231, 230, 230),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Text(
+                    'VietComBank',
+                    style: GoogleFonts.readexPro(
+                        color: value == 2
+                            ? Colors.white
+                            : const Color.fromARGB(255, 75, 75, 75)),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                value = 3;
-                FocusScope.of(context).requestFocus(FocusNode());
-
-                setState(() {});
-              },
-              child: Container(
-                padding: const EdgeInsets.only(
-                    top: 10, left: 20, right: 20, bottom: 10),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: value == 3
-                        ? Colors.blue
-                        : const Color.fromARGB(255, 231, 230, 230),
-                    borderRadius: BorderRadius.circular(5)),
-                child: Text(
-                  'BIDV',
-                  style: GoogleFonts.readexPro(
+              GestureDetector(
+                onTap: () async {
+                  value = 3;
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  _markers =
+                      await googleMapProvider.getPlace('ATM BIDV,ThuaThienHue');
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10, left: 20, right: 20, bottom: 10),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
                       color: value == 3
-                          ? Colors.white
-                          : const Color.fromARGB(255, 75, 75, 75)),
+                          ? Colors.blue
+                          : const Color.fromARGB(255, 231, 230, 230),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Text(
+                    'BIDV',
+                    style: GoogleFonts.readexPro(
+                        color: value == 3
+                            ? Colors.white
+                            : const Color.fromARGB(255, 75, 75, 75)),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                value = 4;
-                FocusScope.of(context).requestFocus(FocusNode());
-
-                setState(() {});
-              },
-              child: Container(
-                padding: const EdgeInsets.only(
-                    top: 10, left: 20, right: 20, bottom: 10),
-                margin: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: value == 4
-                        ? Colors.blue
-                        : const Color.fromARGB(255, 231, 230, 230),
-                    borderRadius: BorderRadius.circular(5)),
-                child: Text(
-                  'AgriBank',
-                  style: GoogleFonts.readexPro(
+              GestureDetector(
+                onTap: () async {
+                  value = 4;
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  _markers = await googleMapProvider
+                      .getPlace('ATM Agribank,ThuaThienHue');
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      top: 10, left: 20, right: 20, bottom: 10),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
                       color: value == 4
-                          ? Colors.white
-                          : const Color.fromARGB(255, 75, 75, 75)),
+                          ? Colors.blue
+                          : const Color.fromARGB(255, 231, 230, 230),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Text(
+                    'AgriBank',
+                    style: GoogleFonts.readexPro(
+                        color: value == 4
+                            ? Colors.white
+                            : const Color.fromARGB(255, 75, 75, 75)),
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -270,68 +282,84 @@ class _ATMPageState extends State<ATMPage> {
   }
 
   listLocation(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ...[1, 2, 3, 4].map((e) {
-          var index = [1, 2, 3, 4].indexOf(e);
-          return Container(
-            margin: const EdgeInsets.only(bottom: 5),
-            width: MediaQuery.of(context).size.width,
-            height: 100,
-            decoration:  BoxDecoration(color: Theme.of(context).colorScheme.onBackground),
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.4,
-                    height: 100,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "VietinBank CS ${index + 1}",
-                            style: Theme.of(context).textTheme.displayMedium,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "Hùng Vương, Vĩnh Ninh, Thừa Thiên Huế",
-                            style: Theme.of(context).textTheme.displaySmall,
-                          ),
-                        ]),
+    return Consumer<GoogleMapProvider>(
+      builder: (context, googleMapProvider, child) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...googleMapProvider.listPlace.map((e) {
+            return GestureDetector(
+              onTap: () {
+                setCamera(
+                    LatLng(e['geometry']['location']['lat'],
+                        e['geometry']['location']['lng']),
+                    MarkerId(e['place_id']));
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 5),
+                width: MediaQuery.of(context).size.width,
+                height: 100,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onBackground),
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.4,
+                        height: 100,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                e['name'],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    Theme.of(context).textTheme.displayMedium,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                e['formatted_address'],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.displaySmall,
+                              ),
+                            ]),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        blurRadius: 2,
+                                        offset: const Offset(2, 2),
+                                        color: Colors.grey.withOpacity(0.1))
+                                  ]),
+                              child: Transform.rotate(
+                                angle: 45,
+                                child: const Icon(
+                                  Icons.navigation_outlined,
+                                  color: Colors.blue,
+                                ),
+                              )),
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Theme.of(context).colorScheme.secondary,
-                              boxShadow: [
-                                BoxShadow(
-                                    blurRadius: 2,
-                                    offset: const Offset(2, 2),
-                                    color: Colors.grey.withOpacity(0.1))
-                              ]),
-                          child: Transform.rotate(
-                            angle: 45,
-                            child:  const Icon(
-                              Icons.navigation_outlined,
-                              color: Colors.blue,
-                            ),
-                          )),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        })
-      ],
+            );
+          })
+        ],
+      ),
     );
   }
 }

@@ -44,6 +44,22 @@ class GoogleMapApi {
     }
     print(response.body);
   }
+
+  static Future getPlace(String query) async {
+    String apiUrl =
+        'https://maps.googleapis.com/maps/api/place/textsearch/json';
+    String apiKey = 'AIzaSyCFMB3KVGNeKYmIgcYh8Wv1At2_wyoTrMU';
+    try {
+      final response =
+          await http.get(Uri.parse('$apiUrl?query=$query&key=$apiKey'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['results'] as List<dynamic>;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return null;
+  }
 }
 
 //
