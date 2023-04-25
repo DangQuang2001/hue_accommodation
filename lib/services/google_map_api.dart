@@ -7,7 +7,7 @@ class GoogleMapApi {
   static Future<String?> placeAutocomplete(String query) async {
     String apiUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-    String apiKey = 'AIzaSyAL7M2Av95H-dCLtQTMxAv5B-KzMiJcO9Y';
+    String apiKey = 'AIzaSyCFMB3KVGNeKYmIgcYh8Wv1At2_wyoTrMU';
     try {
       final response =
           await http.get(Uri.parse('$apiUrl?input=$query&key=$apiKey'));

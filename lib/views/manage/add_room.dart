@@ -131,8 +131,8 @@ class _AddRoomPageState extends State<AddRoomPage>
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer<UserProvider>(
-        builder: (context, userProvider, child) => FloatingActionButton(
+      floatingActionButton: Consumer2<UserProvider,GoogleMapProvider>(
+        builder: (context, userProvider,googleMapProvider, child) => FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState!.validate() &&
                 _formKey2.currentState!.validate()) {
@@ -141,7 +141,9 @@ class _AddRoomPageState extends State<AddRoomPage>
                   setState(() {
                     _isLoading = true;
                   });
+
                   await roomProvider.uploadImages();
+                  final location = await googleMapProvider.getLatLngFromAddress(address);
                   roomProvider.createRoom(
                       userProvider.userCurrent!.id,
                       userProvider.userCurrent!.name,
@@ -149,7 +151,9 @@ class _AddRoomPageState extends State<AddRoomPage>
                       title,
                       description,
                       address,
+                      location!,
                       area,
+                      dropdownCategory,
                       dropdownFurnishingValue,
                       price,
                       dropdownTypeRoomValue,
@@ -933,7 +937,7 @@ class _AddRoomPageState extends State<AddRoomPage>
                   onChanged: (value) {
                     if (value.isNotEmpty) {
                       googleMapProvider
-                          .searchPlace('$value,Vỹ Dạ, Huế, Thừa Thiên Huế');
+                          .placeAutocomplete('$value,$ward,$district,$city');
                     } else {}
                   },
                   decoration: InputDecoration(

@@ -135,8 +135,8 @@ class _EditRoomPageState extends State<EditRoomPage> {
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer<UserProvider>(
-        builder: (context, userProvider, child) => FloatingActionButton(
+      floatingActionButton: Consumer2<UserProvider,GoogleMapProvider>(
+        builder: (context, userProvider,googleMapProvider, child) => FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState!.validate() &&
                 _formKey2.currentState!.validate()) {
@@ -148,14 +148,16 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   if (roomProvider.images.isNotEmpty) {
                     await roomProvider.uploadImages();
                   }
-
+                  final location = await googleMapProvider.getLatLngFromAddress(address!);
                   await roomProvider.updateRoom(
                       widget.room.id,
                       userProvider.userCurrent!.id,
                       title!,
                       description!,
                       address!,
+                      location!,
                       area!,
+                      dropdownCategory,
                       dropdownFurnishingValue,
                       price!,
                       dropdownTypeRoomValue,

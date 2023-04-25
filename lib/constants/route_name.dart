@@ -12,6 +12,7 @@ class RouteName {
   static const String superMarket = "/superMarket";
   static const String hospital = "/hospital";
   static const String householdGoods = "/householdGoods";
+  static const String atm = "/atm";
   static const String addRoom = "/roomManage/addRoom";
   static const String removeRoom = "/roomManage/removeRoom";
   static const String login = "/login";
@@ -22,4 +23,5 @@ class RouteName {
   static const String favorite = "/profile/favorite";
   static const String postHistory = "/profile/postHistory";
   static const String filterHouse = "/boardinghouse/filterHouse";
+
 }

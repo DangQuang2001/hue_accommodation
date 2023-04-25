@@ -1,5 +1,3 @@
-// ignore_for_file: unrelated_type_equality_checks
-
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
@@ -10,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hue_accommodation/view_models/chat_provider.dart';
+import 'package:hue_accommodation/view_models/google_map_provider.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/boarding_house/rent_now.dart';
@@ -18,7 +17,6 @@ import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:location/location.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:provider/provider.dart';
-
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
@@ -36,57 +34,60 @@ class BoardingHouseDetail extends StatefulWidget {
 class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   bool isCheckFavourite = false;
   int listImageLength = 10;
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(16.463713, 107.590866),
-    zoom: 14.4746,
-  );
+  final Completer<GoogleMapController> _controller = Completer();
   Location location = Location();
   final List<Marker> _maker = <Marker>[];
+  LocationData? currentLocation;
+  BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
 
+  Future setCurrentUserIcon(String url) async {
+    await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
+        .then((icon) {
+      currentLocationIcon = icon;
+    });
+  }
+
+  Future setDestinationIcon(String url) async {
+    await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
+        .then((icon) {
+      destinationIcon = icon;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     var favouriteProvider =
         Provider.of<FavouriteProvider>(context, listen: false);
-    var roomProvider =
-    Provider.of<RoomProvider>(context, listen: false);
-    (() async {
-      await favouriteProvider.checkFavourite(widget.motel.roomId,
-          Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
-      isCheckFavourite = favouriteProvider.isCheckFavourite;
-    })();
-    getLocationUser() async {
-      var currentLocation = await location.getLocation();
-      double latitude = double.parse(currentLocation.latitude.toString());
-      double longitude = double.parse(currentLocation.longitude.toString());
-
+    var googleMapProvider =
+        Provider.of<GoogleMapProvider>(context, listen: false);
+    favouriteProvider.checkFavourite(widget.motel.roomId,
+        Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
+    isCheckFavourite = favouriteProvider.isCheckFavourite;
+    location.getLocation().then((location) async {
       final GoogleMapController controller = await _controller.future;
 
-      final BitmapDescriptor motelIcon = await roomProvider.getMarkerIconFromUrl(
-          'https://cdn-icons-png.flaticon.com/512/2763/2763838.png');
-      final BitmapDescriptor myLocation = await roomProvider.getMarkerIconFromUrl(
-          'https://cdn-icons-png.flaticon.com/512/1673/1673221.png');
+      googleMapProvider.getPolyPoints(
+          LatLng(location.latitude!, location.longitude!),
+          LatLng(widget.motel.latitude, widget.motel.longitude));
+      await setDestinationIcon('assets/images/home.png');
+      await setCurrentUserIcon('assets/images/location2.png');
       _maker.add(Marker(
           markerId: const MarkerId('3'),
-          icon: motelIcon,
+          icon: destinationIcon,
           position: LatLng(widget.motel.latitude, widget.motel.longitude),
           infoWindow: InfoWindow(title: '${widget.motel.name} Location')));
       _maker.add(Marker(
           markerId: const MarkerId('1'),
-          icon: myLocation,
-          position: LatLng(latitude, longitude),
+          icon: currentLocationIcon,
+          position: LatLng(location.latitude!, location.longitude!),
           infoWindow: const InfoWindow(title: 'My Location')));
-
       setState(() {});
-
-      double minLat = min(latitude, widget.motel.latitude);
-      double maxLat = max(latitude, widget.motel.latitude);
-      double minLng = min(longitude, widget.motel.longitude);
-      double maxLng = max(longitude, widget.motel.longitude);
-
+      double minLat = min(location.latitude!, widget.motel.latitude);
+      double maxLat = max(location.latitude!, widget.motel.latitude);
+      double minLng = min(location.longitude!, widget.motel.longitude);
+      double maxLng = max(location.longitude!, widget.motel.longitude);
       Timer(const Duration(milliseconds: 1000), () async {
         controller.animateCamera(CameraUpdate.newLatLngBounds(
             LatLngBounds(
@@ -94,9 +95,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                 northeast: LatLng(maxLat, maxLng)),
             30));
       });
-    }
-
-    getLocationUser();
+    });
   }
 
   @override
@@ -195,9 +194,10 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                     borderRadius: BorderRadius.circular(10),
                                     color: Colors.grey.withOpacity(0.5)),
                                 child: isCheckFavourite
-                                    ?  Icon(
+                                    ? Icon(
                                         Icons.favorite_rounded,
-                                        color: Colors.redAccent.withOpacity(0.9),
+                                        color:
+                                            Colors.redAccent.withOpacity(0.9),
                                       )
                                     : const Icon(
                                         Icons.favorite_border_outlined,
@@ -460,7 +460,12 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [listImage(context), info(context), map(context),review(context)],
+                  children: [
+                    listImage(context),
+                    info(context),
+                    map(context),
+                    review(context)
+                  ],
                 ),
               ),
             ),
@@ -635,59 +640,142 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget map(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: 350,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Stack(children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: GoogleMap(
-                zoomControlsEnabled: false,
-                initialCameraPosition: _kGooglePlex,
-                mapType: MapType.terrain,
-                myLocationEnabled: true,
-                markers: Set.from(_maker),
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
-            ),
-            Positioned(
-                bottom: 10,
-                right: 10,
-                child: InkWell(
-                  onTap: () async {
-                    final availableMap =
-                        await map_launcher.MapLauncher.installedMaps;
-                    await availableMap.first.showDirections(
-                        destination:
-                            map_launcher.Coords(16.463713, 107.590866));
+    return Consumer<GoogleMapProvider>(
+      builder: (context, googleMapProvider, child) => Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: 350,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Stack(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: GoogleMap(
+                  zoomControlsEnabled: false,
+                  polylines: {
+                    Polyline(
+                        polylineId: const PolylineId("route"),
+                        points: googleMapProvider.polylineCoordinates,
+                        color: Colors.blue,
+                        width: 5),
                   },
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.lightBlueAccent.withOpacity(0.8),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey.withOpacity(0.4),
-                              blurRadius: 3,
-                              offset: const Offset(2, 2))
-                        ]),
-                    child: const Center(
-                      child: Icon(
-                        Icons.send_outlined,
-                        color: Colors.white,
+                  initialCameraPosition: const CameraPosition(
+                      target: LatLng(16.463713, 107.590866), zoom: 14.5),
+                  mapType: MapType.terrain,
+                  myLocationEnabled: true,
+                  markers: Set.from(_maker),
+                  onMapCreated: (GoogleMapController controller) {
+                    // _controller.complete(controller);
+                  },
+                ),
+              ),
+              Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: InkWell(
+                    onTap: () async {
+                      // final availableMap =
+                      //     await map_launcher.MapLauncher.installedMaps;
+                      // await availableMap.first.showDirections(
+                      //     destination:
+                      //         map_launcher.Coords(16.463713, 107.590866));
+                      showModalBottomSheet<void>(
+                        context: context,
+                        isDismissible: true,
+                        isScrollControlled: true,
+                        builder: (BuildContext context) {
+                          return Container(
+                            color: Theme.of(context).colorScheme.background,
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 150,
+                                  color:
+                                      Theme.of(context).colorScheme.background,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: const Icon(
+                                              Icons.arrow_drop_down_outlined,
+                                              size: 35,
+                                            )),
+                                        Text(
+                                          'Navigation Map',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge,
+                                        ),
+                                        const SizedBox(
+                                          height: 30,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width:MediaQuery.of(context).size.width,
+                                  height: 500,
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(50),topRight: Radius.circular(50)),
+                                    child: GoogleMap(
+                                      zoomControlsEnabled: false,
+                                      polylines: {
+                                        Polyline(
+                                            polylineId: const PolylineId("route"),
+                                            points: googleMapProvider.polylineCoordinates,
+                                            color: Colors.blue,
+                                            width: 5),
+                                      },
+                                      initialCameraPosition: const CameraPosition(
+                                          target: LatLng(16.463713, 107.590866), zoom: 14.5),
+                                      mapType: MapType.terrain,
+                                      myLocationEnabled: true,
+                                      markers: Set.from(_maker),
+                                      onMapCreated: (GoogleMapController controller) {
+                                        _controller.complete(controller);
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.lightBlueAccent.withOpacity(0.8),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.4),
+                                blurRadius: 3,
+                                offset: const Offset(2, 2))
+                          ]),
+                      child: const Center(
+                        child: Icon(
+                          Icons.send_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ))
-          ]),
+                  ))
+            ]),
+          ),
         ),
       ),
     );
@@ -862,122 +950,156 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
 
   Widget review(BuildContext context) {
     return Consumer<RoomProvider>(
-      builder: (context, roomProvider, child) =>  FutureBuilder(
+      builder: (context, roomProvider, child) => FutureBuilder(
         future: roomProvider.getReview(widget.motel.roomId),
         builder: (context, snapshot) {
-          if(snapshot.hasError){
+          if (snapshot.hasError) {
             return Center(
               child: Text(snapshot.error.toString()),
             );
           }
-          if(snapshot.hasData){
+          if (snapshot.hasData) {
             return Padding(
-              padding: const EdgeInsets.only(left:20,right: 20,bottom: 70),
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 70),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Review',style: Theme.of(context).textTheme.displayLarge,),
-
+                  Text(
+                    'Review',
+                    style: Theme.of(context).textTheme.displayLarge,
+                  ),
                   ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) => Container(
-                        margin: const EdgeInsets.only(bottom: 40),
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            margin: const EdgeInsets.only(bottom: 40),
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(50),
-                                      child: CachedNetworkImage(
-                                        imageUrl: snapshot.data![index].user.image,
-                                        width: 40,
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 15,
-                                    ),
-                                    SizedBox(
-                                      width:
-                                      MediaQuery.of(context).size.width - 105,
-                                      height: 50,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(snapshot.data![index].user.name,
-                                              style: Theme.of(context).textTheme.displayMedium),
-                                          Row(
+                                    Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          child: CachedNetworkImage(
+                                            imageUrl: snapshot
+                                                .data![index].user.image,
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 15,
+                                        ),
+                                        SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              105,
+                                          height: 50,
+                                          child: Column(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Text(snapshot.data![index].rating.toString(),style: Theme.of(context).textTheme.displayMedium,),
-                                                  const Icon(Icons.star,color: Colors.orange,size: 20,)
-                                                ],
-                                              ),
                                               Text(
-                                                snapshot.data![index].createdAt.toString().split(" ")[0],
-                                                style:Theme.of(context).textTheme.displaySmall ,
+                                                  snapshot
+                                                      .data![index].user.name,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .displayMedium),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        snapshot
+                                                            .data![index].rating
+                                                            .toString(),
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayMedium,
+                                                      ),
+                                                      const Icon(
+                                                        Icons.star,
+                                                        color: Colors.orange,
+                                                        size: 20,
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    snapshot
+                                                        .data![index].createdAt
+                                                        .toString()
+                                                        .split(" ")[0],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .displaySmall,
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(snapshot.data![index].comment,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayMedium),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    ...snapshot.data![index].images.map((e) =>
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(right: 5),
+                                          width: 100,
+                                          height: 100,
+                                          child: AspectRatio(
+                                            aspectRatio: 1 / 1,
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                child: Image.network(
+                                                  e,
+                                                  fit: BoxFit.cover,
+                                                )),
+                                          ),
+                                        ))
+                                  ],
+                                )
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(snapshot.data![index].comment,
-                                style: Theme.of(context).textTheme.displayMedium),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                ...snapshot.data![index].images.map((e) => Container(
-                                  margin: const EdgeInsets.only(right: 5),
-                                  width: 100,
-                                  height: 100,
-                                  child: AspectRatio(
-                                    aspectRatio: 1 / 1,
-                                    child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: Image.network(e,fit: BoxFit.cover,)),
-                                  ),
-                                ))
-                              ],
-                            )
-                          ],
-                        ),
-                      )),
+                          )),
                 ],
               ),
             );
-          }
-          else{
+          } else {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
         },
-
       ),
     );
   }

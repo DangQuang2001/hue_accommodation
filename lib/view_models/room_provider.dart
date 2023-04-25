@@ -10,8 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/models/room.dart';
 import 'dart:ui' as ui;
-
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/location.dart' as location;
 
 import '../models/review.dart';
 import '../services/provinces_api.dart';
@@ -45,121 +45,20 @@ class RoomProvider extends ChangeNotifier {
       String title,
       String description,
       String address,
+      location.LatLng location,
       double area,
+      String category,
       String furnishing,
       double price,
       String typeRoom,
       List<String> listImageUrl) async {
-    final response = await http.post(Uri.parse('$url/api/motelhouse/create'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": DateTime.now().millisecondsSinceEpoch.toString(),
-          "dateCreate": DateTime.now().toString(),
-          "hostID": hostID,
-          "hostName": "Dang Quang",
-          "name": title.toString(),
-          "description": description,
-          "category": typeRoom == 'Mini House'
-              ? [1]
-              : typeRoom == 'Motel House'
-                  ? [2]
-                  : [3],
-          "images": listImageUrl,
-          "longitude": 1.2,
-          "latitude": 1.2,
-          "typeName": "Cho thuê",
-          "image": listImageUrl[0],
-          "rating": 0,
-          "hasRoom": true,
-          "idReview": 1,
-          "adParams": {
-            "address": {"id": "address", "value": address, "label": "Địa chỉ"},
-            "area": {"id": "area", "value": "Thành phố Huế", "label": "Quận"},
-            "deposit": {
-              "id": "deposit",
-              "value": "$price",
-              "label": "Tình trạng nội thất"
-            },
-            "furnishing_rent": {
-              "id": "furnishing_rent",
-              "value": "Nội thất cao cấp",
-              "label": "Tình trạng nội thất"
-            },
-            "region": {
-              "id": "region",
-              "value": "Thừa Thiên Huế",
-              "label": "Tỉnh"
-            },
-            "size": {"id": "size", "value": area, "label": "Diện tích"},
-            "ward": {"id": "ward", "value": "", "label": "Phường"}
-          },
-          "isDelete": false
-        }));
-
-    if (response.statusCode == 200) {
+      final response =await RoomApi.createRoom(hostID, hostName, imageHost, title, description, address,location, area, category, furnishing, price, typeRoom, listImageUrl);
+    if (response) {
       getListRoomHost(hostID);
-      await createNotification(
-          title, jsonDecode(response.body)['id'], hostID, imageHost, hostName);
-
-      final responses =
-          await http.get(Uri.parse('$url/api/fcmtoken/get-list-token-device'));
-
-      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization':
-                'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
-          },
-          body: jsonEncode(<String, dynamic>{
-            "registration_ids":
-                (jsonDecode(responses.body) as List<dynamic>).toSet().toList(),
-            "priority": "high",
-            "content_available": true,
-            "notification": {
-              "badge": 42,
-              "title": "Quuang dep trai!",
-              "body": "Image"
-            },
-            "data": {
-              "content": {
-                "id": 1,
-                "badge": 42,
-                "channelKey": "alerts",
-                "displayOnForeground": true,
-                "notificationLayout": "BigPicture",
-                "largeIcon": listImageUrl[0],
-                "bigPicture": listImageUrl[0],
-                "showWhen": true,
-                "autoDismissible": true,
-                "privacy": "Private",
-                "payload": {"secret": "Awesome Notifications Rocks!"}
-              },
-              "roomID": jsonDecode(response.body)['id'],
-              "actionButtons": [
-                {"key": "REPLY", "label": "Reply", "requireInputText": true},
-                {
-                  "key": "DISMISS",
-                  "label": "Dismiss",
-                  "actionType": "DismissAction",
-                  "isDangerousOption": true,
-                  "autoDismissible": true
-                }
-              ],
-              "Android": {
-                "content": {
-                  "title": "$hostName đã mở phòng trọ mới!  😍 ",
-                  "payload": {"android": """$title\\n $description """}
-                }
-              }
-            }
-          }));
     }
-    if (response.statusCode == 403) {
-      print('Error: Khong them duoc room');
+    else{
+      debugPrint('Có gì đó sai sai');
     }
-
     return true;
   }
 
@@ -169,65 +68,15 @@ class RoomProvider extends ChangeNotifier {
       String title,
       String description,
       String address,
+      location.LatLng location,
       double area,
+      String category,
       String furnishing,
       double price,
       String typeRoom,
       List<String> listImageUrl) async {
-    final response = await http.post(Uri.parse('$url/api/motelhouse/update'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": id,
-          "dateCreate": DateTime.now().toString(),
-          "hostID": hostID,
-          "hostName": "Dang Quang",
-          "name": title.toString(),
-          "description": description,
-          "category": typeRoom == 'Mini House'
-              ? [1]
-              : typeRoom == 'Motel House'
-                  ? [2]
-                  : [3],
-          "images": listImageUrl,
-          "longitude": 1.2,
-          "latitude": 1.2,
-          "typeName": "Cho thuê",
-          "image": listImageUrl[0],
-          "rating": 0,
-          "hasRoom": true,
-          "idReview": 1,
-          "adParams": {
-            "address": {"id": "address", "value": address, "label": "Địa chỉ"},
-            "area": {"id": "area", "value": "Thành phố Huế", "label": "Quận"},
-            "deposit": {
-              "id": "deposit",
-              "value": "$price",
-              "label": "Tình trạng nội thất"
-            },
-            "furnishing_rent": {
-              "id": "furnishing_rent",
-              "value": "Nội thất cao cấp",
-              "label": "Tình trạng nội thất"
-            },
-            "region": {
-              "id": "region",
-              "value": "Thừa Thiên Huế",
-              "label": "Tỉnh"
-            },
-            "size": {"id": "size", "value": area, "label": "Diện tích"},
-            "ward": {"id": "ward", "value": "", "label": "Phường"}
-          },
-          "isDelete": false
-        }));
-
-    if (response.statusCode == 200) {}
-    if (response.statusCode == 403) {
-      print('Error: Khong them duoc room');
-    }
-
-    return true;
+    final response = await RoomApi.updateRoom(id, hostID, title, description, address,location, area, category, furnishing, price, typeRoom, listImageUrl);
+    return response;
   }
 
   //Get all MotelRoom
@@ -354,30 +203,7 @@ class RoomProvider extends ChangeNotifier {
     return Room.fromJson(jsonObject);
   }
 
-  Future<bool> createNotification(String title, String roomID, String hostID,
-      String imageHost, String nameHost) async {
-    final response = await http.post(Uri.parse('$url/api/notification/create'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "id": DateTime.now().millisecondsSinceEpoch.toString(),
-          "title": title,
-          "roomID": roomID,
-          "hostID": hostID,
-          "imageHost": imageHost,
-          "nameHost": nameHost,
-          "dateSend": DateTime.now().toString(),
-          "isDelete": []
-        }));
 
-    if (response.statusCode == 200) {}
-    if (response.statusCode == 403) {
-      print('Error: Khong them duoc Notification');
-    }
-
-    return true;
-  }
 
   //Filter room ---------------------------------------------------------------------------------
 

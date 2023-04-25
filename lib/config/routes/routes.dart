@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
+import 'package:hue_accommodation/views/extension/atm.dart';
 import 'package:hue_accommodation/views/forum/forum.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house.dart';
 import 'package:hue_accommodation/views/login_register/login.dart';
@@ -52,6 +53,8 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const FavoritePage();
           case RouteName.postHistory:
             return const PostHistory();
+          case RouteName.atm:
+            return const ATMPage();
           default:
             return const Layout(selectedIndex: 0);
         }
