@@ -9,14 +9,14 @@ import 'package:provider/provider.dart';
 
 import 'navigation_map.dart';
 
-class ATMPage extends StatefulWidget {
-  const ATMPage({super.key});
+class HospitalPage extends StatefulWidget {
+  const HospitalPage({super.key});
 
   @override
-  State<ATMPage> createState() => _ATMPageState();
+  State<HospitalPage> createState() => _HospitalPageState();
 }
 
-class _ATMPageState extends State<ATMPage> {
+class _HospitalPageState extends State<HospitalPage> {
   int value = 1;
   final Completer<GoogleMapController> _controller = Completer();
   static const CameraPosition _kGoogle = CameraPosition(
@@ -36,10 +36,10 @@ class _ATMPageState extends State<ATMPage> {
   void initState() {
     super.initState();
     var googleMapProvider =
-        Provider.of<GoogleMapProvider>(context, listen: false);
+    Provider.of<GoogleMapProvider>(context, listen: false);
     (() async {
       _markers =
-          await googleMapProvider.getPlace('ATM Vietinbank,ThuaThienHue');
+      await googleMapProvider.getPlace('Hospital,ThuaThienHue');
       setState(() {});
     })();
   }
@@ -65,165 +65,46 @@ class _ATMPageState extends State<ATMPage> {
               height: MediaQuery.of(context).size.height,
               child: Column(
                 children: [
-                  categories(context),
+                
                   map(context),
                   Expanded(
                       child: SingleChildScrollView(
-                    child: listLocation(context),
-                  ))
+                        child: listLocation(context),
+                      ))
                 ],
               ),
             ),
             Positioned(
                 child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                        )),
-                    Text(
-                      "ATM Location",
-                      style: Theme.of(context).textTheme.headlineLarge,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              size: 30,
+                            )),
+                        Text(
+                          "ATM Location",
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        )
+                      ],
                     ),
-                    const SizedBox(
-                      width: 30,
-                    )
-                  ],
-                ),
-              ),
-            ))
+                  ),
+                ))
           ],
         ),
       ),
     );
   }
 
-  categories(BuildContext context) {
-    return Consumer<GoogleMapProvider>(
-      builder: (context, googleMapProvider, child) => SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  value = 1;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers = await googleMapProvider
-                      .getPlace('ATM Vietinbank,ThuaThienHue');
-
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 1
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'VietinBank',
-                    style: GoogleFonts.readexPro(
-                        color: value == 1
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  value = 2;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers = await googleMapProvider
-                      .getPlace('ATM VietComBank,ThuaThienHue');
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 2
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'VietComBank',
-                    style: GoogleFonts.readexPro(
-                        color: value == 2
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  value = 3;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers =
-                      await googleMapProvider.getPlace('ATM BIDV,ThuaThienHue');
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 3
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'BIDV',
-                    style: GoogleFonts.readexPro(
-                        color: value == 3
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  value = 4;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers = await googleMapProvider
-                      .getPlace('ATM Agribank,ThuaThienHue');
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 4
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'AgriBank',
-                    style: GoogleFonts.readexPro(
-                        color: value == 4
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   map(BuildContext context) {
     return GestureDetector(
@@ -302,7 +183,7 @@ class _ATMPageState extends State<ATMPage> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style:
-                                    Theme.of(context).textTheme.displayMedium,
+                                Theme.of(context).textTheme.displayMedium,
                               ),
                               const SizedBox(
                                 height: 5,
@@ -337,7 +218,7 @@ class _ATMPageState extends State<ATMPage> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  Theme.of(context).colorScheme.secondary,
                                   boxShadow: [
                                     BoxShadow(
                                         blurRadius: 2,

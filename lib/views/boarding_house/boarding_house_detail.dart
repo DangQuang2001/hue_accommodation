@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,10 +11,9 @@ import 'package:hue_accommodation/view_models/google_map_provider.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/boarding_house/rent_now.dart';
+import 'package:hue_accommodation/views/extension/navigation_map.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
-import 'package:location/location.dart';
-import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
@@ -35,25 +33,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   bool isCheckFavourite = false;
   int listImageLength = 10;
   final Completer<GoogleMapController> _controller = Completer();
-  Location location = Location();
-  final List<Marker> _maker = <Marker>[];
-  LocationData? currentLocation;
-  BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
-  BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
 
-  Future setCurrentUserIcon(String url) async {
-    await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
-        .then((icon) {
-      currentLocationIcon = icon;
-    });
-  }
-
-  Future setDestinationIcon(String url) async {
-    await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
-        .then((icon) {
-      destinationIcon = icon;
-    });
-  }
 
   @override
   void initState() {
@@ -68,37 +48,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
           Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
       isCheckFavourite = favouriteProvider.isCheckFavourite;
     }
-    location.getLocation().then((location) async {
-      final GoogleMapController controller = await _controller.future;
-
-      googleMapProvider.getPolyPoints(
-          LatLng(location.latitude!, location.longitude!),
-          LatLng(widget.motel.latitude, widget.motel.longitude));
-      await setDestinationIcon('assets/images/home.png');
-      await setCurrentUserIcon('assets/images/location2.png');
-      _maker.add(Marker(
-          markerId: const MarkerId('3'),
-          icon: destinationIcon,
-          position: LatLng(widget.motel.latitude, widget.motel.longitude),
-          infoWindow: InfoWindow(title: '${widget.motel.name} Location')));
-      _maker.add(Marker(
-          markerId: const MarkerId('1'),
-          icon: currentLocationIcon,
-          position: LatLng(location.latitude!, location.longitude!),
-          infoWindow: const InfoWindow(title: 'My Location')));
-      setState(() {});
-      double minLat = min(location.latitude!, widget.motel.latitude);
-      double maxLat = max(location.latitude!, widget.motel.latitude);
-      double minLng = min(location.longitude!, widget.motel.longitude);
-      double maxLng = max(location.longitude!, widget.motel.longitude);
-      Timer(const Duration(milliseconds: 1000), () async {
-        controller.animateCamera(CameraUpdate.newLatLngBounds(
-            LatLngBounds(
-                southwest: LatLng(minLat, minLng),
-                northeast: LatLng(maxLat, maxLng)),
-            30));
-      });
-    });
+    googleMapProvider.getMarker(_controller, LatLng(widget.motel.latitude, widget.motel.longitude));
   }
 
   @override
@@ -667,7 +617,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                       target: LatLng(16.463713, 107.590866), zoom: 14.5),
                   mapType: MapType.terrain,
                   myLocationEnabled: true,
-                  markers: Set.from(_maker),
+                  markers: Set.from(googleMapProvider.markers),
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
                   },
@@ -688,80 +638,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                         isDismissible: true,
                         isScrollControlled: true,
                         builder: (BuildContext context) {
-                          return Container(
-                            color: Theme.of(context).colorScheme.background,
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 150,
-                                  color:
-                                      Theme.of(context).colorScheme.background,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        IconButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            icon: const Icon(
-                                              Icons.arrow_drop_down_outlined,
-                                              size: 35,
-                                            )),
-                                        Text(
-                                          'Navigation Map',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge,
-                                        ),
-                                        const SizedBox(
-                                          height: 30,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 500,
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(50),
-                                        topRight: Radius.circular(50)),
-                                    child: GoogleMap(
-                                      zoomControlsEnabled: false,
-                                      polylines: {
-                                        Polyline(
-                                            polylineId:
-                                                const PolylineId("route"),
-                                            points: googleMapProvider
-                                                .polylineCoordinates,
-                                            color: Colors.blue,
-                                            width: 5),
-                                      },
-                                      initialCameraPosition:
-                                          const CameraPosition(
-                                              target:
-                                                  LatLng(16.463713, 107.590866),
-                                              zoom: 14.5),
-                                      mapType: MapType.terrain,
-                                      myLocationEnabled: true,
-                                      markers: Set.from(_maker),
-                                      onMapCreated:
-                                          (GoogleMapController controller) {
-                                        // _controller.complete(controller);
-                                      },
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          );
+                          return NavigationMap(placeLocation: LatLng(widget.motel.latitude,widget.motel.longitude));
                         },
                       );
                     },

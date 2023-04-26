@@ -9,14 +9,14 @@ import 'package:provider/provider.dart';
 
 import 'navigation_map.dart';
 
-class ATMPage extends StatefulWidget {
-  const ATMPage({super.key});
+class HouseholdGood extends StatefulWidget {
+  const HouseholdGood({super.key});
 
   @override
-  State<ATMPage> createState() => _ATMPageState();
+  State<HouseholdGood> createState() => _HouseholdGoodState();
 }
 
-class _ATMPageState extends State<ATMPage> {
+class _HouseholdGoodState extends State<HouseholdGood> {
   int value = 1;
   final Completer<GoogleMapController> _controller = Completer();
   static const CameraPosition _kGoogle = CameraPosition(
@@ -36,10 +36,10 @@ class _ATMPageState extends State<ATMPage> {
   void initState() {
     super.initState();
     var googleMapProvider =
-        Provider.of<GoogleMapProvider>(context, listen: false);
+    Provider.of<GoogleMapProvider>(context, listen: false);
     (() async {
       _markers =
-          await googleMapProvider.getPlace('ATM Vietinbank,ThuaThienHue');
+      await googleMapProvider.getPlace('Cua hang do dung gia dung,ThuaThienHue');
       setState(() {});
     })();
   }
@@ -69,36 +69,36 @@ class _ATMPageState extends State<ATMPage> {
                   map(context),
                   Expanded(
                       child: SingleChildScrollView(
-                    child: listLocation(context),
-                  ))
+                        child: listLocation(context),
+                      ))
                 ],
               ),
             ),
             Positioned(
                 child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                        )),
-                    Text(
-                      "ATM Location",
-                      style: Theme.of(context).textTheme.headlineLarge,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              size: 30,
+                            )),
+                        Text(
+                          "ATM Location",
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        )
+                      ],
                     ),
-                    const SizedBox(
-                      width: 30,
-                    )
-                  ],
-                ),
-              ),
-            ))
+                  ),
+                ))
           ],
         ),
       ),
@@ -171,7 +171,7 @@ class _ATMPageState extends State<ATMPage> {
                   value = 3;
                   FocusScope.of(context).requestFocus(FocusNode());
                   _markers =
-                      await googleMapProvider.getPlace('ATM BIDV,ThuaThienHue');
+                  await googleMapProvider.getPlace('ATM BIDV,ThuaThienHue');
                   setState(() {});
                 },
                 child: Container(
@@ -302,7 +302,7 @@ class _ATMPageState extends State<ATMPage> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style:
-                                    Theme.of(context).textTheme.displayMedium,
+                                Theme.of(context).textTheme.displayMedium,
                               ),
                               const SizedBox(
                                 height: 5,
@@ -337,7 +337,7 @@ class _ATMPageState extends State<ATMPage> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  Theme.of(context).colorScheme.secondary,
                                   boxShadow: [
                                     BoxShadow(
                                         blurRadius: 2,

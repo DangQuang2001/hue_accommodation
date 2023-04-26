@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/views/extension/atm.dart';
+import 'package:hue_accommodation/views/extension/household_good.dart';
+import 'package:hue_accommodation/views/extension/supermarket.dart';
 import 'package:hue_accommodation/views/forum/forum.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house.dart';
 import 'package:hue_accommodation/views/login_register/login.dart';
@@ -15,6 +17,7 @@ import 'package:hue_accommodation/views/user_info/post_history.dart';
 import 'package:hue_accommodation/views/user_info/rent_history.dart';
 import 'package:hue_accommodation/views/user_info/user_info.dart';
 import '../../views/components/layout.dart';
+import '../../views/extension/hospital.dart';
 import '../../views/manage/statistical.dart';
 
 final routes = {
@@ -55,6 +58,12 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const PostHistory();
           case RouteName.atm:
             return const ATMPage();
+          case RouteName.hospital:
+            return const HospitalPage();
+          case RouteName.superMarket:
+            return const SuperMarketPage();
+          case RouteName.householdGoods:
+            return const HouseholdGood();
           default:
             return const Layout(selectedIndex: 0);
         }
