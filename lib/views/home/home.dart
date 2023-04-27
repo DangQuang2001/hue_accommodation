@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:animate_do/animate_do.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
     'https://mogi.vn/news/wp-content/uploads/2022/04/phong-tro-gac-lung-dep.jpg',
     'https://blogcdn.muaban.net/wp-content/uploads/2022/12/26172116/thiet-ke-phong-tro-30m2.jpg',
   ];
+
   @override
   initState() {
     super.initState();
@@ -352,8 +354,9 @@ class _HomePageState extends State<HomePage> with AppCloser {
                             const SizedBox(
                               width: 10,
                             ),
-                            Image.network(
-                              "https://media4.giphy.com/media/KbkbRXkIdbiWknW9Ur/giphy.gif?cid=ecf05e47swmprxsjnsazm9865g9qdvutyqck4tq8h4izkxh8&rid=giphy.gif&ct=g",
+                            CachedNetworkImage(
+                              imageUrl:
+                                  "https://media4.giphy.com/media/KbkbRXkIdbiWknW9Ur/giphy.gif?cid=ecf05e47swmprxsjnsazm9865g9qdvutyqck4tq8h4izkxh8&rid=giphy.gif&ct=g",
                               width: 50,
                             )
                           ],
@@ -547,11 +550,27 @@ class _HomePageState extends State<HomePage> with AppCloser {
             content: const Text('Bạn phải đăng nhập để sử dụng chức năng này!'),
             action: SnackBarAction(
               label: 'Đăng nhập',
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AuthService().handleAuthState()));
+              onPressed: () async {
+                var connectivityResult =
+                    await Connectivity().checkConnectivity();
+                if (connectivityResult == ConnectivityResult.mobile ||
+                    connectivityResult == ConnectivityResult.wifi) {
+                  // ignore: use_build_context_synchronously
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AuthService().handleAuthState()));
+                }
+                else{
+                  const snackBar = SnackBar(
+                    backgroundColor: Colors.blue,
+                    content: Text('Không có kết nối mạng!'),
+
+                  );
+                  // ignore: use_build_context_synchronously
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
               },
             ),
           );
@@ -674,8 +693,8 @@ class _HomePageState extends State<HomePage> with AppCloser {
             padding: const EdgeInsets.only(top: 40, left: 25.0, right: 25),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                imageList[index],
+              child: CachedNetworkImage(
+                imageUrl: imageList[index],
                 fit: BoxFit.cover,
               ),
             ),

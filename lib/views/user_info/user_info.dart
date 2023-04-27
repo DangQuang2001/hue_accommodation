@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   S.of(context).profile_title,
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
+                userProvider.userCurrent != null?
                 InkWell(
                     onTap: () {
                       Navigator.pushNamed(context, RouteName.editProfile);
@@ -69,7 +71,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       Icons.edit_note_outlined,
                       color: Theme.of(context).iconTheme.color,
                       size: 30,
-                    )),
+                    )):const Text(''),
               ],
             ),
             const SizedBox(
@@ -132,7 +134,28 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () => Navigator.of(context).push(slideRightToLeft(AuthService().handleAuthState())),
+                            onTap: ()async {
+                              var connectivityResult =
+                                  await Connectivity().checkConnectivity();
+                              if (connectivityResult == ConnectivityResult.mobile ||
+                                  connectivityResult == ConnectivityResult.wifi) {
+                                // ignore: use_build_context_synchronously
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            AuthService().handleAuthState()));
+                              }
+                              else{
+                                const snackBar = SnackBar(
+                                  backgroundColor: Colors.blue,
+                                  content: Text('Không có kết nối mạng!'),
+
+                                );
+                                // ignore: use_build_context_synchronously
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            },
                             child: Container(
                               width: 100,
                               height: 45,
@@ -151,8 +174,25 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             width: 20,
                           ),
                           InkWell(
-                            onTap: () => Navigator.pushNamed(
-                                context, RouteName.register),
+                            onTap: () async{
+                              var connectivityResult =
+                                  await Connectivity().checkConnectivity();
+                              if (connectivityResult == ConnectivityResult.mobile ||
+                                  connectivityResult == ConnectivityResult.wifi) {
+                                // ignore: use_build_context_synchronously
+                                Navigator.pushNamed(
+                                    context, RouteName.register);
+                              }
+                              else{
+                                const snackBar = SnackBar(
+                                  backgroundColor: Colors.blue,
+                                  content: Text('Không có kết nối mạng!'),
+
+                                );
+                                // ignore: use_build_context_synchronously
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            } ,
                             child: Container(
                               width: 100,
                               height: 45,
@@ -390,14 +430,15 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               ),
                               languageProvider.locale ==
                                       const Locale('vi', 'VN')
-                                  ? Image.network(
+                                  ? CachedNetworkImage(
+                                imageUrl: 
                                       'https://cdn-icons-png.flaticon.com/512/5975/5975456.png',
                                       width: 40,
                                       height: 25,
                                       fit: BoxFit.cover,
                                     )
-                                  : Image.network(
-                                      'https://cdn-icons-png.flaticon.com/512/555/555417.png',
+                                  : CachedNetworkImage(
+                                imageUrl: 'https://cdn-icons-png.flaticon.com/512/555/555417.png',
                                       width: 40,
                                       height: 25,
                                       fit: BoxFit.cover,
@@ -476,13 +517,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   final String? currentToken =
                                       await FirebaseMessaging.instance
                                           .getToken();
-                                  await fcmTokenProvider.checkUserLogOut(
+                                  fcmTokenProvider.checkUserLogOut(
                                       userProvider.userCurrent!.id,
                                       currentToken!);
-                                  userProvider.userCurrent = null;
-                                  chatProvider.listRoomChat = [];
-                                  notificationProvider.countNotification = 0;
-                                  notificationProvider.listNotification = [];
+                                  userProvider.disposeUser();
+                                  chatProvider.disposeChat();
+                                  notificationProvider.disposeNotification();
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushNamedAndRemoveUntil(context,
                                       RouteName.home, (route) => false);
@@ -490,13 +530,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                   final String? currentToken =
                                       await FirebaseMessaging.instance
                                           .getToken();
-                                  await fcmTokenProvider.checkUserLogOut(
+                                   fcmTokenProvider.checkUserLogOut(
                                       userProvider.userCurrent!.id,
                                       currentToken!);
-                                  userProvider.userCurrent = null;
-                                  chatProvider.listRoomChat = [];
-                                  notificationProvider.countNotification = 0;
-                                  notificationProvider.listNotification = [];
+                                  userProvider.disposeUser();
+                                  chatProvider.disposeChat();
+                                  notificationProvider.disposeNotification();
                                   // ignore: use_build_context_synchronously
                                   AuthService().signOut(context);
                                 }
@@ -540,40 +579,70 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   Widget itemNavigator(BuildContext context, IconData icon, String name,
       String page, int duration) {
-    return InkWell(
-      onTap: () => Navigator.pushNamed(context, page),
-      child: SlideInRight(
-        delay: const Duration(milliseconds: 200),
-        duration: Duration(milliseconds: duration),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  name,
-                  style: GoogleFonts.readexPro(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w300,
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Colors.black54
-                          : Colors.white),
-                )
-              ],
-            ),
-            Icon(
-              Icons.arrow_forward_ios_outlined,
-              color: Theme.of(context).iconTheme.color,
-              size: 20,
-            )
-          ],
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) => InkWell(
+        onTap: () async{
+          var connectivityResult =
+              await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.mobile ||
+              connectivityResult == ConnectivityResult.wifi) {
+            if(userProvider.userCurrent != null){
+              // ignore: use_build_context_synchronously
+              Navigator.pushNamed(context, page);
+            }
+            else{
+              const snackBar = SnackBar(
+                backgroundColor: Colors.redAccent,
+                content: Text('Bạn cần phải đăng nhập!'),
+
+              );
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          }
+          else{
+            const snackBar = SnackBar(
+              backgroundColor: Colors.blue,
+              content: Text('Không có kết nối mạng!'),
+
+            );
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
+        } ,
+        child: SlideInRight(
+          delay: const Duration(milliseconds: 200),
+          duration: Duration(milliseconds: duration),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    name,
+                    style: GoogleFonts.readexPro(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w300,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? Colors.black54
+                            : Colors.white),
+                  )
+                ],
+              ),
+              Icon(
+                Icons.arrow_forward_ios_outlined,
+                color: Theme.of(context).iconTheme.color,
+                size: 20,
+              )
+            ],
+          ),
         ),
       ),
     );

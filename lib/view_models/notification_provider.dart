@@ -1,8 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/services/notification_api.dart';
 
 import '../models/notification.dart';
@@ -23,5 +19,11 @@ class NotificationProvider extends ChangeNotifier{
     if(response.statusCode==200){
       getListNotification(hostID);
     }
+  }
+
+ disposeNotification() {
+    countNotification = 0;
+    listNotification = [];
+    notifyListeners();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
@@ -101,8 +102,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                   Stack(children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(50),
-                                      child: Image.network(
-                                        e.imageHost,
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                        e.sender.image,
                                         width: 50,
                                         height: 50,
                                         fit: BoxFit.cover,
@@ -147,15 +149,14 @@ class _NotificationPageState extends State<NotificationPage> {
                                                     .displayMedium,
                                                 children: <TextSpan>[
                                                   TextSpan(
-                                                    text: ("${e.nameHost} đã mở phòng trọ mới.")
+                                                    text: ("${e.sender.name} đã đăng phòng trọ mới.")
                                                         .substring(
                                                             0,
-                                                            ("${e.nameHost} đã mở phòng trọ mới.")
-                                                                .indexOf(e
-                                                                    .nameHost)),
+                                                            ("${e.sender.name} đã đăng phòng trọ mới.")
+                                                                .indexOf(e.sender.name)),
                                                   ),
                                                   TextSpan(
-                                                    text: e.nameHost,
+                                                    text: e.sender.name,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .displayMedium!
@@ -165,12 +166,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                     .w600),
                                                   ),
                                                   TextSpan(
-                                                    text: ("${e.nameHost} đã mở phòng trọ mới.")
+                                                    text: ("${e.sender.name} đã đăng phòng trọ mới.")
                                                         .substring(
-                                                            ("${e.nameHost} đã mở phòng trọ mới.")
-                                                                    .indexOf(e
-                                                                        .nameHost) +
-                                                                e.nameHost
+                                                            ("${e.sender.name} đã đăng phòng trọ mới.")
+                                                                    .indexOf(e.sender.name) +
+                                                                e.sender.name
                                                                     .length),
                                                   ),
                                                 ],
@@ -180,7 +180,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                               height: 5,
                                             ),
                                             Text(
-                                              "${e.dateSend.split("T")[0]} ${e.dateSend.split("T")[1].split(".")[0]}",
+                                              "${e.dateSend.toString().split("T")[0]} ${e.dateSend.toString().split("T")[1].split(".")[0]}",
                                               style: GoogleFonts.readexPro(
                                                   fontWeight: FontWeight.w300,
                                                   color: Colors.grey),

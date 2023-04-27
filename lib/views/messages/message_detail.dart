@@ -43,7 +43,7 @@ class _ChatScreenState extends State<ChatScreen> {
         await chatProvider.isOnline(widget.infoUserRoom[1]['_id']);
       }
       _chatController.initSocket(widget.roomId,
-          [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id, chatProvider.tokenUser);
+          [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id, chatProvider.tokenUser,userProvider.userCurrent!);
       if (widget.isNewRoom) {
         _messages = [];
         setState(() {

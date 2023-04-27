@@ -5,6 +5,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/user.dart';
+
 class ChatController {
   late String roomIdReplace;
   late String roomIdReplaceFirst;
@@ -15,7 +17,7 @@ class ChatController {
 
   late IO.Socket _socket;
 
-  void initSocket(String roomId, List<String> userId, String userCurrentId,String token) {
+  void initSocket(String roomId, List<String> userId, String userCurrentId,Map<String,dynamic> token,User userCurrent) {
     _socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
     });
@@ -64,8 +66,7 @@ class ChatController {
         isReadMessage(roomIdReplace, userCurrentId);
       }
       if (listJoinRoom.length == 1) {
-        print(token);
-        sendNotification(token);
+        sendNotification(token,userCurrent, data['content'] );
       }
     });
 
@@ -163,17 +164,71 @@ class ChatController {
 
   }
 
-  Future sendNotification(String token) async {
-    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization':
-              'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
-        },
-        body: jsonEncode(<String, dynamic>{
-          "to":token,
-          "data": {"message": "Tin nhan moi!", "type": "notification"}
-        }));
+  Future sendNotification(Map<String,dynamic> token, User userCurrent,String message) async {
+    List<String> listOnline = token['online'].cast<String>();
+    List<String> listOffline = token['offline'].cast<String>();
+   for (var element in listOnline) {
+     await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+         headers: <String, String>{
+           'Content-Type': 'application/json; charset=UTF-8',
+           'Authorization':
+           'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
+         },
+         body: jsonEncode(<String, dynamic>{
+           "to":element,
+           "data": {"message": "Tin nhan moi!", "type": "notification"}
+         }));
+   }
+    if (listOffline.isNotEmpty) {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization':
+            'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
+          },
+          body: jsonEncode(<String, dynamic>{
+            "registration_ids":listOffline,
+            "priority": "high",
+            "content_available": true,
+            "notification": {
+              "badge": 42,
+              "title": "Quuang dep trai!",
+              "body": "Image"
+            },
+            "data": {
+              "content": {
+                "id": 1,
+                "badge": 42,
+                "channelKey": "alerts",
+                "displayOnForeground": true,
+                "notificationLayout": "BigPicture",
+                "largeIcon": userCurrent.image,
+                "bigPicture": userCurrent.image,
+                "showWhen": true,
+                "autoDismissible": true,
+                "privacy": "Private",
+                "payload": {"secret": "Awesome Notifications Rocks!"}
+              },
+              "roomChatId": "",
+              "actionButtons": [
+                {"key": "REPLY", "label": "Reply", "requireInputText": true},
+                {
+                  "key": "DISMISS",
+                  "label": "Dismiss",
+                  "actionType": "DismissAction",
+                  "isDangerousOption": true,
+                  "autoDismissible": true
+                }
+              ],
+              "Android": {
+                "content": {
+                  "title": "${userCurrent.name} đã nhắn tin cho bạn!  😍 ",
+                  "payload": {"android": message}
+                }
+              }
+            }
+          }));
+    }
   }
 
   void dispose() {

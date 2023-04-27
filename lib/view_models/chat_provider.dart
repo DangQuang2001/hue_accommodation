@@ -9,7 +9,7 @@ import 'package:hue_accommodation/services/chat_api.dart';
 class ChatProvider extends ChangeNotifier {
   bool isGetChat = false;
   bool isUserOnline1 = false;
-  String tokenUser = "";
+  Map<String,dynamic> tokenUser = {};
   int countNewChat = 0;
   late bool isNewRoom;
   late String roomId;
@@ -131,9 +131,22 @@ class ChatProvider extends ChangeNotifier {
 
   Future isOnline(String userId) async {
     final data =await ChatApi.isOnline(userId);
-    if (data.isNotEmpty) {
+    print(data);
+    if (data !=null) {
         isUserOnline1 = true;
-        tokenUser = data[0];
+        tokenUser = data;
     }
+  }
+
+
+  void disposeChat() {
+    listRoomChat = [];
+    countNewChat = 0;
+    isGetChat = false;
+    isUserOnline1 = false;
+    tokenUser = {};
+    countNewChat = 0;
+    listMessage = [];
+    notifyListeners();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hue_accommodation/view_models/google_map_provider.dart';
@@ -64,6 +65,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   categories(context),
                   map(context),
@@ -89,7 +91,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                               size: 30,
                             )),
                         Text(
-                          "ATM Location",
+                          "Household Location",
                           style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         const SizedBox(
@@ -118,8 +120,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                   value = 1;
                   FocusScope.of(context).requestFocus(FocusNode());
                   _markers = await googleMapProvider
-                      .getPlace('ATM Vietinbank,ThuaThienHue');
-
+                      .getPlace('Cua hang do dung gia dung,ThuaThienHue');
                   setState(() {});
                 },
                 child: Container(
@@ -132,7 +133,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                           : const Color.fromARGB(255, 231, 230, 230),
                       borderRadius: BorderRadius.circular(5)),
                   child: Text(
-                    'VietinBank',
+                    'All',
                     style: GoogleFonts.readexPro(
                         color: value == 1
                             ? Colors.white
@@ -144,9 +145,13 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                 onTap: () async {
                   value = 2;
                   FocusScope.of(context).requestFocus(FocusNode());
-                  _markers = await googleMapProvider
-                      .getPlace('ATM VietComBank,ThuaThienHue');
-                  setState(() {});
+                  Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((location)async{
+                    _markers = await googleMapProvider
+                        .getPlaceNearby('Cua hang do dung gia dung,ThuaThienHue',LatLng(location.latitude, location.longitude));
+                    setState(() {});
+                    GoogleMapController controller = await _controller.future;
+                    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(location.latitude, location.longitude),zoom: 15)));
+                  });
                 },
                 child: Container(
                   padding: const EdgeInsets.only(
@@ -158,7 +163,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                           : const Color.fromARGB(255, 231, 230, 230),
                       borderRadius: BorderRadius.circular(5)),
                   child: Text(
-                    'VietComBank',
+                    'Nearby',
                     style: GoogleFonts.readexPro(
                         color: value == 2
                             ? Colors.white
@@ -166,58 +171,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () async {
-                  value = 3;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers =
-                  await googleMapProvider.getPlace('ATM BIDV,ThuaThienHue');
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 3
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'BIDV',
-                    style: GoogleFonts.readexPro(
-                        color: value == 3
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  value = 4;
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  _markers = await googleMapProvider
-                      .getPlace('ATM Agribank,ThuaThienHue');
-                  setState(() {});
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 20, right: 20, bottom: 10),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: value == 4
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 231, 230, 230),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(
-                    'AgriBank',
-                    style: GoogleFonts.readexPro(
-                        color: value == 4
-                            ? Colors.white
-                            : const Color.fromARGB(255, 75, 75, 75)),
-                  ),
-                ),
-              )
+
             ],
           ),
         ),
@@ -308,7 +262,7 @@ class _HouseholdGoodState extends State<HouseholdGood> {
                                 height: 5,
                               ),
                               Text(
-                                e['formatted_address'],
+                                e['formatted_address']??e['vicinity'],
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.displaySmall,

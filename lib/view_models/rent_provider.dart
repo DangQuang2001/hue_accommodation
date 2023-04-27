@@ -9,6 +9,7 @@ class RentProvider extends ChangeNotifier {
   List<Rent> listConfirm = [];
   List<Rent> listUnConfirm = [];
   List<Rent> listRent = [];
+
   Future<bool> createRent(
       String hostID,
       String userID,
@@ -21,45 +22,54 @@ class RentProvider extends ChangeNotifier {
       int numberDaysRented,
       int numberPeople,
       String notes) async {
-    final response = await RentApi.createRent(hostID, userID, name, image, roomImage, phone, roomID, roomName, numberDaysRented, numberPeople, notes);
-    if (response.statusCode == 200) {
-      isRent=true;
+    final response = await RentApi.createRent(
+        hostID,
+        userID,
+        name,
+        image,
+        roomImage,
+        phone,
+        roomID,
+        roomName,
+        numberDaysRented,
+        numberPeople,
+        notes);
+    if (response) {
+      isRent = true;
       notifyListeners();
-    }
-    if (response.statusCode == 403) {
-      print('Error: Khong them duoc rent');
-      isRent =false;
+    } else {
+      isRent = false;
       notifyListeners();
     }
     return true;
   }
 
-  Future<void> getListWaiting(String hostId,int isConfirmed) async {
+  Future<void> getListWaiting(String hostId, int isConfirmed) async {
     final data = await RentApi.getListWaiting(hostId, isConfirmed);
     listWaiting = data;
     notifyListeners();
   }
 
-  Future<void> getListConfirm(String hostId,int isConfirmed) async {
+  Future<void> getListConfirm(String hostId, int isConfirmed) async {
     final data = await RentApi.getListConfirm(hostId, isConfirmed);
     listConfirm = data;
     notifyListeners();
-    getListWaiting(hostId,0);
+    getListWaiting(hostId, 0);
   }
 
-  Future<void> getListUnConfirm(String hostId,int isConfirmed) async {
+  Future<void> getListUnConfirm(String hostId, int isConfirmed) async {
     final data = await RentApi.getListUnConfirm(hostId, isConfirmed);
     listUnConfirm = data;
     notifyListeners();
-    getListWaiting(hostId,0);
+    getListWaiting(hostId, 0);
   }
 
-  Future<void> confirm(String hostId,String id) async {
+  Future<void> confirm(String hostId, String id) async {
     await RentApi.confirm(hostId, id);
     getListConfirm(hostId, 1);
   }
 
-  Future<void> unConfirm(String hostId,String id) async {
+  Future<void> unConfirm(String hostId, String id) async {
     await RentApi.unConfirm(hostId, id);
     getListUnConfirm(hostId, 2);
   }

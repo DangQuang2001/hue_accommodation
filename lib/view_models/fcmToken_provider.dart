@@ -8,10 +8,8 @@ class FcmTokenProvider extends ChangeNotifier {
     isCheckUser = true;
     final response =await FcmTokenApi.isCheckUserToken(userID, fcmToken);
     if (response.statusCode == 200) {
-      isCheckUser = true;
     }
     if (response.statusCode == 201) {
-      isCheckUser = true;
     }
     if (response.statusCode == 403) {
       print('Error: Co gi do sai sai');
@@ -23,10 +21,8 @@ class FcmTokenProvider extends ChangeNotifier {
     isCheckDevice = true;
     final response = await FcmTokenApi.isCheckDeviceToken(fcmToken);
     if (response.statusCode == 200) {
-      isCheckDevice = true;
     }
     if (response.statusCode == 201) {
-      isCheckDevice = true;
     }
     if (response.statusCode == 403) {
       print('Error: Co gi do sai sai');

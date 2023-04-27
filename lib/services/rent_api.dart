@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 
 import '../models/rent.dart';
 
 class RentApi{
-  static Future createRent(
+  static Future<bool> createRent(
       String hostID,
       String userID,
       String name,
@@ -37,7 +38,16 @@ class RentApi{
           "note": notes,
           "isConfirmed": 0,
         }));
-    return response;
+    if (response.statusCode == 200) {
+      createNotification(userID,"đã đăng ký thuê phòng!", 1, hostID, "");
+
+      return true;
+    }
+    if (response.statusCode == 403) {
+      debugPrint('Error: Khong them duoc rent');
+      return false;
+    }
+    return false;
   }
 
   static Future<List<Rent>> getListWaiting(String hostId,int isConfirmed) async {
@@ -75,5 +85,33 @@ class RentApi{
     var listObject = jsonObject as List;
     return listObject.map((e) => Rent.fromJson(e)).toList();
 
+  }
+
+  static Future<bool> createNotification(String senderId, String title,
+      int type, String receiverId,String dataId) async {
+    final response = await http.post(Uri.parse('$url/api/notification/create'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          "id": DateTime.now().millisecondsSinceEpoch.toString(),
+          "senderId": title,
+          "title": title,
+          "type": type,
+          "dateSend": DateTime.now().toString(),
+          "receiverId": receiverId,
+          "readBy": [],
+          "isDelete": [],
+          "dataId":dataId
+        }));
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+    if (response.statusCode == 403) {
+      debugPrint('Có gì đó sai sai!');
+      return false;
+    }
+    return false;
   }
 }

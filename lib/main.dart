@@ -57,8 +57,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (context) => AppLifecycleStateNotifier()),
       ],
-      child: Consumer3<LanguageProvider, ThemeProvider,AppLifecycleStateNotifier>(
-          builder: (context, languageProvider, themeObj,lifecycle, child) {
+      child: Consumer4<LanguageProvider, ThemeProvider,AppLifecycleStateNotifier,RoomProvider>(
+          builder: (context, languageProvider, themeObj,lifecycle,roomProvider, child) {
         var fcmToken = Provider.of<FcmTokenProvider>(context, listen: false);
         var userProvider = Provider.of<UserProvider>(context, listen: false);
         var chatProvider = Provider.of<ChatProvider>(context, listen: false);
@@ -73,6 +73,9 @@ class MyApp extends StatelessWidget {
             checkAndUpdateFCMToken(
                 lifecycle.lifecycleState, userProvider, fcmToken);
           } else {
+            if(roomProvider.isConnect == false){
+              roomProvider.getListNoInternet();
+            }
             print("Could not connect wifi. Please connect a wifi!");
           }
         })();
@@ -99,3 +102,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//AIzaSyBS9MxoBoBvM5aP_tj9VKIF4r8f22gkdcw

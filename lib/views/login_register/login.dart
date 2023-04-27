@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
@@ -8,6 +9,7 @@ import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:provider/provider.dart';
 
+import '../../view_models/fcmToken_provider.dart';
 import '../components/slide_route.dart';
 import 'choose_role.dart';
 
@@ -78,8 +80,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget login(BuildContext context) {
-    return Consumer3<UserProvider,NotificationProvider,ChatProvider>(
-      builder: (context, userProvider,notificationProvider,chatProvider, child) => Form(
+    return Consumer4<UserProvider,NotificationProvider,ChatProvider,FcmTokenProvider>(
+      builder: (context, userProvider,notificationProvider,chatProvider,fcmTokenProvider, child) => Form(
         key: _formKey,
         child: Padding(
           padding: const EdgeInsets.only(top: 20.0, right: 30, left: 30),
@@ -214,8 +216,6 @@ class _LoginPageState extends State<LoginPage> {
                       // do something
                       (() async {
                         await userProvider.login(email, password);
-
-
                         final snackBar = SnackBar(
                           backgroundColor: userProvider.isLogin == 1
                               ? Colors.green
@@ -234,10 +234,15 @@ class _LoginPageState extends State<LoginPage> {
                         // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         if(userProvider.isLogin == 1){
-                          notificationProvider.getListNotification(userProvider.userCurrent!.id);
-                          chatProvider.getRoomChat(userProvider.userCurrent!.id);
                           // ignore: use_build_context_synchronously
                           Navigator.pushNamedAndRemoveUntil(context, RouteName.home,(route) => false,);
+                          final String? currentToken =
+                          await FirebaseMessaging.instance
+                              .getToken();
+                          notificationProvider.getListNotification(userProvider.userCurrent!.id);
+                          chatProvider.getRoomChat(userProvider.userCurrent!.id);
+                          fcmTokenProvider.checkUserTurnOff(userProvider.userCurrent!.id, currentToken!, true);
+
                         }
                       })();
                     }
@@ -288,13 +293,16 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(
             height: 25,
           ),
-          Consumer3<UserProvider,NotificationProvider,ChatProvider>(
-            builder: (context, userProvider,notificationProvider,chatProvider, child) =>  InkWell(
+          Consumer4<UserProvider,NotificationProvider,ChatProvider,FcmTokenProvider>(
+            builder: (context, userProvider,notificationProvider,chatProvider,fcmTokenProvider, child) =>  InkWell(
               onTap: ()  async {
                 await AuthService().signInWithGoogle(context);
                 notificationProvider.getListNotification(userProvider.userCurrent!.id);
                 chatProvider.getRoomChat(userProvider.userCurrent!.id);
-                // ignore: use_build_context_synchronously
+                final String? currentToken =
+                await FirebaseMessaging.instance
+                    .getToken();
+                fcmTokenProvider.checkUserTurnOff(userProvider.userCurrent!.id, currentToken!, true);
                 },
               child: Container(
                 width: MediaQuery.of(context).size.width,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
@@ -414,7 +415,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Image.network(
+                    CachedNetworkImage(
+                      imageUrl:
                       'https://cdn-icons-png.flaticon.com/512/2991/2991148.png',
                       width: 30,
                       height: 30,

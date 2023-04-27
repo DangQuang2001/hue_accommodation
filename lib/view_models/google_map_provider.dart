@@ -26,7 +26,6 @@ class GoogleMapProvider extends ChangeNotifier {
       if (result.predictions != null) {
         placePredictions = result.predictions!;
         notifyListeners();
-        getLatLngFromAddress('vietinbank, thừa thiên huế');
       }
     }
   }
@@ -76,6 +75,37 @@ class GoogleMapProvider extends ChangeNotifier {
   Future getPlace(String query) async {
     List<Marker> markers = [];
     final response = await GoogleMapApi.getPlace(query);
+    if (response != null) {
+      for (var result in response) {
+        // Lấy vị trí từ kết quả
+        LatLng position = LatLng(
+          result["geometry"]["location"]["lat"],
+          result["geometry"]["location"]["lng"],
+        );
+
+        // Tạo marker từ vị trí
+        Marker marker = Marker(
+          markerId: MarkerId(result["place_id"]),
+          position: position,
+          infoWindow: InfoWindow(
+            title: result["name"],
+            snippet: result["formatted_address"],
+          ),
+          icon: BitmapDescriptor.defaultMarker,
+        );
+
+        // Thêm marker vào Set
+        markers.add(marker);
+      }
+      listPlace = response;
+      notifyListeners();
+      return markers;
+    }
+  }
+
+  Future getPlaceNearby(String query,LatLng location) async {
+    List<Marker> markers = [];
+    final response = await GoogleMapApi.getPlaceNearby(query,location);
     if (response != null) {
       for (var result in response) {
         // Lấy vị trí từ kết quả

@@ -397,7 +397,8 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                         borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20),
                             bottomRight: Radius.circular(20)),
-                        child: Image.network(
+                        child: CachedNetworkImage(
+                          imageUrl:
                           widget.motel.image,
                           fit: BoxFit.cover,
                         ),
@@ -472,11 +473,13 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Stack(alignment: Alignment.center, children: [
-                    Image.network(
+                    CachedNetworkImage(
+                      imageUrl:
                       widget.motel.images[index],
-                      cacheWidth: 223,
-                      cacheHeight: 210,
+                      width: 223,
+                      height: 210,
                       fit: BoxFit.cover,
+                      errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
                     ),
                     Positioned(
                       bottom: 0,
@@ -812,6 +815,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                   itemBuilder: (context, index) => CachedNetworkImage(
                     imageUrl: images[index],
                     fit: BoxFit.cover,
+                    errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
                   ),
                 ),
                 Center(
@@ -968,7 +972,8 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                                             child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(5),
-                                                child: Image.network(
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
                                                   e,
                                                   fit: BoxFit.cover,
                                                 )),

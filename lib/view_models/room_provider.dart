@@ -9,9 +9,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/models/room.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui' as ui;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:google_maps_flutter_platform_interface/src/types/location.dart' as location;
+import 'package:google_maps_flutter_platform_interface/src/types/location.dart'
+    as location;
 
 import '../models/review.dart';
 import '../services/provinces_api.dart';
@@ -37,6 +39,7 @@ class RoomProvider extends ChangeNotifier {
   int listRemoveLength = 0;
   bool hasNextPage = true;
   bool hasNextPageFilter = true;
+  bool isConnect = false;
 
   Future<bool> createRoom(
       String hostID,
@@ -52,11 +55,23 @@ class RoomProvider extends ChangeNotifier {
       double price,
       String typeRoom,
       List<String> listImageUrl) async {
-      final response =await RoomApi.createRoom(hostID, hostName, imageHost, title, description, address,location, area, category, furnishing, price, typeRoom, listImageUrl);
+    final response = await RoomApi.createRoom(
+        hostID,
+        hostName,
+        imageHost,
+        title,
+        description,
+        address,
+        location,
+        area,
+        category,
+        furnishing,
+        price,
+        typeRoom,
+        listImageUrl);
     if (response) {
       getListRoomHost(hostID);
-    }
-    else{
+    } else {
       debugPrint('Có gì đó sai sai');
     }
     return true;
@@ -75,7 +90,19 @@ class RoomProvider extends ChangeNotifier {
       double price,
       String typeRoom,
       List<String> listImageUrl) async {
-    final response = await RoomApi.updateRoom(id, hostID, title, description, address,location, area, category, furnishing, price, typeRoom, listImageUrl);
+    final response = await RoomApi.updateRoom(
+        id,
+        hostID,
+        title,
+        description,
+        address,
+        location,
+        area,
+        category,
+        furnishing,
+        price,
+        typeRoom,
+        listImageUrl);
     return response;
   }
 
@@ -96,6 +123,8 @@ class RoomProvider extends ChangeNotifier {
   //Lazyloading motel house
   Future<void> lazyLoadingMini(
       String searchValue, List<int> category, int skip, int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     final response = await http.post(
         Uri.parse('$url/api/motelhouse/lazyloading'),
         headers: <String, String>{
@@ -107,6 +136,7 @@ class RoomProvider extends ChangeNotifier {
           "skip": skip,
           "limit": limit
         }));
+    await prefs.setString('listMiniFirstLoad', response.body);
     var jsonObject = jsonDecode(response.body);
     var listObject = jsonObject as List;
     listMiniFirstLoad = listObject.map((e) => Room.fromJson(e)).toList();
@@ -115,6 +145,7 @@ class RoomProvider extends ChangeNotifier {
 
   Future<void> lazyLoadingMotel(
       String searchValue, List<int> category, int skip, int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse('$url/api/motelhouse/lazyloading'),
         headers: <String, String>{
@@ -126,6 +157,7 @@ class RoomProvider extends ChangeNotifier {
           "skip": skip,
           "limit": limit
         }));
+    await prefs.setString('listMotelFirstLoad', response.body);
     var jsonObject = jsonDecode(response.body);
     var listObject = jsonObject as List;
     listMotelFirstLoad = listObject.map((e) => Room.fromJson(e)).toList();
@@ -134,6 +166,7 @@ class RoomProvider extends ChangeNotifier {
 
   Future<void> lazyLoadingWhole(
       String searchValue, List<int> category, int skip, int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse('$url/api/motelhouse/lazyloading'),
         headers: <String, String>{
@@ -145,6 +178,7 @@ class RoomProvider extends ChangeNotifier {
           "skip": skip,
           "limit": limit
         }));
+    await prefs.setString('listWholeFirstLoad', response.body);
     var jsonObject = jsonDecode(response.body);
     var listObject = jsonObject as List;
     listWholeFirstLoad = listObject.map((e) => Room.fromJson(e)).toList();
@@ -152,9 +186,11 @@ class RoomProvider extends ChangeNotifier {
   }
 
   Future<void> getTopRating(int limit) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final response =
         await http.get(Uri.parse('$url/api/motelhouse/top/rating'));
     var jsonObject = jsonDecode(response.body);
+    await prefs.setString('listTopRating', response.body);
     var listObject = jsonObject as List;
     listTopRating = listObject.map((e) => Room.fromJson(e)).toList();
     notifyListeners();
@@ -203,8 +239,6 @@ class RoomProvider extends ChangeNotifier {
     return Room.fromJson(jsonObject);
   }
 
-
-
   //Filter room ---------------------------------------------------------------------------------
 
   Future<void> filterRoom(
@@ -244,6 +278,28 @@ class RoomProvider extends ChangeNotifier {
       return true;
     }
     return false;
+  }
+
+  Future getListNoInternet() async {
+    isConnect = true;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? listTopPref = prefs.getString('listTopRating');
+    String? listMotelPref = prefs.getString('listMotelFirstLoad');
+    String? listWholePref = prefs.getString('listWholeFirstLoad');
+    String? listMiniPref = prefs.getString('listMiniFirstLoad');
+    listTopRating = (jsonDecode(listTopPref!) as List)
+        .map((e) => Room.fromJson(e))
+        .toList();
+    listMiniFirstLoad = (jsonDecode(listMiniPref!) as List)
+        .map((e) => Room.fromJson(e))
+        .toList();
+    listWholeFirstLoad = (jsonDecode(listWholePref!) as List)
+        .map((e) => Room.fromJson(e))
+        .toList();
+    listMotelFirstLoad = (jsonDecode(listMotelPref!) as List)
+        .map((e) => Room.fromJson(e))
+        .toList();
+    notifyListeners();
   }
 
   getDataFirstTime() async {
@@ -347,6 +403,7 @@ class RoomProvider extends ChangeNotifier {
 
   List<AssetEntity> images = [];
   List<String> listImageUrl = [];
+
   Future<void> selectImages(BuildContext context) async {
     images = [];
     List<AssetEntity>? result = await AssetPicker.pickAssets(context,
@@ -384,6 +441,7 @@ class RoomProvider extends ChangeNotifier {
   }
 
   List listDistrict = [];
+
   Future<void> getDistricts(int code) async {
     listDistrict = [];
     listDistrict = (await ProvincesApi.getDistrict(code))['districts'];
@@ -391,6 +449,7 @@ class RoomProvider extends ChangeNotifier {
   }
 
   List listWard = [];
+
   Future<void> getWards(int code) async {
     listWard = [];
     listWard = (await ProvincesApi.getWards(code))['wards'];

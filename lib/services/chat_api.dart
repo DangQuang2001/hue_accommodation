@@ -61,12 +61,12 @@ class ChatApi{
         jsonEncode(<String, dynamic>{'roomId': roomId, 'userId': userId}));
   }
 
-  static Future<List> isOnline(String userId) async {
+  static Future isOnline(String userId) async {
     final response = await http
         .get(Uri.parse('$url/api/fcmtoken/get-list-token-user/$userId'));
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as List;
+      return jsonDecode(response.body);
     }
-    return [];
+    return null;
   }
 }

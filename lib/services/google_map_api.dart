@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 
@@ -60,6 +61,21 @@ class GoogleMapApi {
     }
     return null;
   }
+
+  static Future getPlaceNearby(String query, LatLng location) async {
+    String apiUrl =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    String apiKey = 'AIzaSyCFMB3KVGNeKYmIgcYh8Wv1At2_wyoTrMU';
+    try {
+      final response =
+      await http.get(Uri.parse('$apiUrl?keyword=$query&location=${location.latitude}%2C${location.longitude}&radius=1000&key=$apiKey'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['results'] as List<dynamic>;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return null;
+  }
 }
 
-//

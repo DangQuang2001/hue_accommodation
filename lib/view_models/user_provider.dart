@@ -1,7 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../services/user_api.dart';
 
@@ -70,6 +72,10 @@ class UserProvider extends ChangeNotifier {
       userCurrent = data;
       isLogin = 1;
       notifyListeners();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      Map<String, dynamic> user = userCurrent!.toJson();
+      await prefs.setString('user', jsonEncode(user));
+
     } else {
       isLogin = 2;
       notifyListeners();
@@ -104,5 +110,18 @@ class UserProvider extends ChangeNotifier {
       return true;
     }
     return false;
+  }
+  void checkSharedPreference()async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userPref = prefs.getString('user');
+    if(userPref!=null){
+      await prefs.remove('user');
+    }
+  }
+
+  void disposeUser() {
+    userCurrent = null;
+    checkSharedPreference();
+    notifyListeners();
   }
 }

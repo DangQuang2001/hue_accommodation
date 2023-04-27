@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
@@ -59,6 +60,14 @@ class _BoardingHousePageState extends State<BoardingHousePage>
     var roomProvider = Provider.of<RoomProvider>(context, listen: false);
     if (roomProvider.listMiniFirstLoad.isEmpty) {
       roomProvider.getDataFirstTime();
+      (()async{
+        var connectivityResult =
+        await Connectivity().checkConnectivity();
+        if (connectivityResult == ConnectivityResult.mobile ||
+            connectivityResult == ConnectivityResult.wifi) {
+          roomProvider.getListNoInternet();
+        }
+      })();
     }
     _startTimer();
     super.initState();
@@ -83,7 +92,14 @@ class _BoardingHousePageState extends State<BoardingHousePage>
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollInfo is ScrollEndNotification &&
                 scrollInfo.metrics.extentAfter == 0) {
-              roomProvider.lazyLoading();
+              (()async{
+                var connectivityResult =
+                await Connectivity().checkConnectivity();
+                if (connectivityResult == ConnectivityResult.mobile ||
+                    connectivityResult == ConnectivityResult.wifi) {
+                  roomProvider.lazyLoading();
+                }
+              })();
             }
             return true;
           },
@@ -933,7 +949,8 @@ class _BoardingHousePageState extends State<BoardingHousePage>
             padding: const EdgeInsets.all(10.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(
+              child: CachedNetworkImage(
+                imageUrl:
                 imageList[index],
                 fit: BoxFit.cover,
               ),
