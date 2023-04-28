@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 
 import '../models/rent.dart';
+import 'chat_api.dart';
 
 class RentApi{
   static Future<bool> createRent(
@@ -40,7 +41,68 @@ class RentApi{
         }));
     if (response.statusCode == 200) {
       createNotification(userID,"đã đăng ký thuê phòng!", 1, hostID, "");
-
+      Map<String,dynamic> data =await ChatApi.isOnline(hostID);
+      List<String> listOnline = data['online'].cast<String>();
+      List<String> listOffline = data['offline'].cast<String>();
+      for (var element in listOnline) {
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization':
+              'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
+            },
+            body: jsonEncode(<String, dynamic>{
+              "to":element,
+              "data": {"title":"Thông báo mới!","message": "$name đã đăng ký thuê phòng!", "type": "notification"}
+            }));
+      }
+      if (listOffline.isNotEmpty) {
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization':
+              'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
+            },
+            body: jsonEncode(<String, dynamic>{
+              "registration_ids":listOffline,
+              "priority": "high",
+              "content_available": true,
+              "notification": {
+                "badge": 42,
+                "title": "Quuang dep trai!",
+                "body": "Image"
+              },
+              "data": {
+                "content": {
+                  "id": 1,
+                  "badge": 42,
+                  "channelKey": "alerts",
+                  "displayOnForeground": false,
+                  "notificationLayout": "Messaging",
+                  "showWhen": true,
+                  "autoDismissible": true,
+                  "privacy": "Private",
+                  "largeIcon": image,
+                  "payload": {
+                    "secret": "Awesome Notifications Rocks!"
+                  }
+                },
+                "roomID": "1680085730187",
+                "Android": {
+                  "content": {
+                    "id": 1,
+                    "badge": 42,
+                    "summary": "Thuê trọ",
+                    "title": "Bạn có đơn thuê trọ mới!",
+                    "body": "$name đã đăng ký thuê phòng trọ",
+                    "payload": {
+                      "android": "android custom content!"
+                    }
+                  }
+                }
+              }
+            }));
+      }
       return true;
     }
     if (response.statusCode == 403) {
@@ -95,7 +157,7 @@ class RentApi{
         },
         body: jsonEncode(<String, dynamic>{
           "id": DateTime.now().millisecondsSinceEpoch.toString(),
-          "senderId": title,
+          "senderId": senderId,
           "title": title,
           "type": type,
           "dateSend": DateTime.now().toString(),

@@ -6,6 +6,7 @@ import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user.dart';
+import '../services/chat_api.dart';
 
 class ChatController {
   late String roomIdReplace;
@@ -17,7 +18,7 @@ class ChatController {
 
   late IO.Socket _socket;
 
-  void initSocket(String roomId, List<String> userId, String userCurrentId,Map<String,dynamic> token,User userCurrent) {
+  void initSocket(String roomId, List<String> userId, String userCurrentId,User userCurrent) {
     _socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
     });
@@ -66,7 +67,7 @@ class ChatController {
         isReadMessage(roomIdReplace, userCurrentId);
       }
       if (listJoinRoom.length == 1) {
-        sendNotification(token,userCurrent, data['content'] );
+        sendNotification(userId,userCurrent, data['content'] );
       }
     });
 
@@ -164,9 +165,16 @@ class ChatController {
 
   }
 
-  Future sendNotification(Map<String,dynamic> token, User userCurrent,String message) async {
-    List<String> listOnline = token['online'].cast<String>();
-    List<String> listOffline = token['offline'].cast<String>();
+  Future sendNotification(List<String> listUserId, User userCurrent,String message) async {
+    Map<String,dynamic> data = {};
+    if(userCurrent.id != listUserId[0]){
+       data =await ChatApi.isOnline(listUserId[0]);
+    }
+    else{
+       data =await ChatApi.isOnline(listUserId[1]);
+    }
+    List<String> listOnline = data['online'].cast<String>();
+    List<String> listOffline = data['offline'].cast<String>();
    for (var element in listOnline) {
      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
          headers: <String, String>{
@@ -176,7 +184,7 @@ class ChatController {
          },
          body: jsonEncode(<String, dynamic>{
            "to":element,
-           "data": {"message": "Tin nhan moi!", "type": "notification"}
+           "data": {"title":"Tin nhắn mới","message": "${userCurrent.name} đã gửi cho bạn tin nhắn", "type": "notification"}
          }));
    }
     if (listOffline.isNotEmpty) {
@@ -187,46 +195,78 @@ class ChatController {
             'key=AAAAlMIgmY8:APA91bHdzbQRIjbCxEvY6JwJqVIVZrnoM-IrjzKxijhbYPUrea9Weg8A4avDg6llt6IYz-nu-yO2iWIcP9jRq1VK0AH01EcE0Vnlrj3E56SR7qvPYmlOlC85PClgCYqqsDDMqLqZcbDY'
           },
           body: jsonEncode(<String, dynamic>{
-            "registration_ids":listOffline,
-            "priority": "high",
-            "content_available": true,
-            "notification": {
-              "badge": 42,
-              "title": "Quuang dep trai!",
-              "body": "Image"
-            },
-            "data": {
-              "content": {
-                "id": 1,
+
+              "registration_ids": listOffline,
+              "priority": "high",
+              "content_available": true,
+              "notification": {
                 "badge": 42,
-                "channelKey": "alerts",
-                "displayOnForeground": true,
-                "notificationLayout": "BigPicture",
-                "largeIcon": userCurrent.image,
-                "bigPicture": userCurrent.image,
-                "showWhen": true,
-                "autoDismissible": true,
-                "privacy": "Private",
-                "payload": {"secret": "Awesome Notifications Rocks!"}
+                "title": "Quuang dep trai!",
+                "body": "Image"
               },
-              "roomChatId": "",
-              "actionButtons": [
-                {"key": "REPLY", "label": "Reply", "requireInputText": true},
-                {
-                  "key": "DISMISS",
-                  "label": "Dismiss",
-                  "actionType": "DismissAction",
-                  "isDangerousOption": true,
-                  "autoDismissible": true
-                }
-              ],
-              "Android": {
+              "data": {
                 "content": {
-                  "title": "${userCurrent.name} đã nhắn tin cho bạn!  😍 ",
-                  "payload": {"android": message}
+                  "id": 1,
+                  "badge": 42,
+                  "channelKey": "alerts",
+                  "displayOnForeground": true,
+                  "notificationLayout": "Messaging",
+                  "showWhen": true,
+                  "autoDismissible": true,
+                  "privacy": "Private",
+                  "largeIcon": userCurrent.image,
+                  "messageStyle": {
+                    "title": "Tên người gửi",
+                    "text": "Nội dung tin nhắn",
+                    "time": 1643450161,
+                    "conversationTitle": "Tên cuộc trò chuyện",
+                    "groupConversation": true,
+                    "messages": [
+                      {
+                        "text": "Nội dung tin nhắn",
+                        "time": 1643450161,
+                        "isSelf": true
+                      },
+                      {
+                        "text": "Nội dung tin nhắn",
+                        "time": 1643450161,
+                        "isSelf": false
+                      }
+                    ]
+                  },
+                  "payload": {
+                    "secret": "Awesome Notifications Rocks!"
+                  }
+                },
+                "roomID": "1680085730187",
+                "actionButtons": [
+                  {
+                    "key": "REPLY",
+                    "label": "Reply",
+                    "requireInputText": true
+                  },
+                  {
+                    "key": "DISMISS",
+                    "label": "Dismiss",
+                    "actionType": "DismissAction",
+                    "isDangerousOption": true,
+                    "autoDismissible": true
+                  }
+                ],
+                "Android": {
+                  "content": {
+                    "id": 1,
+                    "badge": 42,
+                    "summary": "Message",
+                    "title": userCurrent.name,
+                    "body": message,
+                    "payload": {
+                      "android": "android custom content!"
+                    }
+                  }
                 }
               }
-            }
+
           }));
     }
   }

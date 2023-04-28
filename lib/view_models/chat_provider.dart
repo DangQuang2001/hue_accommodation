@@ -120,6 +120,9 @@ class ChatProvider extends ChangeNotifier {
         }
       }
     }
+    listRoomChat.sort((a,b) {
+    return DateTime.parse(b['_id']['message'][0]['createdAt']).compareTo(DateTime.parse(a['_id']['message'][0]['createdAt']));
+    });
     isGetChat = true;
     notifyListeners();
   }

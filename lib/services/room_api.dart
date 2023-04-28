@@ -108,10 +108,9 @@ class RoomApi {
 
     if (response.statusCode == 200) {
       await createNotification(
-          title, jsonDecode(response.body)['id'], hostID, imageHost, hostName);
+          hostID, title, 3, "", jsonDecode(response.body)['id']);
       final responses =
           await http.get(Uri.parse('$url/api/fcmtoken/get-list-token-device'));
-
       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
@@ -133,7 +132,7 @@ class RoomApi {
                 "id": 1,
                 "badge": 42,
                 "channelKey": "alerts",
-                "displayOnForeground": true,
+                "displayOnForeground": false,
                 "notificationLayout": "BigPicture",
                 "largeIcon": listImageUrl[0],
                 "bigPicture": listImageUrl[0],
@@ -143,16 +142,6 @@ class RoomApi {
                 "payload": {"secret": "Awesome Notifications Rocks!"}
               },
               "roomID": jsonDecode(response.body)['id'],
-              "actionButtons": [
-                {"key": "REPLY", "label": "Reply", "requireInputText": true},
-                {
-                  "key": "DISMISS",
-                  "label": "Dismiss",
-                  "actionType": "DismissAction",
-                  "isDangerousOption": true,
-                  "autoDismissible": true
-                }
-              ],
               "Android": {
                 "content": {
                   "title": "$hostName đã mở phòng trọ mới!  😍 ",
@@ -170,21 +159,22 @@ class RoomApi {
     return false;
   }
 
-  static Future<bool> createNotification(String title, String roomID,
-      String hostID, String imageHost, String nameHost) async {
+  static Future<bool> createNotification(String senderId, String title,
+      int type, String receiverId,String dataId) async {
     final response = await http.post(Uri.parse('$url/api/notification/create'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: jsonEncode(<String, dynamic>{
           "id": DateTime.now().millisecondsSinceEpoch.toString(),
+          "senderId": senderId,
           "title": title,
-          "roomID": roomID,
-          "hostID": hostID,
-          "imageHost": imageHost,
-          "nameHost": nameHost,
+          "type": type,
           "dateSend": DateTime.now().toString(),
-          "isDelete": []
+          "receiverId": receiverId,
+          "readBy": [],
+          "isDelete": [],
+          "dataId":dataId
         }));
 
     if (response.statusCode == 200) {

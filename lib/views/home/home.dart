@@ -72,8 +72,8 @@ class _HomePageState extends State<HomePage> with AppCloser {
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         content: AwesomeSnackbarContent(
-          title: 'Tin nhắn mới!',
-          message: 'Dang Quang đã gửi tin nhắn cho bạn!',
+          title: '${message.data['title']}',
+          message: '${message.data['message']}',
           contentType: ContentType.help,
         ),
       );
