@@ -6,7 +6,7 @@ class Notifications {
   String title;
   int type;
   DateTime dateSend;
-  String receivedId;
+  String receiverId;
   List<String> readBy;
   List<String> isDelete;
   String dataId;
@@ -17,7 +17,7 @@ class Notifications {
       required this.title,
       required this.type,
       required this.dateSend,
-      required this.receivedId,
+      required this.receiverId,
       required this.readBy,
       required this.isDelete,
       required this.dataId});
@@ -28,10 +28,10 @@ class Notifications {
         sender: User.fromJson(json['senderId']),
         title: json['title'],
         type: json['type'],
-        dateSend: json['dateSend'],
-        receivedId: json['receivedId'],
-        readBy: json['readBy'],
-        isDelete: json['isDelete'],
+        dateSend: DateTime.parse(json['dateSend']),
+        receiverId: json['receiverId'],
+        readBy: List<String>.from(json['readBy']),
+        isDelete: List<String>.from(json['isDelete']),
         dataId: json['dataId']);
   }
 
@@ -42,7 +42,7 @@ class Notifications {
     data['title'] = title;
     data['type'] = type;
     data['dateSend'] = dateSend;
-    data['receivedId'] = receivedId;
+    data['receivedId'] = receiverId;
     data['readBy'] = readBy;
     data['isDelete'] = isDelete;
     data['dataId'] = dataId;

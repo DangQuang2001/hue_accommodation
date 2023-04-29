@@ -53,7 +53,7 @@ class RentApi{
             },
             body: jsonEncode(<String, dynamic>{
               "to":element,
-              "data": {"title":"Thông báo mới!","message": "$name đã đăng ký thuê phòng!", "type": "notification"}
+              "data": {"title":"Thông báo mới!","message": "$name đã đăng ký thuê phòng!", "type": "notification","category":1}
             }));
       }
       if (listOffline.isNotEmpty) {
@@ -88,6 +88,7 @@ class RentApi{
                   }
                 },
                 "roomID": "1680085730187",
+                "category":1,
                 "Android": {
                   "content": {
                     "id": 1,

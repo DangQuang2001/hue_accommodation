@@ -11,7 +11,13 @@ class NotificationProvider extends ChangeNotifier{
   Future<void> getListNotification(String hostID) async {
     final data = await NotificationApi.getListNotification(hostID);
     listNotification = data;
-    countNotification =listNotification.length;
+    if(countNotification == 0){
+      for (var element in listNotification) {
+        if(!element.readBy.contains(hostID)){
+          countNotification = countNotification+1;
+        }
+      }
+    }
     notifyListeners();
   }
   Future<void> deleteNotification(String hostID) async {
@@ -19,6 +25,10 @@ class NotificationProvider extends ChangeNotifier{
     if(response.statusCode==200){
       getListNotification(hostID);
     }
+  }
+
+  Future readNotification(String hostID)async{
+    await NotificationApi.readNotification(hostID);
   }
 
  disposeNotification() {

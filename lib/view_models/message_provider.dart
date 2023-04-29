@@ -239,6 +239,7 @@ class ChatController {
                   }
                 },
                 "roomID": "1680085730187",
+                "category":4,
                 "actionButtons": [
                   {
                     "key": "REPLY",

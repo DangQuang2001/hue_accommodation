@@ -108,7 +108,7 @@ class RoomApi {
 
     if (response.statusCode == 200) {
       await createNotification(
-          hostID, title, 3, "", jsonDecode(response.body)['id']);
+          hostID, "đã đăng phòng trọ mới!", 3, "", jsonDecode(response.body)['id']);
       final responses =
           await http.get(Uri.parse('$url/api/fcmtoken/get-list-token-device'));
       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -142,6 +142,7 @@ class RoomApi {
                 "payload": {"secret": "Awesome Notifications Rocks!"}
               },
               "roomID": jsonDecode(response.body)['id'],
+              "category":3,
               "Android": {
                 "content": {
                   "title": "$hostName đã mở phòng trọ mới!  😍 ",

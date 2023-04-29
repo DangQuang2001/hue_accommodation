@@ -12,6 +12,7 @@ import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
+import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
@@ -54,12 +55,25 @@ class _HomePageState extends State<HomePage> with AppCloser {
     var chatProvider = Provider.of<ChatProvider>(context, listen: false);
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      Room room = await roomProvider.getDetailRoom(message.data['roomID']);
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => BoardingHouseDetail(motel: room)));
+      print(message.data['category']);
+      if(message.data['category']=='3'){
+        Room room = await roomProvider.getDetailRoom(message.data['roomID']);
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BoardingHouseDetail(motel: room)));
+      }
+      if(message.data['category']=='1'){
+
+        // ignore: use_build_context_synchronously
+        Navigator.pushNamed(context, RouteName.interactManage);
+      }
+      if(message.data['category']=='4'){
+        chatProvider.getRoomChat(userProvider.userCurrent!.id);
+        // ignore: use_build_context_synchronously
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>const Layout(selectedIndex: 1,)));
+      }
     });
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
