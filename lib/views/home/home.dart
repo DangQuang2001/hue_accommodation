@@ -13,6 +13,7 @@ import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
+import 'package:hue_accommodation/views/components/payment.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
@@ -341,12 +342,17 @@ class _HomePageState extends State<HomePage> with AppCloser {
                                     color: Colors.grey.withOpacity(0.4)))),
                         child: Row(
                           children: [
-                            CachedNetworkImage(
-                              imageUrl:
-                                  "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
-                              width: 40,
-                              height: 25,
-                              filterQuality: FilterQuality.low,
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+                              },
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
+                                width: 40,
+                                height: 25,
+                                filterQuality: FilterQuality.low,
+                              ),
                             ),
                             const SizedBox(
                               width: 10,
