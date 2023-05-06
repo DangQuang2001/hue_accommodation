@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/models/room.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
@@ -332,7 +333,9 @@ class _RoomManageState extends State<RoomManage> {
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
-                                  onTap: ()=>Navigator.of(context).push(slideRightToLeft(BoardingHouseDetail(motel: snapshot.data![index]))),
+                                  onTap: () => Navigator.of(context).push(
+                                      slideRightToLeft(BoardingHouseDetail(
+                                          motel: snapshot.data![index]))),
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 15),
                                     width: MediaQuery.of(context).size.width,
@@ -344,7 +347,8 @@ class _RoomManageState extends State<RoomManage> {
                                         borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           BoxShadow(
-                                              color: Colors.grey.withOpacity(0.1),
+                                              color:
+                                                  Colors.grey.withOpacity(0.1),
                                               blurRadius: 7,
                                               offset: const Offset(0, 2))
                                         ]),
@@ -367,6 +371,16 @@ class _RoomManageState extends State<RoomManage> {
 
                                             SlidableAction(
                                               onPressed: (context) {
+                                                _showQRcodeImage(context,
+                                                    snapshot.data![index].id);
+                                              },
+                                              backgroundColor:
+                                                  Colors.greenAccent,
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.qr_code,
+                                            ),
+                                            SlidableAction(
+                                              onPressed: (context) {
                                                 Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
@@ -380,7 +394,6 @@ class _RoomManageState extends State<RoomManage> {
                                                   const Color(0xFF2170CA),
                                               foregroundColor: Colors.white,
                                               icon: Icons.edit,
-                                              label: 'Update',
                                             ),
                                             SlidableAction(
                                               onPressed: (context) {
@@ -391,7 +404,6 @@ class _RoomManageState extends State<RoomManage> {
                                                   const Color(0xFFFE4A49),
                                               foregroundColor: Colors.white,
                                               icon: Icons.delete,
-                                              label: 'Delete',
                                             ),
                                           ],
                                         ),
@@ -404,8 +416,8 @@ class _RoomManageState extends State<RoomManage> {
                                                 borderRadius:
                                                     BorderRadius.circular(15),
                                                 child: CachedNetworkImage(
-                                                  imageUrl:
-                                                      snapshot.data![index].image,
+                                                  imageUrl: snapshot
+                                                      .data![index].image,
                                                   width: 85,
                                                   height: 85,
                                                   fit: BoxFit.cover,
@@ -419,7 +431,8 @@ class _RoomManageState extends State<RoomManage> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      snapshot.data![index].name,
+                                                      snapshot
+                                                          .data![index].name,
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -454,8 +467,8 @@ class _RoomManageState extends State<RoomManage> {
                                                         const Icon(
                                                           Icons
                                                               .attach_money_outlined,
-                                                          color:
-                                                              Colors.orangeAccent,
+                                                          color: Colors
+                                                              .orangeAccent,
                                                           size: 20,
                                                         ),
                                                       ],
@@ -465,8 +478,8 @@ class _RoomManageState extends State<RoomManage> {
                                                     ),
                                                     Text(
                                                       snapshot.data![index]
-                                                              .adParams['address']
-                                                          ['value'],
+                                                              .adParams[
+                                                          'address']['value'],
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -474,8 +487,10 @@ class _RoomManageState extends State<RoomManage> {
                                                           GoogleFonts.readexPro(
                                                               fontSize: 15,
                                                               fontWeight:
-                                                                  FontWeight.w300,
-                                                              color: Colors.grey),
+                                                                  FontWeight
+                                                                      .w300,
+                                                              color:
+                                                                  Colors.grey),
                                                     )
                                                   ],
                                                 ),
@@ -587,6 +602,30 @@ class _RoomManageState extends State<RoomManage> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  Future<void> _showQRcodeImage(BuildContext context, String roomId) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Center(
+                child: Text(
+              "QRcode",
+              style: GoogleFonts.readexPro(),
+            )),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: QrImage(
+                data: roomId,
+                version: QrVersions.auto,
+                size: 200.0,
+                gapless: false,
+              ),
+            ));
       },
     );
   }

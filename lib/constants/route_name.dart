@@ -1,10 +1,10 @@
 class RouteName {
   static const String home = "/";
   static const String boardinghouse = "/boardinghouse";
-  static const String boardinghousedetail = "/boardinghouse/boardingHouseDetail";
+  static const String boardinghousedetail =
+      "/boardinghouse/boardingHouseDetail";
   static const String blogSale = "/blogsale";
   static const String post = "/blogsale/post";
-
   static const String messages = "/messages";
   static const String roomManage = "/roomManage";
   static const String interactManage = "/interactManager";
@@ -23,5 +23,8 @@ class RouteName {
   static const String favorite = "/profile/favorite";
   static const String postHistory = "/profile/postHistory";
   static const String filterHouse = "/boardinghouse/filterHouse";
-
+  static const String qrcode = "/qrcode";
+  static const String myActivity = "/myActivity";
+  static const String transpot = "/transpot";
+  static const String nearby = "/nearby";
 }

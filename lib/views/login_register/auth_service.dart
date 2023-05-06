@@ -17,11 +17,10 @@ class AuthService {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
-            var userProvider = Provider.of<UserProvider>(context,listen: true);
-            if(userProvider.userCurrent != null && userProvider.isNewAccount){
+            var userProvider = Provider.of<UserProvider>(context, listen: true);
+            if (userProvider.userCurrent != null && userProvider.isNewAccount) {
               return ChooseRolePage(email: userProvider.userCurrent!.email);
-            }
-            else{
+            } else {
               return const Layout(
                 selectedIndex: 0,
               );
@@ -33,9 +32,7 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithGoogle(BuildContext context) async {
-    var userProvider = Provider.of<UserProvider>(context,listen: false);
-    var notificationProvider = Provider.of<NotificationProvider>(context,listen: false);
-    var chatProvider = Provider.of<ChatProvider>(context,listen: false);
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // Initiate the auth procedure
     final GoogleSignInAccount? googleUser =
@@ -43,8 +40,9 @@ class AuthService {
     // fetch the auth details from the request made earlier
     final GoogleSignInAuthentication googleAuth =
         await googleUser!.authentication;
-    if(userProvider.userCurrent == null){
-      await userProvider.checkIsmailGoogle(googleUser.email,googleUser.displayName!,googleUser.photoUrl!);
+    if (userProvider.userCurrent == null) {
+      await userProvider.checkIsmailGoogle(
+          googleUser.email, googleUser.displayName!, googleUser.photoUrl!);
     }
     // Create a new credential for signing in with google
     final credential = GoogleAuthProvider.credential(

@@ -32,14 +32,14 @@ class _HospitalPageState extends State<HospitalPage> {
     )));
     controller.showMarkerInfoWindow(markerId);
   }
+
   @override
   void initState() {
     super.initState();
     var googleMapProvider =
-    Provider.of<GoogleMapProvider>(context, listen: false);
+        Provider.of<GoogleMapProvider>(context, listen: false);
     (() async {
-      _markers =
-      await googleMapProvider.getPlace('Hospital,ThuaThienHue');
+      _markers = await googleMapProvider.getPlace('Hospital,ThuaThienHue');
       setState(() {});
     })();
   }
@@ -65,46 +65,47 @@ class _HospitalPageState extends State<HospitalPage> {
               height: MediaQuery.of(context).size.height,
               child: Column(
                 children: [
-                
+                  const SizedBox(
+                    height: 20,
+                  ),
                   map(context),
                   Expanded(
                       child: SingleChildScrollView(
-                        child: listLocation(context),
-                      ))
+                    child: listLocation(context),
+                  ))
                 ],
               ),
             ),
             Positioned(
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              size: 30,
-                            )),
-                        Text(
-                          "ATM Location",
-                          style: Theme.of(context).textTheme.headlineLarge,
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        )
-                      ],
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          size: 30,
+                        )),
+                    Text(
+                      "Hospital Location",
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                  ),
-                ))
+                    const SizedBox(
+                      width: 30,
+                    )
+                  ],
+                ),
+              ),
+            ))
           ],
         ),
       ),
     );
   }
-
 
   map(BuildContext context) {
     return GestureDetector(
@@ -166,7 +167,7 @@ class _HospitalPageState extends State<HospitalPage> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         setCamera(
                             LatLng(e['geometry']['location']['lat'],
                                 e['geometry']['location']['lng']),
@@ -183,7 +184,7 @@ class _HospitalPageState extends State<HospitalPage> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style:
-                                Theme.of(context).textTheme.displayMedium,
+                                    Theme.of(context).textTheme.displayMedium,
                               ),
                               const SizedBox(
                                 height: 5,
@@ -199,15 +200,18 @@ class _HospitalPageState extends State<HospitalPage> {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           showModalBottomSheet<void>(
                             context: context,
                             isDismissible: true,
                             enableDrag: false,
                             isScrollControlled: true,
                             builder: (BuildContext context) {
-                              return NavigationMap(placeLocation: LatLng(e['geometry']['location']['lat'],
-                                  e['geometry']['location']['lng']),);
+                              return NavigationMap(
+                                placeLocation: LatLng(
+                                    e['geometry']['location']['lat'],
+                                    e['geometry']['location']['lng']),
+                              );
                             },
                           );
                         },
@@ -218,7 +222,7 @@ class _HospitalPageState extends State<HospitalPage> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color:
-                                  Theme.of(context).colorScheme.secondary,
+                                      Theme.of(context).colorScheme.secondary,
                                   boxShadow: [
                                     BoxShadow(
                                         blurRadius: 2,

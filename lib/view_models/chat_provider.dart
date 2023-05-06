@@ -1,15 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:hue_accommodation/services/chat_api.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class ChatProvider extends ChangeNotifier {
   bool isGetChat = false;
   bool isUserOnline1 = false;
-  Map<String,dynamic> tokenUser = {};
+  Map<String, dynamic> tokenUser = {};
   int countNewChat = 0;
   late bool isNewRoom;
   late String roomId;
@@ -120,8 +123,9 @@ class ChatProvider extends ChangeNotifier {
         }
       }
     }
-    listRoomChat.sort((a,b) {
-    return DateTime.parse(b['_id']['message'][0]['createdAt']).compareTo(DateTime.parse(a['_id']['message'][0]['createdAt']));
+    listRoomChat.sort((a, b) {
+      return DateTime.parse(b['_id']['message'][0]['createdAt'])
+          .compareTo(DateTime.parse(a['_id']['message'][0]['createdAt']));
     });
     isGetChat = true;
     notifyListeners();
@@ -133,14 +137,32 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future isOnline(String userId) async {
-    final data =await ChatApi.isOnline(userId);
+    final data = await ChatApi.isOnline(userId);
     print(data);
-    if (data !=null) {
-        isUserOnline1 = true;
-        tokenUser = data;
+    if (data != null) {
+      isUserOnline1 = true;
+      tokenUser = data;
     }
   }
 
+  Future<String> uploadImages(List<AssetEntity> images) async {
+    List<String> listUrl = [];
+    final storage = FirebaseStorage.instance;
+    for (var asset in images) {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference reference = storage.ref().child('chatImage').child(fileName);
+      final File? file = await asset.file;
+      if (file != null) {
+        UploadTask task = reference.putFile(file);
+        await task.whenComplete(() => null);
+        String imageUrl = await reference.getDownloadURL();
+        listUrl.add(imageUrl);
+      } else {
+        // handle error, e.g. file is null
+      }
+    }
+    return listUrl[0];
+  }
 
   void disposeChat() {
     listRoomChat = [];

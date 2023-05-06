@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
@@ -12,8 +13,6 @@ import 'package:hue_accommodation/models/room.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui' as ui;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:google_maps_flutter_platform_interface/src/types/location.dart'
-    as location;
 
 import '../models/review.dart';
 import '../services/provinces_api.dart';
@@ -48,7 +47,7 @@ class RoomProvider extends ChangeNotifier {
       String title,
       String description,
       String address,
-      location.LatLng location,
+      Position location,
       double area,
       String category,
       String furnishing,
@@ -83,7 +82,7 @@ class RoomProvider extends ChangeNotifier {
       String title,
       String description,
       String address,
-      location.LatLng location,
+      Position location,
       double area,
       String category,
       String furnishing,
@@ -436,23 +435,85 @@ class RoomProvider extends ChangeNotifier {
     }
   }
 
+  //Lấy list Thành phố
   Future<List> getCity() async {
     return await ProvincesApi.getCity();
   }
 
+  // Lấy list Quận huyện
   List listDistrict = [];
-
   Future<void> getDistricts(int code) async {
     listDistrict = [];
     listDistrict = (await ProvincesApi.getDistrict(code))['districts'];
     notifyListeners();
   }
 
+  //Lấy list thị xã
   List listWard = [];
-
   Future<void> getWards(int code) async {
     listWard = [];
     listWard = (await ProvincesApi.getWards(code))['wards'];
     notifyListeners();
+  }
+
+  //Tính distance giữa User và địa điểm => Gợi ý khoảng cách gần cho user
+  List<Room> listNearby = [];
+  Future getListNearby(
+      Position? position, double maxDistance, int limit, int skip) async {
+    if (position == null) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+      if (permission == LocationPermission.deniedForever) {
+        // Permissions are denied forever, handle appropriately.
+        return Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+      return Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((location) async {
+        final data =
+            await RoomApi.getNearby(location, maxDistance, limit, skip);
+
+        listNearby = data;
+        notifyListeners();
+      });
+    } else {
+      final data = await RoomApi.getNearby(position, maxDistance, limit, skip);
+      listNearby = data;
+      notifyListeners();
+    }
+  }
+
+  List<Room> listNearbyChoose = [];
+  Future getListNearbyLimit(
+      Position? position, double maxDistance, int limit, int skip) async {
+    if (position == null) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+      if (permission == LocationPermission.deniedForever) {
+        // Permissions are denied forever, handle appropriately.
+        return Future.error(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+      return Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high)
+          .then((location) async {
+        final data =
+            await RoomApi.getNearby(location, maxDistance, limit, skip);
+
+        listNearbyChoose = data;
+        notifyListeners();
+      });
+    } else {
+      final data = await RoomApi.getNearby(position, maxDistance, limit, skip);
+      listNearbyChoose = data;
+      notifyListeners();
+    }
   }
 }

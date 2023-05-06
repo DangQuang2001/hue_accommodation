@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
+import 'package:hue_accommodation/views/extension/activity.dart';
 import 'package:hue_accommodation/views/extension/atm.dart';
 import 'package:hue_accommodation/views/extension/household_good.dart';
+import 'package:hue_accommodation/views/extension/nearby.dart';
 import 'package:hue_accommodation/views/extension/supermarket.dart';
+import 'package:hue_accommodation/views/extension/transpot.dart';
 import 'package:hue_accommodation/views/forum/forum.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house.dart';
 import 'package:hue_accommodation/views/login_register/login.dart';
@@ -11,6 +14,7 @@ import 'package:hue_accommodation/views/manage/add_room.dart';
 import 'package:hue_accommodation/views/manage/interact.dart';
 import 'package:hue_accommodation/views/manage/remove_room.dart';
 import 'package:hue_accommodation/views/manage/room.dart';
+import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:hue_accommodation/views/user_info/edit_user.dart';
 import 'package:hue_accommodation/views/user_info/favourite.dart';
 import 'package:hue_accommodation/views/user_info/post_history.dart';
@@ -64,6 +68,14 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const SuperMarketPage();
           case RouteName.householdGoods:
             return const HouseholdGood();
+          case RouteName.qrcode:
+            return const QRCodeScanner();
+          case RouteName.myActivity:
+            return const MyActivity();
+          case RouteName.transpot:
+            return const TranspotPages();
+          case RouteName.nearby:
+            return const NearByLocation();
           default:
             return const Layout(selectedIndex: 0);
         }

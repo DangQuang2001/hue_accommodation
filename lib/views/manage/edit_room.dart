@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/models/room.dart';
@@ -135,8 +136,9 @@ class _EditRoomPageState extends State<EditRoomPage> {
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer2<UserProvider,GoogleMapProvider>(
-        builder: (context, userProvider,googleMapProvider, child) => FloatingActionButton(
+      floatingActionButton: Consumer2<UserProvider, GoogleMapProvider>(
+        builder: (context, userProvider, googleMapProvider, child) =>
+            FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState!.validate() &&
                 _formKey2.currentState!.validate()) {
@@ -148,7 +150,8 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   if (roomProvider.images.isNotEmpty) {
                     await roomProvider.uploadImages();
                   }
-                  final location = await googleMapProvider.getLatLngFromAddress(address!);
+                  final location =
+                      await googleMapProvider.getLatLngFromAddress(address!);
                   await roomProvider.updateRoom(
                       widget.room.id,
                       userProvider.userCurrent!.id,

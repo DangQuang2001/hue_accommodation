@@ -15,7 +15,7 @@ class GoogleMapProvider extends ChangeNotifier {
   List<AutocompletePrediction> placePredictions = [];
   List<LatLng> polylineCoordinates = [];
   List listPlace = [];
-  double distance= 0;
+  double distance = 0;
   List<Marker> markers = <Marker>[];
 
   Future placeAutocomplete(String query) async {
@@ -35,11 +35,19 @@ class GoogleMapProvider extends ChangeNotifier {
         await GoogleMapApi.getSearchResultsFromQueryUsingMapbox(query);
   }
 
-  Future<LatLng?> getLatLngFromAddress(String address) async {
+  Future<Position?> getLatLngFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
       if (locations.isNotEmpty) {
-        return LatLng(locations[0].latitude, locations[0].longitude);
+        return Position(
+            accuracy: 0,
+            altitude: 0,
+            heading: 0,
+            latitude: locations[0].latitude,
+            longitude: locations[0].longitude,
+            speed: 0,
+            speedAccuracy: 0,
+            timestamp: null);
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -103,9 +111,9 @@ class GoogleMapProvider extends ChangeNotifier {
     }
   }
 
-  Future getPlaceNearby(String query,LatLng location) async {
+  Future getPlaceNearby(String query, LatLng location) async {
     List<Marker> markers = [];
-    final response = await GoogleMapApi.getPlaceNearby(query,location);
+    final response = await GoogleMapApi.getPlaceNearby(query, location);
     if (response != null) {
       for (var result in response) {
         // Lấy vị trí từ kết quả
@@ -134,46 +142,48 @@ class GoogleMapProvider extends ChangeNotifier {
     }
   }
 
-
-
-  void directionMap(StreamSubscription<Position> positionStream,Position position,GoogleMapController controller,LatLng destination)async{
-    const distanceThreshold = 10; // Khoảng cách tối đa được cho phép tính bằng mét
+  void directionMap(
+      StreamSubscription<Position> positionStream,
+      Position position,
+      GoogleMapController controller,
+      LatLng destination) async {
+    const distanceThreshold =
+        10; // Khoảng cách tối đa được cho phép tính bằng mét
 
     double bearing = Geolocator.bearingBetween(position.latitude,
-        position.longitude,
-        destination.latitude,
-        destination.longitude);
-      polylineCoordinates.clear();
-      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        bearing:bearing ,
-        tilt: 60,
-        target: LatLng(position.latitude,position.longitude),
-        zoom: 19.0,
-      )));
+        position.longitude, destination.latitude, destination.longitude);
+    polylineCoordinates.clear();
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      bearing: bearing,
+      tilt: 60,
+      target: LatLng(position.latitude, position.longitude),
+      zoom: 19.0,
+    )));
 
-       distance = Geolocator.distanceBetween(
-         position.latitude,
-         position.longitude,
-        destination.latitude,
-        destination.longitude,
-      );
+    distance = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      destination.latitude,
+      destination.longitude,
+    );
 
-       notifyListeners();
-      if (distance < distanceThreshold) {
-        positionStream.cancel(); // Ngừng lắng nghe sự kiện thay đổi vị trí
-      }
-      getPolyPoints(LatLng(position.latitude,position.longitude), destination);
-
-
+    notifyListeners();
+    if (distance < distanceThreshold) {
+      positionStream.cancel(); // Ngừng lắng nghe sự kiện thay đổi vị trí
+    }
+    getPolyPoints(LatLng(position.latitude, position.longitude), destination);
   }
-  Future setCurrentUserIcon(String url,BitmapDescriptor currentLocationIcon) async {
+
+  Future setCurrentUserIcon(
+      String url, BitmapDescriptor currentLocationIcon) async {
     await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
         .then((icon) {
       currentLocationIcon = icon;
     });
   }
 
-  Future setDestinationIcon(String url,BitmapDescriptor destinationIcon) async {
+  Future setDestinationIcon(
+      String url, BitmapDescriptor destinationIcon) async {
     await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, url)
         .then((icon) {
       destinationIcon = icon;
@@ -181,32 +191,42 @@ class GoogleMapProvider extends ChangeNotifier {
   }
 
   late Position currentLocation;
-  void getMarker( Completer<GoogleMapController> controller, LatLng placeLocation)async{
+  void getMarker(
+      Completer<GoogleMapController> controller, LatLng placeLocation) async {
     markers = [];
     BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
     BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
-    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+    LocationPermission permission = await Geolocator.checkPermission();
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
+    }
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((location) async {
-      await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, 'assets/images/location2.png')
+      await BitmapDescriptor.fromAssetImage(
+              ImageConfiguration.empty, 'assets/images/location2.png')
           .then((icon) {
         currentLocationIcon = icon;
       });
-      await BitmapDescriptor.fromAssetImage(ImageConfiguration.empty, 'assets/images/home.png')
+      await BitmapDescriptor.fromAssetImage(
+              ImageConfiguration.empty, 'assets/images/home.png')
           .then((icon) {
         destinationIcon = icon;
       });
       currentLocation = location;
       final GoogleMapController controllerMap = await controller.future;
-      getPolyPoints(
-          LatLng(location.latitude, location.longitude),
-          LatLng(
-              placeLocation.latitude, placeLocation.longitude));
+      getPolyPoints(LatLng(location.latitude, location.longitude),
+          LatLng(placeLocation.latitude, placeLocation.longitude));
 
       markers.add(Marker(
           markerId: const MarkerId('3'),
           icon: destinationIcon,
-          position: LatLng(
-              placeLocation.latitude, placeLocation.longitude),
+          position: LatLng(placeLocation.latitude, placeLocation.longitude),
           infoWindow: const InfoWindow(title: 'Destination Location')));
       markers.add(Marker(
           markerId: const MarkerId('1'),
@@ -224,8 +244,6 @@ class GoogleMapProvider extends ChangeNotifier {
                 northeast: LatLng(maxLat, maxLng)),
             30));
       });
-     });
-
-}
-
+    });
+  }
 }

@@ -9,7 +9,9 @@ import 'package:hue_accommodation/view_models/notification_provider.dart';
 import 'package:hue_accommodation/views/notification/notification.dart';
 import 'package:provider/provider.dart';
 
+import '../../view_models/user_provider.dart';
 import '../home/home.dart';
+import '../home/home_user.dart';
 import '../messages/message.dart';
 import '../user_info/user_info.dart';
 
@@ -115,8 +117,10 @@ class _LayoutState extends State<Layout>
           return false;
         }
       },
-      child: Consumer2<NotificationProvider, ChatProvider>(
-        builder: (context, notificationProvider, chatProvider, child) => Stack(
+      child: Consumer3<NotificationProvider, ChatProvider, UserProvider>(
+        builder: (context, notificationProvider, chatProvider, userProvider,
+                child) =>
+            Stack(
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
@@ -124,11 +128,15 @@ class _LayoutState extends State<Layout>
               decoration: const BoxDecoration(color: Colors.white),
               child: TabBarView(
                 controller: _tabController,
-                children: const [
-                  HomePage(),
-                  MessagePage(),
-                  NotificationPage(),
-                  UserInfoPage(),
+                children: [
+                  userProvider.userCurrent == null
+                      ? const HomeUserPage()
+                      : userProvider.userCurrent!.isHost
+                          ? const HomePage()
+                          : const HomeUserPage(),
+                  const MessagePage(),
+                  const NotificationPage(),
+                  const UserInfoPage(),
                 ],
               ),
             ),

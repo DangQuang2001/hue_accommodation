@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hue_accommodation/view_models/giphy_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../view_models/chat_provider.dart';
 import '../../view_models/message_provider.dart';
@@ -22,28 +26,36 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final TextEditingController _textController = TextEditingController();
   final ChatController _chatController = ChatController();
   late List<Map<String, dynamic>> _messages = [];
   bool isLoading = true;
   late bool isNewRooms;
+  bool chooseGif = false;
+  bool chooseImage = false;
+  List<AssetEntity> albums = [];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 11, vsync: this);
     isNewRooms = widget.isNewRoom;
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    (()async{
-      if(userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']){
+    (() async {
+      if (userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']) {
         await chatProvider.isOnline(widget.infoUserRoom[0]['_id']);
-      }
-      else{
+      } else {
         await chatProvider.isOnline(widget.infoUserRoom[1]['_id']);
       }
-      _chatController.initSocket(widget.roomId,
-          [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],userProvider.userCurrent!.id, userProvider.userCurrent!);
+      _chatController.initSocket(
+          widget.roomId,
+          [widget.infoUserRoom[0]['_id'], widget.infoUserRoom[1]['_id']],
+          userProvider.userCurrent!.id,
+          userProvider.userCurrent!);
       if (widget.isNewRoom) {
         _messages = [];
         setState(() {
@@ -52,7 +64,8 @@ class _ChatScreenState extends State<ChatScreen> {
       } else {
         (() async {
           _messages = await chatProvider.getChatDetail(widget.roomId, -10, 20);
-          chatProvider.isReadMessage(widget.roomId,userProvider.userCurrent!.id );
+          chatProvider.isReadMessage(
+              widget.roomId, userProvider.userCurrent!.id);
           setState(() {
             isLoading = false;
           });
@@ -64,57 +77,341 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<UserProvider>(
-        builder: (context, userProvider, child) => Column(
-          children: [
-            appBar(context),
-            messages(context),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      focusNode: FocusNode(),
-                      controller: _textController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter a message',
+      body: Consumer3<UserProvider, GiphyProvider, ChatProvider>(
+        builder: (context, userProvider, giphyProvider, chatProvider, child) =>
+            GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: [
+              appBar(context),
+              messages(context),
+              chooseImage
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FutureBuilder(
+                            future: albums[0].file,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Opacity(
+                                  opacity: 0.6,
+                                  child: Image.file(
+                                    snapshot.data!,
+                                    width: 250,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              } else {
+                                return const Text('');
+                              }
+                            }),
+                      ],
+                    )
+                  : const Text(''),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          prefix: albums.isEmpty && chooseImage == false
+                              ? const Text('')
+                              : FutureBuilder(
+                                  future: albums[0].file,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Stack(children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            albums =
+                                                (await AssetPicker.pickAssets(
+                                                    context,
+                                                    pickerConfig:
+                                                        const AssetPickerConfig(
+                                                            maxAssets: 1,
+                                                            requestType:
+                                                                RequestType
+                                                                    .image)))!;
+                                          },
+                                          child: Image.file(
+                                            snapshot.data!,
+                                            width: 250,
+                                            height: 150,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Positioned(
+                                            right: -10,
+                                            top: 0,
+                                            child: TextButton(
+                                                onPressed: () {
+                                                  _textController.clear();
+                                                  setState(() {
+                                                    albums = [];
+                                                  });
+                                                },
+                                                child: const Text(
+                                                  'X',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 18),
+                                                )))
+                                      ]);
+                                    } else {
+                                      return const CircularProgressIndicator();
+                                    }
+                                  },
+                                ),
+                          hintText: albums.isEmpty ? 'Enter a message' : "",
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      if (isNewRooms) {
-                        _chatController.sendMessage(
-                            userProvider.userCurrent!.id,
-                            [
-                              widget.infoUserRoom[0]['_id'],
-                              widget.infoUserRoom[1]['_id']
+                    _textController.text.isEmpty || _textController.text == ""
+                        ? Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.emoji_emotions_outlined),
+                                onPressed: () {
+                                  giphyProvider.getCategories();
+                                  giphyProvider.getTrending();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return WillPopScope(
+                                        onWillPop: () async {
+                                          chooseGif = false;
+                                          _textController.clear();
+                                          return true;
+                                        },
+                                        child: Consumer<GiphyProvider>(
+                                          builder:
+                                              (context, giphyProvider, child) =>
+                                                  SizedBox(
+                                            height: 400.0,
+                                            child: StatefulBuilder(
+                                              builder: (context, setState) =>
+                                                  Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 50,
+                                                    child: giphyProvider
+                                                            .listCategories
+                                                            .isEmpty
+                                                        ? const Text('')
+                                                        : TabBar(
+                                                            onTap: (value) {
+                                                              final selectedTab = _tabController
+                                                                          .index ==
+                                                                      0
+                                                                  ? 'trending'
+                                                                  : giphyProvider
+                                                                          .listCategories[
+                                                                      value -
+                                                                          1]['name'];
+                                                              giphyProvider
+                                                                  .getGiphyByCategory(
+                                                                      selectedTab);
+                                                            },
+                                                            controller:
+                                                                _tabController,
+                                                            isScrollable: true,
+                                                            labelColor:
+                                                                Colors.grey,
+                                                            labelStyle: Theme
+                                                                    .of(context)
+                                                                .textTheme
+                                                                .displayMedium,
+                                                            tabs: [
+                                                                const Tab(
+                                                                  text:
+                                                                      'trending',
+                                                                ),
+                                                                ...giphyProvider
+                                                                    .listCategories
+                                                                    .map(
+                                                                        (e) =>
+                                                                            Tab(
+                                                                              text: e['name'],
+                                                                            ))
+                                                              ]),
+                                                  ),
+                                                  Expanded(
+                                                    child:
+                                                        giphyProvider
+                                                                .listTrending
+                                                                .isEmpty
+                                                            ? const Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              )
+                                                            : Stack(children: [
+                                                                GridView
+                                                                    .builder(
+                                                                  gridDelegate:
+                                                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                                                    crossAxisCount:
+                                                                        2,
+                                                                  ),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(5),
+                                                                  itemCount:
+                                                                      giphyProvider
+                                                                          .listTrending
+                                                                          .length,
+                                                                  itemBuilder:
+                                                                      (BuildContext
+                                                                              context,
+                                                                          int index) {
+                                                                    return Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              2.0),
+                                                                      child:
+                                                                          GestureDetector(
+                                                                        onTap:
+                                                                            () {
+                                                                          if (_textController.text !=
+                                                                              giphyProvider.listTrending[index]['images']['fixed_height_small']['url']) {
+                                                                            _textController.text =
+                                                                                giphyProvider.listTrending[index]['images']['fixed_height_small']['url'];
+                                                                            setState(() {
+                                                                              chooseGif = true;
+                                                                            });
+                                                                          } else {
+                                                                            _textController.clear();
+                                                                            setState(() {
+                                                                              chooseGif = false;
+                                                                            });
+                                                                          }
+                                                                        },
+                                                                        child:
+                                                                            Opacity(
+                                                                          opacity: _textController.text == giphyProvider.listTrending[index]['images']['fixed_height_small']['url']
+                                                                              ? 0.4
+                                                                              : 1,
+                                                                          child:
+                                                                              CachedNetworkImage(
+                                                                            imageUrl:
+                                                                                giphyProvider.listTrending[index]['images']['fixed_height_small']['url'],
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                                chooseGif
+                                                                    ? Positioned(
+                                                                        bottom:
+                                                                            20,
+                                                                        left:
+                                                                            20,
+                                                                        right:
+                                                                            20,
+                                                                        child:
+                                                                            SizedBox(
+                                                                          height:
+                                                                              50,
+                                                                          child: ElevatedButton(
+                                                                              onPressed: () {
+                                                                                _chatController.sendMessage(
+                                                                                    userProvider
+                                                                                        .userCurrent!.id,
+                                                                                    [
+                                                                                      widget.infoUserRoom[0]['_id'],
+                                                                                      widget.infoUserRoom[1]['_id']
+                                                                                    ],
+                                                                                    _textController.text,
+                                                                                    'gif',
+                                                                                    false);
+                                                                                _textController.clear();
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: const Text('Send')),
+                                                                        ),
+                                                                      )
+                                                                    : const Text(
+                                                                        '')
+                                                              ]),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                  onPressed: () async {
+                                    albums = (await AssetPicker.pickAssets(
+                                        context,
+                                        pickerConfig: const AssetPickerConfig(
+                                            maxAssets: 1,
+                                            requestType: RequestType.image)))!;
+                                    setState(() {
+                                      _textController.text = '  ';
+                                    });
+                                  },
+                                  icon: const Icon(Icons.image_outlined))
                             ],
-                            _textController.text,
-                            'text',
-                            true);
-                        _textController.clear();
-                        isNewRooms = false;
-                      } else {
-                        _chatController.sendMessage(
-                            userProvider.userCurrent!.id,
-                            [
-                              widget.infoUserRoom[0]['_id'],
-                              widget.infoUserRoom[1]['_id']
-                            ],
-                            _textController.text,
-                            'text',
-                            false);
-                        _textController.clear();
-                      }
-                    },
-                  ),
-                ],
+                          )
+                        : IconButton(
+                            icon: const Icon(Icons.send),
+                            onPressed: () async {
+                              setState(() {
+                                chooseImage = true;
+                              });
+                              if (albums.isNotEmpty) {
+                                _textController.text =
+                                    await chatProvider.uploadImages(albums);
+                              }
+
+                              if (isNewRooms) {
+                                _chatController.sendMessage(
+                                    userProvider.userCurrent!.id,
+                                    [
+                                      widget.infoUserRoom[0]['_id'],
+                                      widget.infoUserRoom[1]['_id']
+                                    ],
+                                    _textController.text,
+                                    albums.isEmpty ? 'text' : 'image',
+                                    true);
+                                _textController.clear();
+                                isNewRooms = false;
+                              } else {
+                                _chatController.sendMessage(
+                                    userProvider.userCurrent!.id,
+                                    [
+                                      widget.infoUserRoom[0]['_id'],
+                                      widget.infoUserRoom[1]['_id']
+                                    ],
+                                    _textController.text,
+                                    albums.isEmpty ? 'text' : 'image',
+                                    false);
+                                _textController.clear();
+                              }
+                              setState(() {
+                                chooseImage = false;
+                                albums = [];
+                              });
+                            },
+                          ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -223,59 +520,117 @@ class _ChatScreenState extends State<ChatScreen> {
                               ? MainAxisAlignment.end
                               : MainAxisAlignment.start,
                           children: [
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 7, horizontal: 10),
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: isMyMessage
-                                    ? Colors.blue.withOpacity(0.7)
-                                    : Colors.grey[500],
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Container(
-                                  padding:
-                                      const EdgeInsets.only(left: 5, right: 5),
-                                  constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              2 /
-                                              3),
-                                  child: Wrap(
-                                    alignment: WrapAlignment.end,
-                                    crossAxisAlignment: WrapCrossAlignment.end,
-                                    children: [
-                                      Text(
-                                        message['content'],
-                                        style: GoogleFonts.readexPro(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 17,
-                                            color: Colors.white),
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            "${DateTime.parse(message['createdAt']).hour.toString().padLeft(2, '0')}:${DateTime.parse(message['createdAt']).minute.toString().padLeft(2, '0')}",
-                                            style: GoogleFonts.readexPro(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w300,
-                                                color: Colors.white),
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          const Icon(Icons.check,
-                                              color: Colors.greenAccent,
-                                              size: 15)
-                                        ],
+                            message['typeM'] == 'gif'
+                                ? Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        CachedNetworkImage(
+                                          imageUrl: message['content'],
+                                          width: 150,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        Text(
+                                          "${DateTime.parse(message['createdAt']).hour.toString().padLeft(2, '0')}:${DateTime.parse(message['createdAt']).minute.toString().padLeft(2, '0')}",
+                                          style: GoogleFonts.readexPro(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w300,
+                                              color: Colors.grey),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                : message['typeM'] == 'image'
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            CachedNetworkImage(
+                                              imageUrl: message['content'],
+                                              width: 200,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              "${DateTime.parse(message['createdAt']).hour.toString().padLeft(2, '0')}:${DateTime.parse(message['createdAt']).minute.toString().padLeft(2, '0')}",
+                                              style: GoogleFonts.readexPro(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w300,
+                                                  color: Colors.grey),
+                                            )
+                                          ],
+                                        ),
                                       )
-                                    ],
-                                  )),
-                            ),
+                                    : Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 7, horizontal: 10),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: isMyMessage
+                                              ? Colors.blue.withOpacity(0.7)
+                                              : Colors.grey[500],
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 5, right: 5),
+                                            constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    2 /
+                                                    3),
+                                            child: Wrap(
+                                              alignment: WrapAlignment.end,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.end,
+                                              children: [
+                                                Text(
+                                                  message['content'],
+                                                  style: GoogleFonts.readexPro(
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      fontSize: 17,
+                                                      color: Colors.white),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "${DateTime.parse(message['createdAt']).hour.toString().padLeft(2, '0')}:${DateTime.parse(message['createdAt']).minute.toString().padLeft(2, '0')}",
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w300,
+                                                              color:
+                                                                  Colors.white),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    const Icon(Icons.check,
+                                                        color:
+                                                            Colors.greenAccent,
+                                                        size: 15)
+                                                  ],
+                                                )
+                                              ],
+                                            )),
+                                      ),
                           ],
                         );
                       },

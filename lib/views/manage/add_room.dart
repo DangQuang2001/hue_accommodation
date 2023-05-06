@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/google_map_provider.dart';
@@ -131,8 +132,9 @@ class _AddRoomPageState extends State<AddRoomPage>
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer2<UserProvider,GoogleMapProvider>(
-        builder: (context, userProvider,googleMapProvider, child) => FloatingActionButton(
+      floatingActionButton: Consumer2<UserProvider, GoogleMapProvider>(
+        builder: (context, userProvider, googleMapProvider, child) =>
+            FloatingActionButton(
           onPressed: () {
             if (_formKey.currentState!.validate() &&
                 _formKey2.currentState!.validate()) {
@@ -143,7 +145,8 @@ class _AddRoomPageState extends State<AddRoomPage>
                   });
 
                   await roomProvider.uploadImages();
-                  final location = await googleMapProvider.getLatLngFromAddress(address);
+                  final position =
+                      await googleMapProvider.getLatLngFromAddress(address);
                   roomProvider.createRoom(
                       userProvider.userCurrent!.id,
                       userProvider.userCurrent!.name,
@@ -151,7 +154,7 @@ class _AddRoomPageState extends State<AddRoomPage>
                       title,
                       description,
                       address,
-                      location!,
+                      position!,
                       area,
                       dropdownCategory,
                       dropdownFurnishingValue,

@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 
 import '../models/review.dart';
+import '../models/room.dart';
 
 class RoomApi {
   static Future<bool> reviewRoom(String roomId, String userId, double rating,
@@ -51,7 +53,7 @@ class RoomApi {
       String title,
       String description,
       String address,
-      LatLng location,
+      Position location,
       double area,
       String category,
       String furnishing,
@@ -107,8 +109,8 @@ class RoomApi {
         }));
 
     if (response.statusCode == 200) {
-      await createNotification(
-          hostID, "đã đăng phòng trọ mới!", 3, "", jsonDecode(response.body)['id']);
+      await createNotification(hostID, "đã đăng phòng trọ mới!", 3, "",
+          jsonDecode(response.body)['id']);
       final responses =
           await http.get(Uri.parse('$url/api/fcmtoken/get-list-token-device'));
       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
@@ -142,7 +144,7 @@ class RoomApi {
                 "payload": {"secret": "Awesome Notifications Rocks!"}
               },
               "roomID": jsonDecode(response.body)['id'],
-              "category":3,
+              "category": 3,
               "Android": {
                 "content": {
                   "title": "$hostName đã mở phòng trọ mới!  😍 ",
@@ -161,7 +163,7 @@ class RoomApi {
   }
 
   static Future<bool> createNotification(String senderId, String title,
-      int type, String receiverId,String dataId) async {
+      int type, String receiverId, String dataId) async {
     final response = await http.post(Uri.parse('$url/api/notification/create'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
@@ -175,7 +177,7 @@ class RoomApi {
           "receiverId": receiverId,
           "readBy": [],
           "isDelete": [],
-          "dataId":dataId
+          "dataId": dataId
         }));
 
     if (response.statusCode == 200) {
@@ -194,7 +196,7 @@ class RoomApi {
       String title,
       String description,
       String address,
-      LatLng location,
+      Position location,
       double area,
       String category,
       String furnishing,
@@ -257,5 +259,50 @@ class RoomApi {
       return false;
     }
     return false;
+  }
+
+  static Future<List<Room>> getAllRoom() async {
+    try {
+      final response = await http.get(Uri.parse('$url/api/motelhouse'));
+      if (response.statusCode == 200) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => Room.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      debugPrint('Có gì đó sai sai: $e');
+      return [];
+    }
+  }
+
+  //Function get list Motel house nearby currentUserPosition with maxDistance & limit
+  static Future<List<Room>> getNearby(Position currentUserPosition,
+      double maxDistance, int limit, int skip) async {
+    try {
+      final response = await http.post(
+          Uri.parse('$url/api/motelhouse/get-nearby'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          },
+          body: jsonEncode(<String, dynamic>{
+            "longitude": currentUserPosition.longitude,
+            "latitude": currentUserPosition.latitude,
+            "maxDistance": maxDistance,
+            "limit": limit,
+            "skip": skip
+          }));
+      if (response.statusCode == 200) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => Room.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      debugPrint('Có gì đó sai sai: $e');
+      return [];
+    }
   }
 }

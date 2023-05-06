@@ -13,6 +13,7 @@ import 'package:hue_accommodation/view_models/check_login_user.dart';
 import 'package:hue_accommodation/view_models/comment_provider.dart';
 import 'package:hue_accommodation/view_models/favourite_provider.dart';
 import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
+import 'package:hue_accommodation/view_models/giphy_provider.dart';
 import 'package:hue_accommodation/view_models/google_map_provider.dart';
 import 'package:hue_accommodation/view_models/language_provider.dart';
 import 'package:hue_accommodation/view_models/notification_provider.dart';
@@ -21,6 +22,7 @@ import 'package:hue_accommodation/view_models/rent_provider.dart';
 import 'package:hue_accommodation/view_models/room_provider.dart';
 import 'package:hue_accommodation/view_models/theme_provider.dart';
 import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/weather_provider.dart';
 import 'package:provider/provider.dart';
 import 'generated/l10n.dart';
 import 'notification/notification.dart';
@@ -54,14 +56,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => FavouriteProvider()),
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => GoogleMapProvider()),
+        ChangeNotifierProvider(create: (context) => WeatherProvider()),
+        ChangeNotifierProvider(create: (context) => GiphyProvider()),
         ChangeNotifierProvider(
             create: (context) => AppLifecycleStateNotifier()),
       ],
-      child: Consumer4<LanguageProvider, ThemeProvider,AppLifecycleStateNotifier,RoomProvider>(
-          builder: (context, languageProvider, themeObj,lifecycle,roomProvider, child) {
+      child:
+          Consumer3<LanguageProvider, ThemeProvider, AppLifecycleStateNotifier>(
+              builder: (context, languageProvider, themeObj, lifecycle, child) {
         var fcmToken = Provider.of<FcmTokenProvider>(context, listen: false);
         var userProvider = Provider.of<UserProvider>(context, listen: false);
         var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+        var roomProvider = Provider.of<RoomProvider>(context, listen: false);
         var notificationProvider =
             Provider.of<NotificationProvider>(context, listen: false);
         (() async {
@@ -73,7 +79,7 @@ class MyApp extends StatelessWidget {
             checkAndUpdateFCMToken(
                 lifecycle.lifecycleState, userProvider, fcmToken);
           } else {
-            if(roomProvider.isConnect == false){
+            if (roomProvider.isConnect == false) {
               roomProvider.getListNoInternet();
             }
             print("Could not connect wifi. Please connect a wifi!");

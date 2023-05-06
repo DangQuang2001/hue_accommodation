@@ -186,7 +186,12 @@ class _MessagePageState extends State<MessagePage> {
                                 .copyWith(fontSize: 18),
                           ),
                           Text(
-                            roomChat['_id']['message'][0]['content'],
+                            roomChat['_id']['message'][0]['typeM'] == "gif"
+                                ? "Gif"
+                                : roomChat['_id']['message'][0]['typeM'] ==
+                                        "image"
+                                    ? "Image"
+                                    : roomChat['_id']['message'][0]['content'],
                             style: (roomChat['_id']['readBy'] as List)
                                     .contains(userProvider.userCurrent!.id)
                                 ? Theme.of(context).textTheme.headlineMedium
@@ -231,5 +236,3 @@ class _MessagePageState extends State<MessagePage> {
     );
   }
 }
-
-
