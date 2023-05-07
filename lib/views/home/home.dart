@@ -9,18 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
-import 'package:hue_accommodation/views/components/payment.dart';
+import 'package:hue_accommodation/utils/payment.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/chat_provider.dart';
+import '../../view_models/chat_model.dart';
 
 mixin AppCloser {
   void closeApp() {
@@ -52,9 +52,9 @@ class _HomePageState extends State<HomePage> with AppCloser {
   initState() {
     super.initState();
     // Add listeners to this class
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
-    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatModel>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print(message.data['category']);
       if(message.data['category']=='3'){
@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => WillPopScope(
         onWillPop: () async {
           closeApp();
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
   }
 
   Widget header(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Stack(children: [
         Stack(children: [
           Container(
@@ -342,17 +342,12 @@ class _HomePageState extends State<HomePage> with AppCloser {
                                     color: Colors.grey.withOpacity(0.4)))),
                         child: Row(
                           children: [
-                            GestureDetector(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
-                              },
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
-                                width: 40,
-                                height: 25,
-                                filterQuality: FilterQuality.low,
-                              ),
+                            CachedNetworkImage(
+                              imageUrl:
+                                  "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
+                              width: 40,
+                              height: 25,
+                              filterQuality: FilterQuality.low,
                             ),
                             const SizedBox(
                               width: 10,
@@ -392,7 +387,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
   }
 
   Widget body(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 20, right: 20),
         child: SizedBox(
@@ -543,6 +538,13 @@ class _HomePageState extends State<HomePage> with AppCloser {
                     RouteName.interactManage,
                     400,
                     false),
+                  buttonLinkSmall(
+                    context,
+                    "https://cdn-icons-png.flaticon.com/512/4168/4168988.png",
+                    "User",
+                    RouteName.interactManage,
+                    400,
+                    false),
                 buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/2783/2783924.png",
@@ -605,9 +607,9 @@ class _HomePageState extends State<HomePage> with AppCloser {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
-                width: 100,
-                height: 100,
+                padding: const EdgeInsets.all(25),
+                width: 90,
+                height: 90,
                 decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.onBackground,
                     borderRadius: BorderRadius.circular(20),

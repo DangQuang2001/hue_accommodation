@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/room_provider.dart';
+import '../../view_models/room_model.dart';
 
 class ReviewRoom extends StatefulWidget {
   final Room room;
@@ -31,7 +31,7 @@ class _ReviewRoomState extends State<ReviewRoom> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     roomProvider.images = [];
     roomProvider.listImageUrl = [];
   }
@@ -154,7 +154,7 @@ class _ReviewRoomState extends State<ReviewRoom> {
 
   Widget images(BuildContext context) {
     return Expanded(
-      child: Consumer2<RoomProvider,UserProvider>(
+      child: Consumer2<RoomModel,UserModel>(
         builder: (context, roomProvider,userProvider, child) => GestureDetector(
           onTap: () => roomProvider.selectImages(context),
           child: Column(

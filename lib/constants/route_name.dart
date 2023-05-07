@@ -27,4 +27,5 @@ class RouteName {
   static const String myActivity = "/myActivity";
   static const String transpot = "/transpot";
   static const String nearby = "/nearby";
+  static const String payment = "/payment";
 }

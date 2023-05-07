@@ -4,12 +4,12 @@ import 'package:bottom_bar_matu/bottom_bar_matu.dart' as bottom_bar_matu;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/notification_model.dart';
 import 'package:hue_accommodation/views/notification/notification.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/user_provider.dart';
+import '../../view_models/user_model.dart';
 import '../home/home.dart';
 import '../home/home_user.dart';
 import '../messages/message.dart';
@@ -117,7 +117,7 @@ class _LayoutState extends State<Layout>
           return false;
         }
       },
-      child: Consumer3<NotificationProvider, ChatProvider, UserProvider>(
+      child: Consumer3<NotificationModel, ChatModel, UserModel>(
         builder: (context, notificationProvider, chatProvider, userProvider,
                 child) =>
             Stack(

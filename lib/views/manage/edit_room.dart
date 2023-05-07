@@ -4,13 +4,13 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/models/room.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
-import '../../view_models/google_map_provider.dart';
+import '../../view_models/google_map_model.dart';
 
 List<String> listFurnishing = <String>['Full', 'Less'];
 List<String> listCategory = <String>['Rent', 'Buy', 'Project'];
@@ -55,7 +55,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   void initState() {
     super.initState();
     address = widget.room.adParams['address']['value'];
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     dropdownFurnishingValue = listFurnishing.first;
     dropdownTypeRoomValue = listTypeRoom.first;
     listImageUrl = widget.room.images;
@@ -65,7 +65,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    var roomProvider = Provider.of<RoomProvider>(context);
+    var roomProvider = Provider.of<RoomModel>(context);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -136,7 +136,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer2<UserProvider, GoogleMapProvider>(
+      floatingActionButton: Consumer2<UserModel, GoogleMapModel>(
         builder: (context, userProvider, googleMapProvider, child) =>
             FloatingActionButton(
           onPressed: () {
@@ -297,7 +297,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   }
 
   Widget multiImageUploadScreen(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -567,7 +567,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   }
 
   Widget chooseAddress(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => GestureDetector(
         onTap: () {
           showDistricts = false;
@@ -718,7 +718,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   }
 
   Widget districts(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),
@@ -814,7 +814,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   }
 
   Widget wards(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),
@@ -912,7 +912,7 @@ class _EditRoomPageState extends State<EditRoomPage> {
   }
 
   Widget road(BuildContext context) {
-    return Consumer<GoogleMapProvider>(
+    return Consumer<GoogleMapModel>(
       builder: (context, googleMapProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),

@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../generated/l10n.dart';
-import '../../view_models/room_provider.dart';
+import '../../view_models/room_model.dart';
 import 'boarding_house_detail.dart';
 
 class FilterHouse extends StatefulWidget {
@@ -26,21 +26,11 @@ class _FilterHouseState extends State<FilterHouse> {
   List<String> listSelected = [];
   bool isLoading = false;
 
-  void _onCategorySelected(bool selected, String name) {
-    if (selected == true) {
-      setState(() {
-        listSelected.add(name);
-      });
-    } else {
-      setState(() {
-        listSelected.remove(name);
-      });
-    }
-  }
+
 
   @override
   void initState() {
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     if (roomProvider.typeName != widget.typeName) {
       isLoading = true;
       roomProvider.typeName = widget.typeName;
@@ -71,7 +61,7 @@ class _FilterHouseState extends State<FilterHouse> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => Padding(
           padding: const EdgeInsets.only(top: 0),
           child: ExpansionPanelList(
@@ -148,7 +138,7 @@ class _FilterHouseState extends State<FilterHouse> {
           ? Container(
               alignment: Alignment.center,
               child: const CircularProgressIndicator())
-          : Consumer<RoomProvider>(
+          : Consumer<RoomModel>(
               builder: (context, roomProvider, child) =>
                   NotificationListener<ScrollNotification>(
                     onNotification: (ScrollNotification scrollInfo) {
@@ -575,7 +565,7 @@ class _FilterHouseState extends State<FilterHouse> {
             const SizedBox(
               height: 20,
             ),
-            Consumer<RoomProvider>(
+            Consumer<RoomModel>(
               builder: (context, roomProvider, child) => GestureDetector(
                 onTap: () {
                   if (_character == SingingCharacter.newPost) {
@@ -866,5 +856,17 @@ class _FilterHouseState extends State<FilterHouse> {
         )
       ],
     );
+  }
+
+  void _onCategorySelected(bool selected, String name) {
+    if (selected == true) {
+      setState(() {
+        listSelected.add(name);
+      });
+    } else {
+      setState(() {
+        listSelected.remove(name);
+      });
+    }
   }
 }

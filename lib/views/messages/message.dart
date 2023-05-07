@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
@@ -23,8 +23,8 @@ class _MessagePageState extends State<MessagePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var chatProvider = Provider.of<ChatModel>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       chatProvider.getRoomChat(userProvider.userCurrent!.id);
     });
@@ -101,7 +101,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer2<UserProvider, ChatProvider>(
+    return Consumer2<UserModel, ChatModel>(
       builder: (context, userProvider, chatProvider, child) => Expanded(
         child: userProvider.userCurrent == null
             ? Padding(
@@ -127,7 +127,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget message(BuildContext context, Map<String, dynamic> roomChat) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => GestureDetector(
         onTap: () => Navigator.push(
             context,

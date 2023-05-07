@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/google_map_provider.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
+import 'package:hue_accommodation/view_models/google_map_model.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +25,7 @@ class _NearByLocationState extends State<NearByLocation> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     roomProvider.getListNearbyLimit(null, 5000, 5, 0);
   }
 
@@ -78,7 +78,7 @@ class _NearByLocationState extends State<NearByLocation> {
       {"index": 2, "title": "Near School"},
       {"index": 3, "title": "In District"},
     ];
-    return Consumer2<RoomProvider, GoogleMapProvider>(
+    return Consumer2<RoomModel, GoogleMapModel>(
       builder: (context, roomProvider, googleMapProvider, child) => SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 60,
@@ -154,7 +154,7 @@ class _NearByLocationState extends State<NearByLocation> {
   }
 
   Widget chooseDistricts(BuildContext context) {
-    return Consumer2<RoomProvider, GoogleMapProvider>(
+    return Consumer2<RoomModel, GoogleMapModel>(
       builder: (context, roomProvider, googleMapProvider, child) =>
           FractionallySizedBox(
         heightFactor: 0.9,
@@ -293,7 +293,7 @@ class _NearByLocationState extends State<NearByLocation> {
       },
     ];
 
-    return Consumer2<RoomProvider, GoogleMapProvider>(
+    return Consumer2<RoomModel, GoogleMapModel>(
       builder: (context, roomProvider, googleMapProvider, child) =>
           FractionallySizedBox(
         heightFactor: 0.9,
@@ -384,7 +384,7 @@ class _NearByLocationState extends State<NearByLocation> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => Expanded(
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20),

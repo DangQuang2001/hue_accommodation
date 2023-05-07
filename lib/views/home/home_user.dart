@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -19,8 +19,8 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/chat_provider.dart';
-import '../../view_models/weather_provider.dart';
+import '../../view_models/chat_model.dart';
+import '../../view_models/weather_model.dart';
 import 'near_by.dart';
 
 mixin AppCloser {
@@ -53,10 +53,10 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   initState() {
     super.initState();
     // Add listeners to this class
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
-    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
-    var weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatModel>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var weatherProvider = Provider.of<WeatherModel>(context, listen: false);
     weatherProvider.getWeather();
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print(message.data['category']);
@@ -110,7 +110,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => WillPopScope(
         onWillPop: () async {
           closeApp();
@@ -143,7 +143,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget header(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Stack(children: [
         Stack(children: [
           Container(
@@ -366,7 +366,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                       ),
                       Padding(
                           padding: const EdgeInsets.only(left: 20.0),
-                          child: Consumer<WeatherProvider>(
+                          child: Consumer<WeatherModel>(
                               builder: (context, value, child) => Padding(
                                     padding: const EdgeInsets.only(left: 20.0),
                                     child: Row(
@@ -421,7 +421,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget body(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 10, right: 20),
         child: SizedBox(
@@ -628,7 +628,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
             delay: const Duration(milliseconds: 200),
             duration: const Duration(milliseconds: 200),
             child: Text(
-              S.of(context).home_page_extension,
+              "Feature",
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
@@ -644,8 +644,8 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                   children: [
                     buttonLink(
                         context,
-                        "https://cdn-icons-png.flaticon.com/512/1865/1865699.png",
-                        "My Activity",
+                        "https://cdn-icons-png.flaticon.com/512/9156/9156007.png",
+                        "Reservation",
                         RouteName.myActivity,
                         true,
                         400),
@@ -725,7 +725,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                         ),
                       ),
                       Text(
-                        "Direction Map",
+                        S.of(context).home_page_extension,
                         style: Theme.of(context).textTheme.displayMedium,
                       )
                     ],

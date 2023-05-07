@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/comment_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/comment_model.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import '../../generated/l10n.dart';
 import '../../models/post.dart';
-import '../../view_models/post_provider.dart';
-import '../../view_models/user_provider.dart';
+import '../../view_models/post_model.dart';
+import '../../view_models/user_model.dart';
 import '../components/slide_route.dart';
 import '../messages/message_detail.dart';
 
@@ -37,8 +37,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
-    var commentProvider = Provider.of<CommentProvider>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var commentProvider = Provider.of<CommentModel>(context, listen: false);
     commentProvider.getComment(widget.post.id, 10, 10);
     isLike = widget.post.likedBy!.contains(userProvider.userCurrent!.id);
     likeCount = widget.post.likedBy!.length;
@@ -64,7 +64,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Consumer2<CommentProvider, UserProvider>(
+      body: Consumer2<CommentModel, UserModel>(
         builder: (context, commentProvider, userProvider, child) => Column(
           children: [
             appBar(context),
@@ -196,7 +196,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer3<UserProvider, ChatProvider, PostProvider>(
+    return Consumer3<UserModel, ChatModel, PostModel>(
       builder: (context, userProvider, chatProvider, postProvider, child) =>
           Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
@@ -368,7 +368,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     Widget spaceW = const SizedBox(
       width: 5,
     );
-    return Consumer2<PostProvider, UserProvider>(
+    return Consumer2<PostModel, UserModel>(
       builder: (context, postProvider, userProvider, child) => Container(
         margin: const EdgeInsets.only(top: 5),
         padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -645,7 +645,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       width: 5,
     );
 
-    return Consumer<CommentProvider>(
+    return Consumer<CommentModel>(
       builder: (context, commentProvider, child) => Container(
         width: MediaQuery.of(context).size.width,
         decoration:

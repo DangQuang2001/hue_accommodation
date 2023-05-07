@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/post_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/post_model.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/forum/create_post.dart';
 import 'package:hue_accommodation/views/forum/post.dart';
@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 
 import '../../generated/l10n.dart';
-import '../../view_models/user_provider.dart';
+import '../../view_models/user_model.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({Key? key}) : super(key: key);
@@ -36,8 +36,8 @@ class _ForumPageState extends State<ForumPage>
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
-    var postProvider = Provider.of<PostProvider>(context, listen: false);
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var postProvider = Provider.of<PostModel>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
     postProvider.getAllData(userProvider.userCurrent!.id);
     super.initState();
   }
@@ -56,7 +56,7 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer3<UserProvider,ChatProvider,PostProvider>(
+    return Consumer3<UserModel,ChatModel,PostModel>(
       builder: (context, userProvider,chatProvider,postProvider, child) => Container(
         height: 160,
         width: MediaQuery.of(context).size.width,
@@ -233,7 +233,7 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget allPost(BuildContext context) {
-    return Consumer<PostProvider>(
+    return Consumer<PostModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listAllPost.isNotEmpty){
           return ListView(
@@ -251,7 +251,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget roommate(BuildContext context) {
-    return Consumer<PostProvider>(
+    return Consumer<PostModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listRoommate.isNotEmpty){
           return ListView(
@@ -269,7 +269,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget transfer(BuildContext context) {
-    return Consumer<PostProvider>(
+    return Consumer<PostModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listTransfer.isNotEmpty){
           return ListView(
@@ -287,7 +287,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget others(BuildContext context) {
-    return Consumer<PostProvider>(
+    return Consumer<PostModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listOther.isNotEmpty){
           return ListView(

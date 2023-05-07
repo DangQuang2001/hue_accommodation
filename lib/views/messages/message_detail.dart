@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/giphy_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/giphy_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import '../../view_models/chat_provider.dart';
-import '../../view_models/message_provider.dart';
+import '../../view_models/chat_model.dart';
+import '../../view_models/message_model.dart';
 
 class ChatScreen extends StatefulWidget {
   final bool isNewRoom;
@@ -43,8 +43,8 @@ class _ChatScreenState extends State<ChatScreen>
     super.initState();
     _tabController = TabController(length: 11, vsync: this);
     isNewRooms = widget.isNewRoom;
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
-    var chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatModel>(context, listen: false);
     (() async {
       if (userProvider.userCurrent!.id != widget.infoUserRoom[0]['_id']) {
         await chatProvider.isOnline(widget.infoUserRoom[0]['_id']);
@@ -77,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer3<UserProvider, GiphyProvider, ChatProvider>(
+      body: Consumer3<UserModel, GiphyModel, ChatModel>(
         builder: (context, userProvider, giphyProvider, chatProvider, child) =>
             GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -189,7 +189,7 @@ class _ChatScreenState extends State<ChatScreen>
                                           _textController.clear();
                                           return true;
                                         },
-                                        child: Consumer<GiphyProvider>(
+                                        child: Consumer<GiphyModel>(
                                           builder:
                                               (context, giphyProvider, child) =>
                                                   SizedBox(
@@ -424,7 +424,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Container(
         width: MediaQuery.of(context).size.width,
         height: 100,
@@ -483,7 +483,7 @@ class _ChatScreenState extends State<ChatScreen>
   }
 
   Widget messages(BuildContext context) {
-    return Consumer2<UserProvider, ChatProvider>(
+    return Consumer2<UserModel, ChatModel>(
       builder: (context, userProvider, chatProvider, child) => Expanded(
         child: isLoading
             ? Container()

@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/phone_call.dart';
+import '../../services/phone_repository.dart';
 
 class TranspotPages extends StatefulWidget {
   const TranspotPages({super.key});

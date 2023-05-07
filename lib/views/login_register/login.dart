@@ -3,13 +3,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/notification_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/fcmToken_provider.dart';
+import '../../view_models/fcmToken_model.dart';
 import '../components/slide_route.dart';
 import 'choose_role.dart';
 
@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget login(BuildContext context) {
-    return Consumer4<UserProvider,NotificationProvider,ChatProvider,FcmTokenProvider>(
+    return Consumer4<UserModel,NotificationModel,ChatModel,FcmTokenModel>(
       builder: (context, userProvider,notificationProvider,chatProvider,fcmTokenProvider, child) => Form(
         key: _formKey,
         child: Padding(
@@ -293,7 +293,7 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(
             height: 25,
           ),
-          Consumer4<UserProvider,NotificationProvider,ChatProvider,FcmTokenProvider>(
+          Consumer4<UserModel,NotificationModel,ChatModel,FcmTokenModel>(
             builder: (context, userProvider,notificationProvider,chatProvider,fcmTokenProvider, child) =>  InkWell(
               onTap: ()  async {
                 await AuthService().signInWithGoogle(context);

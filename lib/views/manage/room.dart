@@ -5,14 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/models/room.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:hue_accommodation/views/manage/edit_room.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
-import '../../view_models/room_provider.dart';
+import '../../view_models/room_model.dart';
 
 class RoomManage extends StatefulWidget {
   const RoomManage({Key? key}) : super(key: key);
@@ -26,8 +26,8 @@ class _RoomManageState extends State<RoomManage> {
   void initState() {
 // TODO: implement initState
     super.initState();
-    Provider.of<RoomProvider>(context, listen: false).getListRemove(
-        Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
+    Provider.of<RoomModel>(context, listen: false).getListRemove(
+        Provider.of<UserModel>(context, listen: false).userCurrent!.id);
   }
 
   @override
@@ -73,7 +73,7 @@ class _RoomManageState extends State<RoomManage> {
   }
 
   Widget info(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Container(
         margin: const EdgeInsets.all(20),
         padding: const EdgeInsets.all(20),
@@ -283,7 +283,7 @@ class _RoomManageState extends State<RoomManage> {
                               ),
                             ),
                           ),
-                          Consumer<RoomProvider>(
+                          Consumer<RoomModel>(
                             builder: (context, value, child) => Positioned(
                                 right: 5,
                                 top: 5,
@@ -317,8 +317,8 @@ class _RoomManageState extends State<RoomManage> {
               height: 10,
             ),
             Expanded(
-                child: Consumer<UserProvider>(
-              builder: (context, userProvider, child) => Consumer<RoomProvider>(
+                child: Consumer<UserModel>(
+              builder: (context, userProvider, child) => Consumer<RoomModel>(
                 builder: (context, value, child) => FutureBuilder<List<Room>>(
                   future: value.getListRoomHost(userProvider.userCurrent!.id),
                   builder: (context, snapshot) {
@@ -566,9 +566,9 @@ class _RoomManageState extends State<RoomManage> {
                     const SizedBox(
                       width: 20,
                     ),
-                    Consumer<UserProvider>(
+                    Consumer<UserModel>(
                       builder: (context, userProvider, child) =>
-                          Consumer<RoomProvider>(
+                          Consumer<RoomModel>(
                         builder: (context, value, child) => InkWell(
                           onTap: () {
                             (() async {

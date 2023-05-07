@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:hue_accommodation/view_models/favourite_provider.dart';
+import 'package:hue_accommodation/view_models/favourite_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/user_provider.dart';
+import '../../view_models/user_model.dart';
 
 class FavoritePage extends StatefulWidget {
   const FavoritePage({Key? key}) : super(key: key);
@@ -52,7 +52,7 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer2<FavouriteProvider, UserProvider>(
+    return Consumer2<FavouriteModel, UserModel>(
       builder: (context, favouriteProvider, userProvider, child) => Expanded(
         child: FutureBuilder(
           future: favouriteProvider.getFavourite(userProvider.userCurrent!.id),

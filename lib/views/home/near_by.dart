@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../constants/route_name.dart';
 import '../../generated/l10n.dart';
-import '../../view_models/room_provider.dart';
+import '../../view_models/room_model.dart';
 import '../boarding_house/boarding_house_detail.dart';
 import '../components/slide_route.dart';
 
@@ -22,13 +22,13 @@ class _NearByState extends State<NearBy> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     roomProvider.getListNearby(null, 5000, 5, 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => roomProvider.listNearby.isEmpty
           ? const Text('')
           : Column(

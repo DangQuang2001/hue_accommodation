@@ -6,7 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
 import 'package:hue_accommodation/views/boarding_house/filter_house.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -26,7 +26,6 @@ class BoardingHousePage extends StatefulWidget {
 class _BoardingHousePageState extends State<BoardingHousePage>
     with SingleTickerProviderStateMixin {
   List<Room> listRoom = [];
-
   Timer? _timer;
   int currentPage = 0;
   late TabController _tabController;
@@ -42,22 +41,10 @@ class _BoardingHousePageState extends State<BoardingHousePage>
      Tab(text: S.current.boardinghouse_whole_house),
   ];
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (_pageController.page == 2) {
-        _pageController.animateToPage(0,
-            duration: const Duration(milliseconds: 2000), curve: Curves.ease);
-      } else {
-        _pageController.nextPage(
-            duration: const Duration(milliseconds: 3000), curve: Curves.ease);
-      }
-    });
-  }
-
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    var roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    var roomProvider = Provider.of<RoomModel>(context, listen: false);
     if (roomProvider.listMiniFirstLoad.isEmpty) {
       roomProvider.getDataFirstTime();
       (()async{
@@ -74,19 +61,10 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-    _scrollController.dispose();
-    _timer?.cancel();
-    _timer = null;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onBackground,
-      body: Consumer<RoomProvider>(
+      body: Consumer<RoomModel>(
         builder: (context, roomProvider, child) =>
             NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
@@ -254,7 +232,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemMini(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -565,7 +543,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemMotel(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -752,7 +730,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemWhole(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -962,7 +940,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget hot(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1225,4 +1203,25 @@ class _BoardingHousePageState extends State<BoardingHousePage>
       ),
     );
   }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_pageController.page == 2) {
+        _pageController.animateToPage(0,
+            duration: const Duration(milliseconds: 2000), curve: Curves.ease);
+      } else {
+        _pageController.nextPage(
+            duration: const Duration(milliseconds: 3000), curve: Curves.ease);
+      }
+    });
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+    _scrollController.dispose();
+    _timer?.cancel();
+    _timer = null;
+  }
+
 }

@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/view_models/post_provider.dart';
+import 'package:hue_accommodation/view_models/post_model.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:hue_accommodation/views/forum/post_detail.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/user_provider.dart';
+import '../../view_models/user_model.dart';
 
 class PostHistory extends StatefulWidget {
   const PostHistory({Key? key}) : super(key: key);
@@ -51,7 +51,7 @@ class _PostHistoryState extends State<PostHistory> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer2<PostProvider, UserProvider>(
+    return Consumer2<PostModel, UserModel>(
       builder: (context, postProvider, userProvider, child) => Expanded(
         child: FutureBuilder(
           future: postProvider.getPostById(userProvider.userCurrent!.id),
@@ -200,7 +200,7 @@ class _PostHistoryState extends State<PostHistory> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return Consumer2<UserProvider,PostProvider>(
+        return Consumer2<UserModel,PostModel>(
           builder: (context, userProvider,postProvider, child) => StatefulBuilder(
             builder: (context, setState) => AlertDialog(
               title:isHidden?Center(

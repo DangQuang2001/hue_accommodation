@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/post_provider.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/post_model.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -83,7 +83,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer2<PostProvider, UserProvider>(
+    return Consumer2<PostModel, UserModel>(
       builder: (context, postProvider, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 40.0, right: 20, left: 20),
         child: Row(
@@ -160,7 +160,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     Widget spaceW = const SizedBox(
       width: 5,
     );
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -613,7 +613,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Widget location(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => Padding(
         padding: const EdgeInsets.all(10.0),
         child: Row(

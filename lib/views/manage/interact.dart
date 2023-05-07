@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/rent_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/rent_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
@@ -21,12 +21,12 @@ class _InteractManageState extends State<InteractManage> {
 // TODO: implement initState
     super.initState();
 
-    Provider.of<RentProvider>(context, listen: false).getListWaiting(
-        Provider.of<UserProvider>(context, listen: false).userCurrent!.id,0);
-    Provider.of<RentProvider>(context, listen: false).getListConfirm(
-        Provider.of<UserProvider>(context, listen: false).userCurrent!.id,1);
-    Provider.of<RentProvider>(context, listen: false).getListUnConfirm(
-        Provider.of<UserProvider>(context, listen: false).userCurrent!.id,2);
+    Provider.of<RentModel>(context, listen: false).getListWaiting(
+        Provider.of<UserModel>(context, listen: false).userCurrent!.id,0);
+    Provider.of<RentModel>(context, listen: false).getListConfirm(
+        Provider.of<UserModel>(context, listen: false).userCurrent!.id,1);
+    Provider.of<RentModel>(context, listen: false).getListUnConfirm(
+        Provider.of<UserModel>(context, listen: false).userCurrent!.id,2);
   }
   @override
   Widget build(BuildContext context) {
@@ -78,7 +78,7 @@ class _InteractManageState extends State<InteractManage> {
   }
 
   Widget info(BuildContext context) {
-    return  Consumer<RentProvider>(
+    return  Consumer<RentModel>(
       builder: (context, rentProvider, child) => (rentProvider.listWaiting.isNotEmpty || rentProvider.listConfirm.isNotEmpty ||rentProvider.listUnConfirm.isNotEmpty)? Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Column(
@@ -348,8 +348,8 @@ class _InteractManageState extends State<InteractManage> {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
-          return Consumer<UserProvider>(
-            builder: (context, userProvider, child) =>  Consumer<RentProvider>(
+          return Consumer<UserModel>(
+            builder: (context, userProvider, child) =>  Consumer<RentModel>(
               builder: (context, rentProvider, child) => AlertDialog(
                 title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

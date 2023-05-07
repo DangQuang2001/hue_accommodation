@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:provider/provider.dart';
 
 import '../components/slide_route.dart';
@@ -83,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget login(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Form(
         key: _formKey,
         child: Padding(
@@ -356,7 +356,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget loginGoogle(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) =>  Padding(
         padding:
             const EdgeInsets.only(top: 10, bottom: 10, left: 30.0, right: 30),

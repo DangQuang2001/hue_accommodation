@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/notification_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
-import '../../view_models/room_provider.dart';
+import '../../view_models/room_model.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
@@ -24,9 +24,9 @@ class _NotificationPageState extends State<NotificationPage> {
     // TODO: implement initState
     super.initState();
     var notificationProvider =
-        Provider.of<NotificationProvider>(context, listen: false);
+        Provider.of<NotificationModel>(context, listen: false);
     var userProvider =
-    Provider.of<UserProvider>(context, listen: false);
+    Provider.of<UserModel>(context, listen: false);
     notificationProvider.countNotification = 0;
     notificationProvider.readNotification(userProvider.userCurrent!.id);
   }
@@ -42,8 +42,8 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) => Consumer<NotificationProvider>(
+    return Consumer<UserModel>(
+      builder: (context, userProvider, child) => Consumer<NotificationModel>(
         builder: (context, notificationProvider, child) => Padding(
           padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
           child: Row(
@@ -77,8 +77,8 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Widget items(BuildContext context) {
-    return Consumer2<UserProvider,RoomProvider>(
-      builder: (context, userProvider,roomProvider, child) => Consumer<NotificationProvider>(
+    return Consumer2<UserModel,RoomModel>(
+      builder: (context, userProvider,roomProvider, child) => Consumer<NotificationModel>(
         builder: (context, notificationProvider, child) => Padding(
           padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
           child: userProvider.userCurrent == null

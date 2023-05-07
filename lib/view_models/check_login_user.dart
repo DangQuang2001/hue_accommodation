@@ -2,15 +2,21 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/fcmToken_provider.dart';
-import 'package:hue_accommodation/view_models/notification_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/fcmToken_model.dart';
+import 'package:hue_accommodation/view_models/notification_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hue_accommodation/models/user.dart' as user_model;
 
-void checkLoginUser(UserProvider userProvider, FcmTokenProvider fcmToken,
-    NotificationProvider notificationProvider, ChatProvider chatProvider) async{
+void checkLoginUser(BuildContext context) async{
+  var fcmToken = Provider.of<FcmTokenModel>(context, listen: false);
+  var userProvider = Provider.of<UserModel>(context, listen: false);
+  var chatProvider = Provider.of<ChatModel>(context, listen: false);
+  var notificationProvider =
+  Provider.of<NotificationModel>(context, listen: false);
   final String? currentToken = await FirebaseMessaging.instance.getToken();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   if (FirebaseAuth.instance.currentUser != null &&

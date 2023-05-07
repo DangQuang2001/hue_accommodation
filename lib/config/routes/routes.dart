@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
+import 'package:hue_accommodation/utils/payment.dart';
 import 'package:hue_accommodation/views/extension/activity.dart';
 import 'package:hue_accommodation/views/extension/atm.dart';
 import 'package:hue_accommodation/views/extension/household_good.dart';
@@ -76,6 +77,8 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const TranspotPages();
           case RouteName.nearby:
             return const NearByLocation();
+            case RouteName.payment:
+            return const Payment();
           default:
             return const Layout(selectedIndex: 0);
         }

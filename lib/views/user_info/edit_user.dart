@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hue_accommodation/views/user_info/user_info.dart';
 import 'package:provider/provider.dart';
 import '../../generated/l10n.dart';
-import '../../view_models/user_provider.dart';
+import '../../view_models/user_model.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -28,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
 // TODO: implement initState
     super.initState();
 
-    var user = Provider.of<UserProvider>(context, listen: false);
+    var user = Provider.of<UserModel>(context, listen: false);
     name = user.userCurrent!.name;
     email = user.userCurrent!.email;
     password = user.userCurrent!.password;
@@ -58,7 +58,7 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
 
-      floatingActionButton:isChanged.contains(true)? Consumer<UserProvider>(
+      floatingActionButton:isChanged.contains(true)? Consumer<UserModel>(
         builder: (context, userProvider, child) =>  FloatingActionButton(
           onPressed: (){
             if (_formKey.currentState!.validate()) {
@@ -120,7 +120,7 @@ class _EditProfileState extends State<EditProfile> {
       children: [
         Container(
           padding: const EdgeInsets.only(top: 40, right: 10),
-          child: Consumer<UserProvider>(
+          child: Consumer<UserModel>(
             builder: (context, userProvider, child) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -150,7 +150,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   avatar(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) =>  Stack(children: [
         CircularBorder(
           width: 2.5,

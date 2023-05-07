@@ -6,10 +6,10 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hue_accommodation/view_models/chat_provider.dart';
-import 'package:hue_accommodation/view_models/google_map_provider.dart';
-import 'package:hue_accommodation/view_models/room_provider.dart';
-import 'package:hue_accommodation/view_models/user_provider.dart';
+import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/google_map_model.dart';
+import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/user_model.dart';
 import 'package:hue_accommodation/views/boarding_house/rent_now.dart';
 import 'package:hue_accommodation/views/extension/navigation_map.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/favourite_provider.dart';
+import '../../view_models/favourite_model.dart';
 
 class BoardingHouseDetail extends StatefulWidget {
   final Room motel;
@@ -39,13 +39,13 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   void initState() {
     super.initState();
     var favouriteProvider =
-        Provider.of<FavouriteProvider>(context, listen: false);
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+        Provider.of<FavouriteModel>(context, listen: false);
+    var userProvider = Provider.of<UserModel>(context, listen: false);
     var googleMapProvider =
-        Provider.of<GoogleMapProvider>(context, listen: false);
+        Provider.of<GoogleMapModel>(context, listen: false);
     if (userProvider.userCurrent != null) {
       favouriteProvider.checkFavourite(widget.motel.roomId,
-          Provider.of<UserProvider>(context, listen: false).userCurrent!.id);
+          Provider.of<UserModel>(context, listen: false).userCurrent!.id);
       isCheckFavourite = favouriteProvider.isCheckFavourite;
     }
     googleMapProvider.getMarker(_controller, LatLng(widget.motel.latitude, widget.motel.longitude));
@@ -61,7 +61,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
-        Consumer3<UserProvider, ChatProvider, FavouriteProvider>(
+        Consumer3<UserModel, ChatModel, FavouriteModel>(
           builder:
               (context, userProvider, chatProvider, favouriteProvider, child) =>
                   NestedScrollView(
@@ -596,7 +596,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget map(BuildContext context) {
-    return Consumer<GoogleMapProvider>(
+    return Consumer<GoogleMapModel>(
       builder: (context, googleMapProvider, child) => Padding(
         padding: const EdgeInsets.only(bottom: 10.0),
         child: SizedBox(
@@ -673,7 +673,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget bottomBar(BuildContext context) {
-    return Consumer<UserProvider>(
+    return Consumer<UserModel>(
       builder: (context, userProvider, child) => Positioned(
         bottom: 0,
         child: Container(
@@ -841,7 +841,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget review(BuildContext context) {
-    return Consumer<RoomProvider>(
+    return Consumer<RoomModel>(
       builder: (context, roomProvider, child) => FutureBuilder(
         future: roomProvider.getReview(widget.motel.roomId),
         builder: (context, snapshot) {
