@@ -77,8 +77,7 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const TranspotPages();
           case RouteName.nearby:
             return const NearByLocation();
-            case RouteName.payment:
-            return const Payment();
+
           default:
             return const Layout(selectedIndex: 0);
         }

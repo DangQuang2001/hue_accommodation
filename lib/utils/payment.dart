@@ -5,43 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 
-class Payment extends StatefulWidget {
-  const Payment({Key? key}) : super(key: key);
-
-  @override
-  _PaymentState createState() => _PaymentState();
-}
-
-class _PaymentState extends State<Payment> {
+class Payment {
 
   Map<String, dynamic>? paymentIntent;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    WidgetsFlutterBinding.ensureInitialized();
 
-    // set the publishable key for Stripe - this is mandatory
-    Stripe.publishableKey = "pk_test_51N4fplCYZEI22fEEbtNGRxHaUlnUcQfTWdJSd7NW3vkHoTvvk62WUtUh2PwpC07F9RZ7NU0eWfFpkYKw3TU0zep800RSjDjGC0";
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stripe Payment'),
-      ),
-      body: Center(
-        child: TextButton(
-          child: const Text('Make Payment'),
-          onPressed: ()async{
-            await makePayment();
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> makePayment() async {
+  Future<void> makePayment(BuildContext context) async {
     try {
       paymentIntent = await createPaymentIntent('10', 'USD');
       //Payment Sheet
@@ -56,14 +24,14 @@ class _PaymentState extends State<Payment> {
 
 
       ///now finally display payment sheeet
-      displayPaymentSheet();
+      // ignore: use_build_context_synchronously
+      displayPaymentSheet(context);
     } catch (e, s) {
-      print('exception:$e$s');
+      debugPrint('exception:$e$s');
     }
   }
 
-  displayPaymentSheet() async {
-
+  displayPaymentSheet(BuildContext context) async {
     try {
       await Stripe.instance.presentPaymentSheet(
       ).then((value){
@@ -87,19 +55,19 @@ class _PaymentState extends State<Payment> {
         paymentIntent = null;
 
       }).onError((error, stackTrace){
-        print('Error is:--->$error $stackTrace');
+        debugPrint('Error is:--->$error $stackTrace');
       });
 
 
     } on StripeException catch (e) {
-      print('Error is:---> $e');
+      debugPrint('Error is:---> $e');
       showDialog(
           context: context,
           builder: (_) => const AlertDialog(
             content: Text("Cancelled "),
           ));
     } catch (e) {
-      print('$e');
+      debugPrint('$e');
     }
   }
 
