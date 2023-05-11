@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/rent_model.dart';
-import '../../view_models/user_model.dart';
+import '../../view_models/rent_view_model.dart';
+import '../../view_models/user_view_model.dart';
 
 class RentHistory extends StatefulWidget {
   const RentHistory({Key? key}) : super(key: key);
@@ -18,8 +18,8 @@ class _RentHistoryState extends State<RentHistory> {
 // TODO: implement initState
     super.initState();
 
-    Provider.of<RentModel>(context, listen: false).getListRent(
-        Provider.of<UserModel>(context, listen: false).userCurrent!.id);
+    Provider.of<RentViewModel>(context, listen: false).getListRent(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id);
   }
 
   @override
@@ -67,7 +67,7 @@ class _RentHistoryState extends State<RentHistory> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer<RentModel>(
+    return Consumer<RentViewModel>(
         builder: (context, rentProvider, child) => Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),

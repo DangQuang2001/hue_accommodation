@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/comment_repository.dart';
+import 'package:hue_accommodation/repository/comment_repository.dart';
 
-class CommentModel extends ChangeNotifier {
+class CommentViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> listComment = [];
   List<Map<String, dynamic>> listReply = [];
 

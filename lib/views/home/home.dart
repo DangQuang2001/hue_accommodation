@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/utils/payment.dart';
@@ -20,7 +20,7 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/chat_model.dart';
+import '../../view_models/chat_view_model.dart';
 
 mixin AppCloser {
   void closeApp() {
@@ -52,9 +52,9 @@ class _HomePageState extends State<HomePage> with AppCloser {
   initState() {
     super.initState();
     // Add listeners to this class
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
-    var chatProvider = Provider.of<ChatModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print(message.data['category']);
       if(message.data['category']=='3'){
@@ -103,7 +103,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => WillPopScope(
         onWillPop: () async {
           closeApp();
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
   }
 
   Widget header(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Stack(children: [
         Stack(children: [
           Container(
@@ -387,7 +387,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
   }
 
   Widget body(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 20, right: 20),
         child: SizedBox(
@@ -433,7 +433,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 buttonLinkSmall(
                                     context,
@@ -456,7 +456,7 @@ class _HomePageState extends State<HomePage> with AppCloser {
                             ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 buttonLinkSmall(
                                     context,
@@ -541,8 +541,8 @@ class _HomePageState extends State<HomePage> with AppCloser {
                   buttonLinkSmall(
                     context,
                     "https://cdn-icons-png.flaticon.com/512/4168/4168988.png",
-                    "User",
-                    RouteName.interactManage,
+                      S.of(context).home_page_user,
+                    RouteName.userManage,
                     400,
                     false),
                 buttonLinkSmall(

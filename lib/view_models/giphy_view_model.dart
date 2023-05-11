@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/giphy_repository.dart';
+import 'package:hue_accommodation/repository/giphy_repository.dart';
 
-class GiphyModel extends ChangeNotifier {
+class GiphyViewModel extends ChangeNotifier {
   List<dynamic> listCategories = [];
   List<dynamic> listTrending = [];
   Future getCategories() async {

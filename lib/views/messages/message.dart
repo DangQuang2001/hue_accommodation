@@ -1,8 +1,9 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
@@ -23,8 +24,8 @@ class _MessagePageState extends State<MessagePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var chatProvider = Provider.of<ChatModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       chatProvider.getRoomChat(userProvider.userCurrent!.id);
     });
@@ -53,9 +54,12 @@ class _MessagePageState extends State<MessagePage> {
         children: [
           Hero(
             tag: "Messages",
-            child: Text(
-              S.of(context).message_title,
-              style: Theme.of(context).textTheme.headlineLarge,
+            child: SlideInRight(
+              duration: const Duration(milliseconds: 400),
+              child: Text(
+                S.of(context).message_title,
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
           ),
           Padding(
@@ -72,36 +76,39 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget search(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
-      child: SizedBox(
-        height: 50,
-        child: TextField(
-          cursorColor: Colors.grey,
-          decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.search_sharp,
-                color: Theme.of(context).iconTheme.color,
-              ),
-              filled: true,
-              fillColor: Theme.of(context).hintColor,
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide.none, //<-- SEE HERE
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              hintText: S.of(context).message_search,
-              hintStyle: Theme.of(context).textTheme.headlineSmall),
+    return SlideInRight(
+      duration: const Duration(milliseconds: 450),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20.0, right: 20, top: 10),
+        child: SizedBox(
+          height: 50,
+          child: TextField(
+            cursorColor: Colors.grey,
+            decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.search_sharp,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+                filled: true,
+                fillColor: Theme.of(context).hintColor,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none, //<-- SEE HERE
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(50.0),
+                ),
+                hintText: S.of(context).message_search,
+                hintStyle: Theme.of(context).textTheme.headlineSmall),
+          ),
         ),
       ),
     );
   }
 
   Widget content(BuildContext context) {
-    return Consumer2<UserModel, ChatModel>(
+    return Consumer2<UserViewModel, ChatViewModel>(
       builder: (context, userProvider, chatProvider, child) => Expanded(
         child: userProvider.userCurrent == null
             ? Padding(
@@ -119,7 +126,8 @@ class _MessagePageState extends State<MessagePage> {
                 : ListView(
                     children: [
                       ...chatProvider.listRoomChat
-                          .map((e) => message(context, e))
+                          .map((e) => SlideInRight(
+                          duration: const Duration(milliseconds: 500),child: message(context, e)))
                     ],
                   ),
       ),
@@ -127,7 +135,7 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget message(BuildContext context, Map<String, dynamic> roomChat) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => GestureDetector(
         onTap: () => Navigator.push(
             context,

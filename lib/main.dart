@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hue_accommodation/config/routes/routes.dart';
@@ -9,9 +10,9 @@ import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/view_models/appLifeCycle.dart';
 import 'package:hue_accommodation/view_models/check_and_update_fcmToken.dart';
 import 'package:hue_accommodation/view_models/check_login_user.dart';
-import 'package:hue_accommodation/view_models/language_model.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/theme_model.dart';
+import 'package:hue_accommodation/view_models/language_view_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/theme_view_model.dart';
 import 'package:provider/provider.dart';
 import 'config/provider/provider_manager.dart';
 import 'generated/l10n.dart';
@@ -22,7 +23,7 @@ void main() async {
   await Firebase.initializeApp();
   await NotificationController.initializeLocalNotifications(debug: true);
   await NotificationController.initializeRemoteNotifications(debug: true);
-
+  await FirebaseMessaging.instance.subscribeToTopic("quangdeptrai");
   runApp(const MyApp());
 }
 
@@ -34,9 +35,9 @@ class MyApp extends StatelessWidget {
     String initialRoute = RouteName.home;
     return MultiProvider(
       providers: providers,
-      child: Consumer3<LanguageModel, ThemeModel, AppLifecycleStateNotifier>(
+      child: Consumer3<LanguageViewModel, ThemeViewModel, AppLifecycleStateNotifier>(
           builder: (context, languageProvider, themeObj, lifecycle, child) {
-        var roomModel = Provider.of<RoomModel>(context, listen: false);
+        var roomModel = Provider.of<RoomViewModel>(context, listen: false);
 
         Connectivity().checkConnectivity().then((connectivityResult) {
           if (connectivityResult == ConnectivityResult.mobile ||

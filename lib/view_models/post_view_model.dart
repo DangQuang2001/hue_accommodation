@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/models/post.dart';
-import 'package:hue_accommodation/services/post_repository.dart';
+import 'package:hue_accommodation/repository/post_repository.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-class PostModel extends ChangeNotifier {
+class PostViewModel extends ChangeNotifier {
   List<Post> listAllPost = [];
   List<Post> listRoommate = [];
   List<Post> listTransfer = [];

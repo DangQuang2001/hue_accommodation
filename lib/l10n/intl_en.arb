@@ -14,6 +14,12 @@
   "home_page_rent": "Rent",
   "home_page_statistical": "Statistical",
   "home_page_qrcode": "QR Code",
+  "home_page_nearby": "Nearby",
+  "home_page_feature": "Feature",
+  "home_page_see_all": "See all",
+  "home_page_reservation": "Reservation",
+  "home_page_transport": "Transport",
+  "home_page_user": "User",
 
 
   "message_title": "Messages",

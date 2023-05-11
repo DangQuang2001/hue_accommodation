@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:provider/provider.dart';
-import '../../view_models/room_model.dart';
+import '../../view_models/room_view_model.dart';
 
 class RemoveRoomPage extends StatefulWidget {
   const RemoveRoomPage({Key? key}) : super(key: key);
@@ -62,8 +62,8 @@ class _RemoveRoomPageState extends State<RemoveRoomPage> {
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.only(left: 20.0, right: 20),
-      child: Consumer<UserModel>(
-        builder: (context, userProvider, child) =>  Consumer<RoomModel>(
+      child: Consumer<UserViewModel>(
+        builder: (context, userProvider, child) =>  Consumer<RoomViewModel>(
           builder: (context, value, child) => ListView.builder(
             shrinkWrap: true,
             itemCount: value.listRemove.length,
@@ -245,7 +245,7 @@ class _RemoveRoomPageState extends State<RemoveRoomPage> {
                     const SizedBox(
                       width: 20,
                     ),
-                    Consumer<RoomModel>(
+                    Consumer<RoomViewModel>(
                       builder: (context, value, child) => InkWell(
                         onTap: ()async {
                           await value.deleteRoom(id);

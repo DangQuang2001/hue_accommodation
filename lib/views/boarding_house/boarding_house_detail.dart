@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/google_map_model.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/google_map_view_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/rent_now.dart';
 import 'package:hue_accommodation/views/extension/navigation_map.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -18,7 +19,7 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/favourite_model.dart';
+import '../../view_models/favourite_view_model.dart';
 
 class BoardingHouseDetail extends StatefulWidget {
   final Room motel;
@@ -39,13 +40,13 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   void initState() {
     super.initState();
     var favouriteProvider =
-        Provider.of<FavouriteModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+        Provider.of<FavouriteViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
     var googleMapProvider =
-        Provider.of<GoogleMapModel>(context, listen: false);
+        Provider.of<GoogleMapViewModel>(context, listen: false);
     if (userProvider.userCurrent != null) {
       favouriteProvider.checkFavourite(widget.motel.roomId,
-          Provider.of<UserModel>(context, listen: false).userCurrent!.id);
+          Provider.of<UserViewModel>(context, listen: false).userCurrent!.id);
       isCheckFavourite = favouriteProvider.isCheckFavourite;
     }
     googleMapProvider.getMarker(_controller, LatLng(widget.motel.latitude, widget.motel.longitude));
@@ -61,7 +62,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
-        Consumer3<UserModel, ChatModel, FavouriteModel>(
+        Consumer3<UserViewModel, ChatViewModel, FavouriteViewModel>(
           builder:
               (context, userProvider, chatProvider, favouriteProvider, child) =>
                   NestedScrollView(
@@ -401,6 +402,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
                           imageUrl:
                           widget.motel.image,
                           fit: BoxFit.cover,
+                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                         ),
                       ),
                     ),
@@ -451,59 +453,63 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
               onTap: () {
                 _dialogBuilder(context, widget.motel.images);
               },
-              child: Container(
-                margin: widget.motel.images.length < 4
-                    ? const EdgeInsets.only(right: 10)
-                    : const EdgeInsets.only(right: 0),
-                width: 85,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ThemeMode == ThemeMode.light
-                          ? Colors.grey.withOpacity(0.5)
-                          : Colors.transparent,
-                      spreadRadius: 0,
-                      blurRadius: 2,
-                      offset: const Offset(2, 3), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Stack(alignment: Alignment.center, children: [
-                    CachedNetworkImage(
-                      imageUrl:
-                      widget.motel.images[index],
-                      width: 223,
-                      height: 210,
-                      fit: BoxFit.cover,
-                      errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        color: (widget.motel.images.length > 4 && index == 3)
-                            ? Colors.black.withOpacity(0.4)
+              child: SlideInRight(
+                  duration: Duration(milliseconds:100*index),
+                delay: const Duration(milliseconds: 200),
+                child: Container(
+                  margin: widget.motel.images.length < 4
+                      ? const EdgeInsets.only(right: 10)
+                      : const EdgeInsets.only(right: 0),
+                  width: 85,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ThemeMode == ThemeMode.light
+                            ? Colors.grey.withOpacity(0.5)
                             : Colors.transparent,
+                        spreadRadius: 0,
+                        blurRadius: 2,
+                        offset: const Offset(2, 3), // changes position of shadow
                       ),
-                    ),
-                    Positioned(
-                      child: (widget.motel.images.length > 4 && index == 3)
-                          ? Text(
-                              "${widget.motel.images.length - 4}+",
-                              style: GoogleFonts.readexPro(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500),
-                            )
-                          : const Text(''),
-                    )
-                  ]),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Stack(alignment: Alignment.center, children: [
+                      CachedNetworkImage(
+                        imageUrl:
+                        widget.motel.images[index],
+                        width: 223,
+                        height: 210,
+                        fit: BoxFit.cover,
+                        errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          color: (widget.motel.images.length > 4 && index == 3)
+                              ? Colors.black.withOpacity(0.4)
+                              : Colors.transparent,
+                        ),
+                      ),
+                      Positioned(
+                        child: (widget.motel.images.length > 4 && index == 3)
+                            ? Text(
+                                "${widget.motel.images.length - 4}+",
+                                style: GoogleFonts.readexPro(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500),
+                              )
+                            : const Text(''),
+                      )
+                    ]),
+                  ),
                 ),
               ),
             );
@@ -522,68 +528,83 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.bed_outlined,
-                    size: 25,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    '2 ${S.of(context).boardinghouse_detail_bed}',
-                    style: Theme.of(context).textTheme.displayMedium,
-                  )
-                ],
+              SlideInRight(
+                duration: const Duration(milliseconds: 300),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.bed_outlined,
+                      size: 25,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      '2 ${S.of(context).boardinghouse_detail_bed}',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    )
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  const Icon(Icons.bathtub_outlined, size: 25),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    '1 ${S.of(context).boardinghouse_detail_bath}',
-                    style: Theme.of(context).textTheme.displayMedium,
-                  )
-                ],
+              SlideInRight(
+                duration: const Duration(milliseconds: 350),
+                child: Row(
+                  children: [
+                    const Icon(Icons.bathtub_outlined, size: 25),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      '1 ${S.of(context).boardinghouse_detail_bath}',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    )
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  const Icon(Icons.area_chart_outlined, size: 25),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    widget.motel.adParams['size']['value'].toString(),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  )
-                ],
+              SlideInRight(
+                duration: const Duration(milliseconds: 400),
+                child: Row(
+                  children: [
+                    const Icon(Icons.area_chart_outlined, size: 25),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      widget.motel.adParams['size']['value'].toString(),
+                      style: Theme.of(context).textTheme.displayMedium,
+                    )
+                  ],
+                ),
               )
             ],
           ),
           const SizedBox(
             height: 20,
           ),
-          Text(
-            S.of(context).boardinghouse_detail_description,
-            style: Theme.of(context).textTheme.displayLarge,
+          SlideInRight(
+            duration: const Duration(milliseconds: 400),
+            child: Text(
+              S.of(context).boardinghouse_detail_description,
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15.0, left: 10),
-            child: Opacity(
-              opacity: 0.8,
-              child: ExpandableText(
-                widget.motel.description,
-                expandText: 'More',
-                expandOnTextTap: true,
-                maxLines: 5,
-                animation: true,
-                animationDuration: const Duration(milliseconds: 1000),
-                linkColor: Colors.blue,
-                collapseOnTextTap: true,
-                style: Theme.of(context).textTheme.displaySmall,
+          SlideInRight(
+            duration: const Duration(milliseconds: 500),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 15.0, left: 10),
+              child: Opacity(
+                opacity: 0.8,
+                child: ExpandableText(
+                  widget.motel.description,
+                  expandText: 'More',
+                  expandOnTextTap: true,
+                  maxLines: 5,
+                  animation: true,
+                  animationDuration: const Duration(milliseconds: 1000),
+                  linkColor: Colors.blue,
+                  collapseOnTextTap: true,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
               ),
             ),
           ),
@@ -596,7 +617,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget map(BuildContext context) {
-    return Consumer<GoogleMapModel>(
+    return Consumer<GoogleMapViewModel>(
       builder: (context, googleMapProvider, child) => Padding(
         padding: const EdgeInsets.only(bottom: 10.0),
         child: SizedBox(
@@ -673,7 +694,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget bottomBar(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Positioned(
         bottom: 0,
         child: Container(
@@ -841,7 +862,7 @@ class _BoardingHouseDetailState extends State<BoardingHouseDetail> {
   }
 
   Widget review(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => FutureBuilder(
         future: roomProvider.getReview(widget.motel.roomId),
         builder: (context, snapshot) {

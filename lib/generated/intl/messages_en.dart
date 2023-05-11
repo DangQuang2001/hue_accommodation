@@ -111,21 +111,29 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Type your title..."),
         "home_page_extension":
             MessageLookupByLibrary.simpleMessage("Extension"),
+        "home_page_feature": MessageLookupByLibrary.simpleMessage("Feature"),
         "home_page_forum": MessageLookupByLibrary.simpleMessage("Forum"),
         "home_page_hospital": MessageLookupByLibrary.simpleMessage("Hospital"),
         "home_page_household_goods":
             MessageLookupByLibrary.simpleMessage("Household Goods"),
         "home_page_manage": MessageLookupByLibrary.simpleMessage("Manage"),
         "home_page_motel": MessageLookupByLibrary.simpleMessage("Motel House"),
+        "home_page_nearby": MessageLookupByLibrary.simpleMessage("Nearby"),
         "home_page_qrcode": MessageLookupByLibrary.simpleMessage("QR Code"),
         "home_page_rent": MessageLookupByLibrary.simpleMessage("Rent"),
+        "home_page_reservation":
+            MessageLookupByLibrary.simpleMessage("Reservation"),
         "home_page_room": MessageLookupByLibrary.simpleMessage("Room"),
+        "home_page_see_all": MessageLookupByLibrary.simpleMessage("See all"),
         "home_page_statistical":
             MessageLookupByLibrary.simpleMessage("Statistical"),
         "home_page_super_market":
             MessageLookupByLibrary.simpleMessage("SuperMarket"),
         "home_page_title": MessageLookupByLibrary.simpleMessage(
             "Welcome to Hue Accommodation"),
+        "home_page_transport":
+            MessageLookupByLibrary.simpleMessage("Transport"),
+        "home_page_user": MessageLookupByLibrary.simpleMessage("User"),
         "language": MessageLookupByLibrary.simpleMessage("English"),
         "manage_day_rent": MessageLookupByLibrary.simpleMessage("days rental"),
         "manage_rent_UnConfirmed":

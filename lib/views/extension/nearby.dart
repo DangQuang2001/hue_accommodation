@@ -1,9 +1,10 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/google_map_model.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/google_map_view_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class _NearByLocationState extends State<NearByLocation> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
     roomProvider.getListNearbyLimit(null, 5000, 5, 0);
   }
 
@@ -46,23 +47,29 @@ class _NearByLocationState extends State<NearByLocation> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(),
-              child: const Center(
-                child: Icon(
-                  Icons.arrow_back_outlined,
-                  size: 30,
+          SlideInRight(
+            duration: const Duration(milliseconds: 300),
+            child: InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(),
+                child: const Center(
+                  child: Icon(
+                    Icons.arrow_back_outlined,
+                    size: 30,
+                  ),
                 ),
               ),
             ),
           ),
-          Text(
-            '     Nearby    ',
-            style: Theme.of(context).textTheme.headlineLarge,
+          SlideInRight(
+            duration: const Duration(milliseconds: 400),
+            child: Text(
+              '     Nearby    ',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
           ),
           const SizedBox(
             width: 30,
@@ -78,7 +85,7 @@ class _NearByLocationState extends State<NearByLocation> {
       {"index": 2, "title": "Near School"},
       {"index": 3, "title": "In District"},
     ];
-    return Consumer2<RoomModel, GoogleMapModel>(
+    return Consumer2<RoomViewModel, GoogleMapViewModel>(
       builder: (context, roomProvider, googleMapProvider, child) => SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 60,
@@ -113,36 +120,39 @@ class _NearByLocationState extends State<NearByLocation> {
                             });
                       }
                     },
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 20, top: 0),
-                      padding: const EdgeInsets.only(
-                          top: 5, bottom: 5, left: 10, right: 10),
-                      decoration: BoxDecoration(
-                          color: chooseIndex == e['index']
-                              ? Colors.blue
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 0,
-                                blurRadius: 3,
-                                offset: const Offset(2, 3))
-                          ]),
-                      child: Row(
-                        children: [
-                          Text(e['title'],
-                              style: GoogleFonts.readexPro(
-                                  color: chooseIndex == e['index']
-                                      ? Colors.white
-                                      : Colors.blue,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 16)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.arrow_drop_down)
-                        ],
+                    child: SlideInRight(
+                      duration:  const Duration(milliseconds: 300),
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 20, top: 0),
+                        padding: const EdgeInsets.only(
+                            top: 5, bottom: 5, left: 10, right: 10),
+                        decoration: BoxDecoration(
+                            color: chooseIndex == e['index']
+                                ? Colors.blue
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 0,
+                                  blurRadius: 3,
+                                  offset: const Offset(2, 3))
+                            ]),
+                        child: Row(
+                          children: [
+                            Text(e['title'],
+                                style: GoogleFonts.readexPro(
+                                    color: chooseIndex == e['index']
+                                        ? Colors.white
+                                        : Colors.blue,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16)),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            const Icon(Icons.arrow_drop_down)
+                          ],
+                        ),
                       ),
                     ),
                   ))
@@ -154,7 +164,7 @@ class _NearByLocationState extends State<NearByLocation> {
   }
 
   Widget chooseDistricts(BuildContext context) {
-    return Consumer2<RoomModel, GoogleMapModel>(
+    return Consumer2<RoomViewModel, GoogleMapViewModel>(
       builder: (context, roomProvider, googleMapProvider, child) =>
           FractionallySizedBox(
         heightFactor: 0.9,
@@ -293,7 +303,7 @@ class _NearByLocationState extends State<NearByLocation> {
       },
     ];
 
-    return Consumer2<RoomModel, GoogleMapModel>(
+    return Consumer2<RoomViewModel, GoogleMapViewModel>(
       builder: (context, roomProvider, googleMapProvider, child) =>
           FractionallySizedBox(
         heightFactor: 0.9,
@@ -384,7 +394,7 @@ class _NearByLocationState extends State<NearByLocation> {
   }
 
   Widget content(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => Expanded(
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20),
@@ -394,87 +404,90 @@ class _NearByLocationState extends State<NearByLocation> {
               onTap: () => Navigator.of(context).push(slideRightToLeft(
                   BoardingHouseDetail(
                       motel: roomProvider.listNearbyChoose[index]))),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 20, right: 5),
-                width: MediaQuery.of(context).size.width,
-                height: 150,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onBackground,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 2,
-                          offset: const Offset(2, 3))
-                    ]),
-                child: Flex(
-                  direction: Axis.horizontal,
-                  children: [
-                    Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              imageUrl:
-                                  roomProvider.listNearbyChoose[index].image,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
+              child: SlideInRight(
+                duration:   Duration(milliseconds: 100*(index+1)),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 20, right: 5),
+                  width: MediaQuery.of(context).size.width,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onBackground,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 2,
+                            offset: const Offset(2, 3))
+                      ]),
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    roomProvider.listNearbyChoose[index].image,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                        )),
-                    Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                roomProvider.listNearbyChoose[index].name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style:
-                                    Theme.of(context).textTheme.displayMedium,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  roomProvider.listNearbyChoose[index]
-                                      .adParams['address']['value'],
+                          )),
+                      Expanded(
+                          flex: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  roomProvider.listNearbyChoose[index].name,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.justify,
+                                  style:
+                                      Theme.of(context).textTheme.displayMedium,
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.social_distance_outlined,
-                                    color: Colors.blue,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    roomProvider.listNearbyChoose[index]
+                                        .adParams['address']['value'],
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.justify,
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    "${(roomProvider.listNearbyChoose[index].distance! / 1000).toStringAsFixed(2)} km",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displayMedium,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ))
-                  ],
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.social_distance_outlined,
+                                      color: Colors.blue,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "${(roomProvider.listNearbyChoose[index].distance! / 1000).toStringAsFixed(2)} km",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displayMedium,
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ))
+                    ],
+                  ),
                 ),
               ),
             ),

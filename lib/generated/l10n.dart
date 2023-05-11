@@ -180,6 +180,66 @@ class S {
     );
   }
 
+  /// `Nearby`
+  String get home_page_nearby {
+    return Intl.message(
+      'Nearby',
+      name: 'home_page_nearby',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Feature`
+  String get home_page_feature {
+    return Intl.message(
+      'Feature',
+      name: 'home_page_feature',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `See all`
+  String get home_page_see_all {
+    return Intl.message(
+      'See all',
+      name: 'home_page_see_all',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reservation`
+  String get home_page_reservation {
+    return Intl.message(
+      'Reservation',
+      name: 'home_page_reservation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transport`
+  String get home_page_transport {
+    return Intl.message(
+      'Transport',
+      name: 'home_page_transport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User`
+  String get home_page_user {
+    return Intl.message(
+      'User',
+      name: 'home_page_user',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Messages`
   String get message_title {
     return Intl.message(

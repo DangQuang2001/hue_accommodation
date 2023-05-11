@@ -1,22 +1,22 @@
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/comment_model.dart';
-import 'package:hue_accommodation/view_models/favourite_model.dart';
-import 'package:hue_accommodation/view_models/google_map_model.dart';
-import 'package:hue_accommodation/view_models/language_model.dart';
-import 'package:hue_accommodation/view_models/notification_model.dart';
-import 'package:hue_accommodation/view_models/fcmToken_model.dart';
-import 'package:hue_accommodation/view_models/post_model.dart';
-import 'package:hue_accommodation/view_models/rent_model.dart';
-import 'package:hue_accommodation/view_models/weather_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/comment_view_model.dart';
+import 'package:hue_accommodation/view_models/favourite_view_model.dart';
+import 'package:hue_accommodation/view_models/google_map_view_model.dart';
+import 'package:hue_accommodation/view_models/language_view_model.dart';
+import 'package:hue_accommodation/view_models/notification_view_model.dart';
+import 'package:hue_accommodation/view_models/fcmToken_view_model.dart';
+import 'package:hue_accommodation/view_models/post_view_model.dart';
+import 'package:hue_accommodation/view_models/rent_view_model.dart';
+import 'package:hue_accommodation/view_models/weather_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../../view_models/appLifeCycle.dart';
-import '../../view_models/giphy_model.dart';
-import '../../view_models/room_model.dart';
-import '../../view_models/theme_model.dart';
-import '../../view_models/user_model.dart';
+import '../../view_models/giphy_view_model.dart';
+import '../../view_models/room_view_model.dart';
+import '../../view_models/theme_view_model.dart';
+import '../../view_models/user_view_model.dart';
 
 List<SingleChildWidget> providers = [
   ...independentServices,
@@ -26,47 +26,47 @@ List<SingleChildWidget> providers = [
 
 /// 独立的model
 List<SingleChildWidget> independentServices = [
-  ChangeNotifierProvider<ThemeModel>(
-    create: (context) => ThemeModel(),
+  ChangeNotifierProvider<ThemeViewModel>(
+    create: (context) => ThemeViewModel(),
   ),
-  ChangeNotifierProvider<RoomModel>(
-    create: (context) => RoomModel(),
+  ChangeNotifierProvider<RoomViewModel>(
+    create: (context) => RoomViewModel(),
   ),
-  ChangeNotifierProvider<UserModel>(
-    create: (context) => UserModel(),
+  ChangeNotifierProvider<UserViewModel>(
+    create: (context) => UserViewModel(),
   ),
-  ChangeNotifierProvider<RentModel>(
-    create: (context) => RentModel(),
+  ChangeNotifierProvider<RentViewModel>(
+    create: (context) => RentViewModel(),
   ),
-  ChangeNotifierProvider<FcmTokenModel>(
-    create: (context) => FcmTokenModel(),
+  ChangeNotifierProvider<FcmTokenViewModel>(
+    create: (context) => FcmTokenViewModel(),
   ),
-  ChangeNotifierProvider<NotificationModel>(
-    create: (context) => NotificationModel(),
+  ChangeNotifierProvider<NotificationViewModel>(
+    create: (context) => NotificationViewModel(),
   ),
-  ChangeNotifierProvider<PostModel>(
-    create: (context) => PostModel(),
+  ChangeNotifierProvider<PostViewModel>(
+    create: (context) => PostViewModel(),
   ),
-  ChangeNotifierProvider<ChatModel>(
-    create: (context) => ChatModel(),
+  ChangeNotifierProvider<ChatViewModel>(
+    create: (context) => ChatViewModel(),
   ),
-  ChangeNotifierProvider<CommentModel>(
-    create: (context) => CommentModel(),
+  ChangeNotifierProvider<CommentViewModel>(
+    create: (context) => CommentViewModel(),
   ),
-  ChangeNotifierProvider<FavouriteModel>(
-    create: (context) => FavouriteModel(),
+  ChangeNotifierProvider<FavouriteViewModel>(
+    create: (context) => FavouriteViewModel(),
   ),
-  ChangeNotifierProvider<LanguageModel>(
-    create: (context) => LanguageModel(),
+  ChangeNotifierProvider<LanguageViewModel>(
+    create: (context) => LanguageViewModel(),
   ),
-  ChangeNotifierProvider<GoogleMapModel>(
-    create: (context) => GoogleMapModel(),
+  ChangeNotifierProvider<GoogleMapViewModel>(
+    create: (context) => GoogleMapViewModel(),
   ),
-  ChangeNotifierProvider<WeatherModel>(
-    create: (context) => WeatherModel(),
+  ChangeNotifierProvider<WeatherViewModel>(
+    create: (context) => WeatherViewModel(),
   ),
-  ChangeNotifierProvider<GiphyModel>(
-    create: (context) => GiphyModel(),
+  ChangeNotifierProvider<GiphyViewModel>(
+    create: (context) => GiphyViewModel(),
   ),
   ChangeNotifierProvider<AppLifecycleStateNotifier>(
     create: (context) => AppLifecycleStateNotifier(),

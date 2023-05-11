@@ -13,7 +13,7 @@ class Weather {
   }
 }
 
-class WeatherModel extends ChangeNotifier {
+class WeatherViewModel extends ChangeNotifier {
   bool isloading = true;
 
   Weather currentweather = Weather(weather: [

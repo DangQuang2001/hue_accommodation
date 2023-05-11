@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/fcm_token_repository.dart';
+import 'package:hue_accommodation/repository/fcm_token_repository.dart';
 
-class FcmTokenModel extends ChangeNotifier {
+class FcmTokenViewModel extends ChangeNotifier {
   bool isCheckDevice = false;
   bool isCheckUser = false;
   Future<bool> isCheckUserToken(String userID, String fcmToken) async {

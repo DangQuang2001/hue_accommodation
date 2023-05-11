@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../constants/route_name.dart';
 import '../../generated/l10n.dart';
-import '../../view_models/room_model.dart';
+import '../../view_models/room_view_model.dart';
 import '../boarding_house/boarding_house_detail.dart';
 import '../components/slide_route.dart';
 
@@ -22,13 +22,13 @@ class _NearByState extends State<NearBy> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
     roomProvider.getListNearby(null, 5000, 5, 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => roomProvider.listNearby.isEmpty
           ? const Text('')
           : Column(
@@ -43,19 +43,24 @@ class _NearByState extends State<NearBy> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Nearby",
-                          style: Theme.of(context).textTheme.displayLarge,
+                        SlideInRight(
+                          duration: const Duration(milliseconds: 400),
+                          child: Text(
+                            S.of(context).home_page_nearby,
+                            style: Theme.of(context).textTheme.displayLarge,
+                          ),
+                        ),SlideInRight(
+                          duration: const Duration(milliseconds: 450),
+                          child: TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, RouteName.nearby);
+                              },
+                              child: Text(
+                                S.of(context).home_page_see_all,
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 15, color: Colors.blue),
+                              )),
                         ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, RouteName.nearby);
-                            },
-                            child: Text(
-                              "See all",
-                              style: GoogleFonts.readexPro(
-                                  fontSize: 15, color: Colors.blue),
-                            )),
                       ],
                     ),
                   ),
@@ -95,6 +100,8 @@ class _NearByState extends State<NearBy> {
                                         width: double.infinity,
                                         height: 140,
                                         fit: BoxFit.cover,
+
+                                          errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
                                       ),
                                     ),
                                     Positioned(

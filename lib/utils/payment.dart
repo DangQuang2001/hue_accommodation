@@ -3,18 +3,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:hue_accommodation/view_models/rent_view_model.dart';
 
 
 class Payment {
 
   Map<String, dynamic>? paymentIntent;
 
-  Future<void> makePayment(BuildContext context) async {
+  Future<void> makePayment(BuildContext context,RentViewModel rentViewModel,String rentId,double totalPrice,String userId) async {
     try {
-      paymentIntent = await createPaymentIntent('10', 'USD');
+      print(totalPrice);
+      paymentIntent = await createPaymentIntent((totalPrice/23).toStringAsFixed(0), 'USD');
       //Payment Sheet
       await Stripe.instance.initPaymentSheet(
+
           paymentSheetParameters: SetupPaymentSheetParameters(
+
               paymentIntentClientSecret: paymentIntent!['client_secret'],
               // applePay: const PaymentSheetApplePay(merchantCountryCode: '+92',),
               // googlePay: const PaymentSheetGooglePay(testEnv: true, currencyCode: "US", merchantCountryCode: "+92"),
@@ -25,16 +29,17 @@ class Payment {
 
       ///now finally display payment sheeet
       // ignore: use_build_context_synchronously
-      displayPaymentSheet(context);
+      displayPaymentSheet(context,rentViewModel,rentId,totalPrice,userId);
     } catch (e, s) {
       debugPrint('exception:$e$s');
     }
   }
 
-  displayPaymentSheet(BuildContext context) async {
+  displayPaymentSheet(BuildContext context,RentViewModel rentViewModel,String rentId,double totalPrice,String userId) async {
     try {
       await Stripe.instance.presentPaymentSheet(
       ).then((value){
+
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -51,7 +56,7 @@ class Payment {
               ),
             ));
         // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("paid successfully")));
-
+        rentViewModel.createPayment(rentId, totalPrice, 0, paymentIntent!['id'], userId);
         paymentIntent = null;
 
       }).onError((error, stackTrace){

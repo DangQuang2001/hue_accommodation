@@ -15,10 +15,10 @@ import 'dart:ui' as ui;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../models/review.dart';
-import '../services/provinces_repository.dart';
-import '../services/room_repository.dart';
+import '../repository/provinces_repository.dart';
+import '../repository/room_repository.dart';
 
-class RoomModel extends ChangeNotifier {
+class RoomViewModel extends ChangeNotifier {
   bool isLoadMoreRunning = false;
   bool isLoadMoreRunningFilter = false;
   List<Room> listRoom = [];

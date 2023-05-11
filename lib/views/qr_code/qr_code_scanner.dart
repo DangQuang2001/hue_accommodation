@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:hue_accommodation/views/qr_code/review_room.dart';
@@ -164,7 +164,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return Consumer2<RoomModel, UserModel>(
+        return Consumer2<RoomViewModel, UserViewModel>(
           builder: (context, roomProvider, userProvider, child) => AlertDialog(
               title: Center(
                   child: Text(

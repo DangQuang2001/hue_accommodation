@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -19,8 +19,8 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/chat_model.dart';
-import '../../view_models/weather_model.dart';
+import '../../view_models/chat_view_model.dart';
+import '../../view_models/weather_view_model.dart';
 import 'near_by.dart';
 
 mixin AppCloser {
@@ -53,10 +53,10 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   initState() {
     super.initState();
     // Add listeners to this class
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
-    var chatProvider = Provider.of<ChatModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
-    var weatherProvider = Provider.of<WeatherModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
+    var weatherProvider = Provider.of<WeatherViewModel>(context, listen: false);
     weatherProvider.getWeather();
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print(message.data['category']);
@@ -110,7 +110,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => WillPopScope(
         onWillPop: () async {
           closeApp();
@@ -143,7 +143,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget header(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Stack(children: [
         Stack(children: [
           Container(
@@ -366,7 +366,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                       ),
                       Padding(
                           padding: const EdgeInsets.only(left: 20.0),
-                          child: Consumer<WeatherModel>(
+                          child: Consumer<WeatherViewModel>(
                               builder: (context, value, child) => Padding(
                                     padding: const EdgeInsets.only(left: 20.0),
                                     child: Row(
@@ -421,7 +421,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget body(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 10, right: 20),
         child: SizedBox(
@@ -628,7 +628,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
             delay: const Duration(milliseconds: 200),
             duration: const Duration(milliseconds: 200),
             child: Text(
-              "Feature",
+              S.of(context).home_page_feature,
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
@@ -645,15 +645,15 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/9156/9156007.png",
-                        "Reservation",
+                        S.of(context).home_page_reservation,
                         RouteName.myActivity,
                         true,
                         400),
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/411/411712.png",
-                        "Transpot",
-                        RouteName.transpot,
+                        S.of(context).home_page_transport,
+                        RouteName.transport,
                         true,
                         400),
                   ],

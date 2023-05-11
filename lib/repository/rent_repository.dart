@@ -38,6 +38,7 @@ class RentRepository{
           "numberPeople": numberPeople,
           "note": notes,
           "isConfirmed": 0,
+          "isPay":false
         }));
     if (response.statusCode == 200) {
       createNotification(userID,"đã đăng ký thuê phòng!", 1, hostID, "");
@@ -146,6 +147,7 @@ class RentRepository{
     final response = await http.get(Uri.parse('$url/api/rent/rentuser/$userId'));
     var jsonObject = jsonDecode(response.body);
     var listObject = jsonObject as List;
+
     return listObject.map((e) => Rent.fromJson(e)).toList();
 
   }
@@ -166,6 +168,33 @@ class RentRepository{
           "readBy": [],
           "isDelete": [],
           "dataId":dataId
+        }));
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+    if (response.statusCode == 403) {
+      debugPrint('Có gì đó sai sai!');
+      return false;
+    }
+    return false;
+  }
+
+  static Future<bool> createPayment(String rentId,double totalPrice, double transitionFee,String description) async {
+    final response = await http.post(Uri.parse('$url/api/rent/payment'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, dynamic>{
+          "payment":{
+            "countryCode":84,
+            "postalCode":	49000,
+            "totalPrice":totalPrice,
+            "transitionFee":transitionFee,
+            "status":"Succeeded",
+            "description":description
+          },
+          "rentId":rentId
         }));
 
     if (response.statusCode == 200) {
