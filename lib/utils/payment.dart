@@ -35,6 +35,7 @@ class Payment {
     try {
       await Stripe.instance.presentPaymentSheet(
       ).then((value){
+        
         showDialog(
             context: context,
             builder: (_) => AlertDialog(

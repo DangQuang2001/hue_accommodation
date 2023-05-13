@@ -19,6 +19,8 @@ class Room {
   DateTime createAt;
   String roomId;
   double? distance;
+  int isConfirmed;
+  String? note;
 
   Room(
       {required this.id,
@@ -40,7 +42,10 @@ class Room {
       required this.isDelete,
       required this.createAt,
       required this.roomId,
-      this.distance});
+      this.distance,
+      required this.isConfirmed,
+      this.note
+      });
 
   factory Room.fromJson(Map<String, dynamic> json) {
     return Room(
@@ -63,7 +68,10 @@ class Room {
         isDelete: json['isDelete'],
         createAt: DateTime.parse(json['createdAt']),
         roomId: json['_id'],
-        distance: json['distance'] ?? 0);
+        distance: json['distance'] ?? 0,
+        isConfirmed: json['isConfirmed'],
+        note: json['noteConfirm']
+        );
   }
 
   Map<String, dynamic> toJson() {

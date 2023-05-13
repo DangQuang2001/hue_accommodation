@@ -339,7 +339,7 @@ class _RoomManageState extends State<RoomManage> {
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 15),
                                     width: MediaQuery.of(context).size.width,
-                                    height: 100,
+                                    height: 130,
                                     decoration: BoxDecoration(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -418,8 +418,8 @@ class _RoomManageState extends State<RoomManage> {
                                                 child: CachedNetworkImage(
                                                   imageUrl: snapshot
                                                       .data![index].image,
-                                                  width: 85,
-                                                  height: 85,
+                                                  width: 110,
+                                                  height: 110,
                                                   fit: BoxFit.cover,
                                                 )),
                                             Expanded(
@@ -491,6 +491,27 @@ class _RoomManageState extends State<RoomManage> {
                                                                       .w300,
                                                               color:
                                                                   Colors.grey),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Text(
+                                                      snapshot.data![index]
+                                                              .isConfirmed==0?"Waiting":snapshot.data![index]
+                                                              .isConfirmed==1?"Confirmed":"UnConfirmed",
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style:
+                                                          GoogleFonts.readexPro(
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              color:
+                                                                  snapshot.data![index]
+                                                              .isConfirmed==0?Colors.blueAccent:snapshot.data![index]
+                                                              .isConfirmed==1?Colors.green:Colors.redAccent),
                                                     )
                                                   ],
                                                 ),
