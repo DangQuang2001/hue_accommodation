@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/google_map_model.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/google_map_view_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -61,7 +61,7 @@ class _AddRoomPageState extends State<AddRoomPage>
 
   @override
   Widget build(BuildContext context) {
-    var roomProvider = Provider.of<RoomModel>(context);
+    var roomProvider = Provider.of<RoomViewModel>(context);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -132,7 +132,7 @@ class _AddRoomPageState extends State<AddRoomPage>
               : Container(),
         ]),
       ),
-      floatingActionButton: Consumer2<UserModel, GoogleMapModel>(
+      floatingActionButton: Consumer2<UserViewModel, GoogleMapViewModel>(
         builder: (context, userProvider, googleMapProvider, child) =>
             FloatingActionButton(
           onPressed: () {
@@ -143,7 +143,7 @@ class _AddRoomPageState extends State<AddRoomPage>
                   setState(() {
                     _isLoading = true;
                   });
-
+                  final validation = await roomProvider.getValidation();
                   await roomProvider.uploadImages();
                   final position =
                       await googleMapProvider.getLatLngFromAddress(address);
@@ -160,10 +160,25 @@ class _AddRoomPageState extends State<AddRoomPage>
                       dropdownFurnishingValue,
                       price,
                       dropdownTypeRoomValue,
-                      roomProvider.listImageUrl);
+                      roomProvider.listImageUrl,validation);
                   setState(() {
                     _isLoading = false;
                   });
+                  if(validation==0){
+                    final snackBar = SnackBar(
+                            backgroundColor: Colors.green,
+                            content: const Text('Your room is waiting for approval!'),
+                            action: SnackBarAction(
+                              label: 'Close',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 })();
@@ -291,7 +306,7 @@ class _AddRoomPageState extends State<AddRoomPage>
   }
 
   Widget multiImageUploadScreen(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -547,7 +562,7 @@ class _AddRoomPageState extends State<AddRoomPage>
   }
 
   Widget chooseAddress(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => GestureDetector(
         onTap: () {
           showDistricts = false;
@@ -698,7 +713,7 @@ class _AddRoomPageState extends State<AddRoomPage>
   }
 
   Widget districts(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),
@@ -794,7 +809,7 @@ class _AddRoomPageState extends State<AddRoomPage>
   }
 
   Widget wards(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),
@@ -892,7 +907,7 @@ class _AddRoomPageState extends State<AddRoomPage>
   }
 
   Widget road(BuildContext context) {
-    return Consumer<GoogleMapModel>(
+    return Consumer<GoogleMapViewModel>(
       builder: (context, googleMapProvider, child) => StatefulBuilder(
         builder: (context, setState) => AnimatedPositioned(
           duration: const Duration(milliseconds: 400),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ThemeModel with ChangeNotifier {
+class ThemeViewModel with ChangeNotifier {
    bool _light = true;
   ThemeMode _mode ;
 
   ThemeMode get mode => _mode;
   bool get light => _light;
 
-  ThemeModel({ThemeMode mode = ThemeMode.light}) : _mode = mode;
+  ThemeViewModel({ThemeMode mode = ThemeMode.light}) : _mode = mode;
 
   void setLightMode(){
     _mode = ThemeMode.light;

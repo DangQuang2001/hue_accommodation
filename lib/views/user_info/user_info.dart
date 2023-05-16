@@ -10,12 +10,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/fcmToken_model.dart';
-import 'package:hue_accommodation/view_models/language_model.dart';
-import 'package:hue_accommodation/view_models/notification_model.dart';
-import 'package:hue_accommodation/view_models/theme_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/fcmToken_view_model.dart';
+import 'package:hue_accommodation/view_models/language_view_model.dart';
+import 'package:hue_accommodation/view_models/notification_view_model.dart';
+import 'package:hue_accommodation/view_models/theme_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -49,7 +49,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 40.0, left: 20, right: 20),
         child: Column(
@@ -242,8 +242,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   Widget editing(BuildContext context) {
-    return Consumer5<FcmTokenModel, UserModel, NotificationModel,
-        ChatModel, LanguageModel>(
+    return Consumer5<FcmTokenViewModel, UserViewModel, NotificationViewModel,
+        ChatViewModel, LanguageViewModel>(
       builder: (context, fcmTokenProvider, userProvider, notificationProvider,
               chatProvider, languageProvider, child) =>
           SizedBox(
@@ -481,7 +481,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                               height: 20,
                               child: Transform.scale(
                                 scale: 1.3,
-                                child: Consumer<ThemeModel>(
+                                child: Consumer<ThemeViewModel>(
                                   builder: (context, values, child) => Switch(
                                     // This bool value toggles the switch.
 
@@ -579,7 +579,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   Widget itemNavigator(BuildContext context, IconData icon, String name,
       String page, int duration) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => InkWell(
         onTap: () async{
           var connectivityResult =
@@ -652,7 +652,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return Consumer<UserModel>(
+        return Consumer<UserViewModel>(
           builder: (context, userProvider, child) => StatefulBuilder(
             builder: (context, setState) => AlertDialog(
               title: Row(

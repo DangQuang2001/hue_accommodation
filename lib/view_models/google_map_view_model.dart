@@ -9,9 +9,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hue_accommodation/models/place_auto_complate_response.dart';
 
 import '../models/autocomplate_prediction.dart';
-import '../services/google_map_repository.dart';
+import '../repository/google_map_repository.dart';
 
-class GoogleMapModel extends ChangeNotifier {
+class GoogleMapViewModel extends ChangeNotifier {
   List<AutocompletePrediction> placePredictions = [];
   List<LatLng> polylineCoordinates = [];
   List listPlace = [];

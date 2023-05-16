@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
-import '../services/user_repository.dart';
+import '../repository/user_repository.dart';
 
-class UserModel extends ChangeNotifier {
+class UserViewModel extends ChangeNotifier {
   User? userCurrent;
   int isLogin = 1;
   bool isUpdate = false;

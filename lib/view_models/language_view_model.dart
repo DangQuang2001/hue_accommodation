@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '';
 import '../generated/l10n.dart';
 
-class LanguageModel with ChangeNotifier {
+class LanguageViewModel with ChangeNotifier {
   Locale _locale=const Locale('en', 'US');
 
   Locale get locale => _locale;
@@ -19,7 +19,7 @@ class LanguageModel with ChangeNotifier {
     notifyListeners();
   }
 
-  static LanguageModel of(BuildContext context) {
-    return Provider.of<LanguageModel>(context, listen: false);
+  static LanguageViewModel of(BuildContext context) {
+    return Provider.of<LanguageViewModel>(context, listen: false);
   }
 }

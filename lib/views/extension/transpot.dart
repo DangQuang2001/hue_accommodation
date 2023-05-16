@@ -2,16 +2,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../services/phone_repository.dart';
+import '../../repository/phone_repository.dart';
 
-class TranspotPages extends StatefulWidget {
-  const TranspotPages({super.key});
+class TransportPages extends StatefulWidget {
+  const TransportPages({super.key});
 
   @override
-  State<TranspotPages> createState() => _TranspotPagesState();
+  State<TransportPages> createState() => _TransportPagesState();
 }
 
-class _TranspotPagesState extends State<TranspotPages> {
+class _TransportPagesState extends State<TransportPages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

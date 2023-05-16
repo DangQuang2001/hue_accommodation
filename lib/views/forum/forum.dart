@@ -1,8 +1,9 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/post_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/post_view_model.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/forum/create_post.dart';
 import 'package:hue_accommodation/views/forum/post.dart';
@@ -10,7 +11,7 @@ import 'package:provider/provider.dart';
 
 
 import '../../generated/l10n.dart';
-import '../../view_models/user_model.dart';
+import '../../view_models/user_view_model.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({Key? key}) : super(key: key);
@@ -36,8 +37,8 @@ class _ForumPageState extends State<ForumPage>
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
-    var postProvider = Provider.of<PostModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var postProvider = Provider.of<PostViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
     postProvider.getAllData(userProvider.userCurrent!.id);
     super.initState();
   }
@@ -56,7 +57,7 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer3<UserModel,ChatModel,PostModel>(
+    return Consumer3<UserViewModel,ChatViewModel,PostViewModel>(
       builder: (context, userProvider,chatProvider,postProvider, child) => Container(
         height: 160,
         width: MediaQuery.of(context).size.width,
@@ -68,73 +69,79 @@ class _ForumPageState extends State<ForumPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back_ios_new_outlined)),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text(S.of(context).forum_title,
-                          style: Theme.of(context).textTheme.headlineLarge),
-                    ],
+                  SlideInRight(
+                    duration: const Duration(milliseconds: 400),
+                    child: Row(
+                      children: [
+                        IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back_ios_new_outlined)),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Text(S.of(context).forum_title,
+                            style: Theme.of(context).textTheme.headlineLarge),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(40),
-                            color: Theme.of(context).colorScheme.onSecondary),
-                        child: Icon(Icons.search_sharp,
-                            color: Theme.of(context).iconTheme.color, size: 27),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Stack(children: [
-                        GestureDetector(
-                          onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>const Layout(selectedIndex: 1,))),
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: 50,
-                            height: 50,
+                  SlideInRight(
+                    duration: const Duration(milliseconds: 500),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                              color: Theme.of(context).colorScheme.onSecondary),
+                          child: Icon(Icons.search_sharp,
+                              color: Theme.of(context).iconTheme.color, size: 27),
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Stack(children: [
+                          GestureDetector(
+                            onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>const Layout(selectedIndex: 1,))),
                             child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary),
-                              child: Icon(Icons.message_outlined,
-                                  color: Theme.of(context).iconTheme.color,
-                                  size: 24),
+                              alignment: Alignment.center,
+                              width: 50,
+                              height: 50,
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(40),
+                                    color:
+                                        Theme.of(context).colorScheme.onSecondary),
+                                child: Icon(Icons.message_outlined,
+                                    color: Theme.of(context).iconTheme.color,
+                                    size: 24),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.red),
-                            child: Center(
-                                child: Text(
-                              chatProvider.countNewChat.toString(),
-                              style: GoogleFonts.readexPro(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            )),
-                          ),
-                        )
-                      ])
-                    ],
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.red),
+                              child: Center(
+                                  child: Text(
+                                chatProvider.countNewChat.toString(),
+                                style: GoogleFonts.readexPro(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              )),
+                            ),
+                          )
+                        ])
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -144,48 +151,54 @@ class _ForumPageState extends State<ForumPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: CachedNetworkImage(
-                          imageUrl: userProvider.userCurrent!.image,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
+                  SlideInRight(
+                    duration: const Duration(milliseconds: 400),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: CachedNetworkImage(
+                            imageUrl: userProvider.userCurrent!.image,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 7,
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const CreatePostPage())),
-                        child: Text(
-                          S.of(context).forum_post_something,
-                          style: Theme.of(context).textTheme.displaySmall,
+                        const SizedBox(
+                          width: 7,
                         ),
-                      ),
-                    ],
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const CreatePostPage())),
+                          child: Text(
+                            S.of(context).forum_post_something,
+                            style: Theme.of(context).textTheme.displaySmall,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  IconButton(
-                      onPressed: () async {
-                        await postProvider.selectImages(context);
-                        // ignore: use_build_context_synchronously
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreatePostPage(
-                                      images: postProvider.images,
-                                    )));
-                      },
-                      icon: const Icon(
-                        Icons.image,
-                        color: Color.fromRGBO(1, 138, 221, 1.0),
-                        size: 35,
-                      ))
+                  SlideInRight(
+                    duration: const Duration(milliseconds: 500),
+                    child: IconButton(
+                        onPressed: () async {
+                          await postProvider.selectImages(context);
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreatePostPage(
+                                        images: postProvider.images,
+                                      )));
+                        },
+                        icon: const Icon(
+                          Icons.image,
+                          color: Color.fromRGBO(1, 138, 221, 1.0),
+                          size: 35,
+                        )),
+                  )
                 ],
               )
             ],
@@ -233,14 +246,15 @@ class _ForumPageState extends State<ForumPage>
   }
 
   Widget allPost(BuildContext context) {
-    return Consumer<PostModel>(
+    return Consumer<PostViewModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listAllPost.isNotEmpty){
           return ListView(
             padding: const EdgeInsets.only(top: 5),
             shrinkWrap: true,
             children: [
-              ...postProvider.listAllPost.map((e) => PostCard(post: e))
+              ...postProvider.listAllPost.map((e) => SlideInRight(
+                  duration: const Duration(milliseconds: 400),child: PostCard(post: e)))
             ],
           );
         }
@@ -251,7 +265,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget roommate(BuildContext context) {
-    return Consumer<PostModel>(
+    return Consumer<PostViewModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listRoommate.isNotEmpty){
           return ListView(
@@ -269,7 +283,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget transfer(BuildContext context) {
-    return Consumer<PostModel>(
+    return Consumer<PostViewModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listTransfer.isNotEmpty){
           return ListView(
@@ -287,7 +301,7 @@ class _ForumPageState extends State<ForumPage>
     );
   }
   Widget others(BuildContext context) {
-    return Consumer<PostModel>(
+    return Consumer<PostViewModel>(
       builder: (context, postProvider, child) {
         if(postProvider.listOther.isNotEmpty){
           return ListView(

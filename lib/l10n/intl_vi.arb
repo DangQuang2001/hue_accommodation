@@ -14,7 +14,12 @@
   "home_page_rent": "Đơn thuê",
   "home_page_statistical": "Thống kê",
   "home_page_qrcode": "Mã QR",
-
+  "home_page_nearby": "Gần tôi",
+  "home_page_feature": "Tính năng",
+  "home_page_see_all": "Xem tất cả",
+  "home_page_reservation": "Thuê phòng",
+  "home_page_transport": "Vận chuyển",
+  "home_page_user": "Khách hàng",
 
   "message_title": "Tin nhắn",
   "message_search": "Tìm kiếm..",

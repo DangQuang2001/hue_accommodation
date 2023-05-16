@@ -111,21 +111,29 @@ class MessageLookup extends MessageLookupByLibrary {
         "forum_type_title":
             MessageLookupByLibrary.simpleMessage("Nhập tiêu đề..."),
         "home_page_extension": MessageLookupByLibrary.simpleMessage("Tiện ích"),
+        "home_page_feature": MessageLookupByLibrary.simpleMessage("Tính năng"),
         "home_page_forum": MessageLookupByLibrary.simpleMessage("Diễn đàn"),
         "home_page_hospital": MessageLookupByLibrary.simpleMessage("Bệnh viện"),
         "home_page_household_goods":
             MessageLookupByLibrary.simpleMessage("Cửa hàng gia dụng"),
         "home_page_manage": MessageLookupByLibrary.simpleMessage("Quản lý"),
         "home_page_motel": MessageLookupByLibrary.simpleMessage("Trọ tốt"),
+        "home_page_nearby": MessageLookupByLibrary.simpleMessage("Gần tôi"),
         "home_page_qrcode": MessageLookupByLibrary.simpleMessage("Mã QR"),
         "home_page_rent": MessageLookupByLibrary.simpleMessage("Đơn thuê"),
+        "home_page_reservation":
+            MessageLookupByLibrary.simpleMessage("Thuê phòng"),
         "home_page_room": MessageLookupByLibrary.simpleMessage("Nhà trọ"),
+        "home_page_see_all": MessageLookupByLibrary.simpleMessage("Xem tất cả"),
         "home_page_statistical":
             MessageLookupByLibrary.simpleMessage("Thống kê"),
         "home_page_super_market":
             MessageLookupByLibrary.simpleMessage("Siêu thị"),
         "home_page_title": MessageLookupByLibrary.simpleMessage(
             "Chào mừng bạn đến với Huế Accommodation"),
+        "home_page_transport":
+            MessageLookupByLibrary.simpleMessage("Vận chuyển"),
+        "home_page_user": MessageLookupByLibrary.simpleMessage("Khách hàng"),
         "language": MessageLookupByLibrary.simpleMessage("English"),
         "manage_day_rent": MessageLookupByLibrary.simpleMessage("Ngày"),
         "manage_rent_UnConfirmed": MessageLookupByLibrary.simpleMessage("Hủy"),

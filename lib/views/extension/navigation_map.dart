@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/google_map_model.dart';
+import '../../view_models/google_map_view_model.dart';
 
 class NavigationMap extends StatefulWidget {
   final LatLng placeLocation;
@@ -28,7 +28,7 @@ class _NavigationMapState extends State<NavigationMap> {
     // TODO: implement initState
     super.initState();
     var googleMapProvider =
-        Provider.of<GoogleMapModel>(context, listen: false);
+        Provider.of<GoogleMapViewModel>(context, listen: false);
     googleMapProvider.getMarker(_controller, widget.placeLocation);
 
   }
@@ -47,7 +47,7 @@ class _NavigationMapState extends State<NavigationMap> {
         }
         return true;
       },
-      child: Consumer<GoogleMapModel>(
+      child: Consumer<GoogleMapViewModel>(
         builder: (context, googleMapProvider, child) => Container(
           color: Theme.of(context).colorScheme.background,
           height: MediaQuery.of(context).size.height,

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/post_model.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/post_view_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -83,7 +83,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer2<PostModel, UserModel>(
+    return Consumer2<PostViewModel, UserViewModel>(
       builder: (context, postProvider, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 40.0, right: 20, left: 20),
         child: Row(
@@ -106,6 +106,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   setState(() {
                     isPost = false;
                   });
+                  final validation = await postProvider.getValidation();
                   await postProvider.createPost(
                       title,
                       captions,
@@ -115,10 +116,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       _selectRoomId,
                       _selectedName,
                       tagSelect,
-                      imagesChoose);
+                      imagesChoose,
+                      validation
+                      );
                   setState(() {
                     isPost = true;
                   });
+                   if(validation==0){
+                    final snackBar = SnackBar(
+                            backgroundColor: Colors.green,
+                            content: const Text('Your post is waiting for approval!'),
+                            action: SnackBarAction(
+                              label: 'Close',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                   setState(() {
                     Navigator.pop(context);
                   });
@@ -160,7 +178,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     Widget spaceW = const SizedBox(
       width: 5,
     );
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -613,7 +631,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Widget location(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => Padding(
         padding: const EdgeInsets.all(10.0),
         child: Row(

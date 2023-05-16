@@ -58,7 +58,7 @@ class RoomRepository {
       String furnishing,
       double price,
       String typeRoom,
-      List<String> listImageUrl) async {
+      List<String> listImageUrl,int isConfirmed) async {
     final response = await http.post(Uri.parse('$url/api/motelhouse/create'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
@@ -104,7 +104,13 @@ class RoomRepository {
             "size": {"id": "size", "value": area, "label": "Diện tích"},
             "ward": {"id": "ward", "value": "", "label": "Phường"}
           },
-          "isDelete": false
+          "isDelete": false,
+          "isConfirmed":isConfirmed,
+          "noteConfirm":"",
+          "location":{
+            "type":"Point",
+            "coordinates":[location.longitude,location.latitude]
+          }
         }));
 
     if (response.statusCode == 200) {
@@ -155,7 +161,7 @@ class RoomRepository {
       return true;
     }
     if (response.statusCode == 403) {
-      print('Error: Khong them duoc room');
+      print('Error: ${response.body}');
       return false;
     }
     return false;
@@ -304,4 +310,20 @@ class RoomRepository {
       return [];
     }
   }
+
+  static Future getValidation() async {
+    try {
+      final response = await http.get(Uri.parse('$url/api/validation/get-validation'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)[0];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint('Có gì đó sai sai: $e');
+      return null;
+    }
+  }
+
+
 }

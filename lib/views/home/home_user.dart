@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/layout.dart';
 import 'package:hue_accommodation/views/login_register/auth_service.dart';
@@ -19,8 +19,8 @@ import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/room.dart';
-import '../../view_models/chat_model.dart';
-import '../../view_models/weather_model.dart';
+import '../../view_models/chat_view_model.dart';
+import '../../view_models/weather_view_model.dart';
 import 'near_by.dart';
 
 mixin AppCloser {
@@ -53,10 +53,10 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   initState() {
     super.initState();
     // Add listeners to this class
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
-    var chatProvider = Provider.of<ChatModel>(context, listen: false);
-    var userProvider = Provider.of<UserModel>(context, listen: false);
-    var weatherProvider = Provider.of<WeatherModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
+    var chatProvider = Provider.of<ChatViewModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
+    var weatherProvider = Provider.of<WeatherViewModel>(context, listen: false);
     weatherProvider.getWeather();
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print(message.data['category']);
@@ -110,7 +110,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => WillPopScope(
         onWillPop: () async {
           closeApp();
@@ -143,7 +143,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget header(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Stack(children: [
         Stack(children: [
           Container(
@@ -328,91 +328,77 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                                   ? Colors.grey.withOpacity(0.3)
                                   : Colors.transparent)
                     ]),
-                child: InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const QRCodeScanner())),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 20),
-                        alignment: Alignment.center,
-                        width:
-                            (MediaQuery.of(context).size.width / 1.2) / 2 - 15,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                right: BorderSide(
-                                    width: 1,
-                                    color: Colors.grey.withOpacity(0.4)))),
-                        child: Row(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl:
-                                  "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
-                              width: 40,
-                              height: 25,
-                              filterQuality: FilterQuality.low,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("Hue City",
-                                style:
-                                    Theme.of(context).textTheme.displaySmall),
-                          ],
-                        ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(left: 20),
+                      alignment: Alignment.center,
+                      width:
+                          (MediaQuery.of(context).size.width / 1.2) / 2 - 15,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              right: BorderSide(
+                                  width: 1,
+                                  color: Colors.grey.withOpacity(0.4)))),
+                      child: Row(
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl:
+                                "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
+                            width: 40,
+                            height: 25,
+                            filterQuality: FilterQuality.low,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text("Hue City",
+                              style:
+                                  Theme.of(context).textTheme.displaySmall),
+                        ],
                       ),
-                      Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Consumer<WeatherModel>(
-                              builder: (context, value, child) => Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    child: Row(
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              value.currentweather
-                                                      .main['feels_like']
-                                                      .toStringAsFixed(0) +
-                                                  "\u2103",
-                                              style: GoogleFonts.readexPro(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: const Color.fromARGB(
-                                                      255, 63, 63, 63)),
-                                            ),
-                                            Text(
-                                              value.currentweather.weather[0]
-                                                  ['main'],
-                                              style: GoogleFonts.readexPro(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: const Color.fromARGB(
-                                                      255, 94, 93, 93)),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        const Icon(
-                                          Icons.wb_cloudy_outlined,
-                                          size: 40,
-                                          color:
-                                              Color.fromARGB(255, 94, 93, 93),
-                                        )
-                                      ],
-                                    ),
-                                  ))),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Consumer<WeatherViewModel>(
+                            builder: (context, value, child) => Padding(
+                                  padding: const EdgeInsets.only(left: 20.0),
+                                  child: Row(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            value.currentweather
+                                                    .main['feels_like']
+                                                    .toStringAsFixed(0) +
+                                                "\u2103",
+                                            style: Theme.of(context).textTheme.displayMedium,
+                                          ),
+                                          Text(
+                                            value.currentweather.weather[0]
+                                                ['main'],
+                                            style: Theme.of(context).textTheme.displayMedium,
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                       Icon(
+                                        Icons.wb_cloudy_outlined,
+                                        size: 40,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      )
+                                    ],
+                                  ),
+                                ))),
+                  ],
                 ),
               ),
             ))
@@ -421,7 +407,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
   }
 
   Widget body(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Padding(
         padding: const EdgeInsets.only(top: 30.0, left: 10, right: 20),
         child: SizedBox(
@@ -628,7 +614,7 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
             delay: const Duration(milliseconds: 200),
             duration: const Duration(milliseconds: 200),
             child: Text(
-              "Feature",
+              S.of(context).home_page_feature,
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ),
@@ -645,15 +631,15 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/9156/9156007.png",
-                        "Reservation",
+                        S.of(context).home_page_reservation,
                         RouteName.myActivity,
                         true,
                         400),
                     buttonLink(
                         context,
                         "https://cdn-icons-png.flaticon.com/512/411/411712.png",
-                        "Transpot",
-                        RouteName.transpot,
+                        S.of(context).home_page_transport,
+                        RouteName.transport,
                         true,
                         400),
                   ],

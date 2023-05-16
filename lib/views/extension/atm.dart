@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hue_accommodation/view_models/google_map_model.dart';
+import 'package:hue_accommodation/view_models/google_map_view_model.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,7 @@ class _ATMPageState extends State<ATMPage> {
   void initState() {
     super.initState();
     var googleMapProvider =
-        Provider.of<GoogleMapModel>(context, listen: false);
+        Provider.of<GoogleMapViewModel>(context, listen: false);
     (() async {
       _markers =
           await googleMapProvider.getPlace('ATM Vietinbank,ThuaThienHue');
@@ -106,7 +106,7 @@ class _ATMPageState extends State<ATMPage> {
   }
 
   categories(BuildContext context) {
-    return Consumer<GoogleMapModel>(
+    return Consumer<GoogleMapViewModel>(
       builder: (context, googleMapProvider, child) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Padding(
@@ -269,7 +269,7 @@ class _ATMPageState extends State<ATMPage> {
   }
 
   listLocation(BuildContext context) {
-    return Consumer<GoogleMapModel>(
+    return Consumer<GoogleMapViewModel>(
       builder: (context, googleMapProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

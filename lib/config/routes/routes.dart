@@ -15,6 +15,7 @@ import 'package:hue_accommodation/views/manage/add_room.dart';
 import 'package:hue_accommodation/views/manage/interact.dart';
 import 'package:hue_accommodation/views/manage/remove_room.dart';
 import 'package:hue_accommodation/views/manage/room.dart';
+import 'package:hue_accommodation/views/manage/user.dart';
 import 'package:hue_accommodation/views/qr_code/qr_code_scanner.dart';
 import 'package:hue_accommodation/views/user_info/edit_user.dart';
 import 'package:hue_accommodation/views/user_info/favourite.dart';
@@ -73,11 +74,12 @@ transitionRightToLeftPage(RouteSettings settings) {
             return const QRCodeScanner();
           case RouteName.myActivity:
             return const MyActivity();
-          case RouteName.transpot:
-            return const TranspotPages();
+          case RouteName.transport:
+            return const TransportPages();
           case RouteName.nearby:
             return const NearByLocation();
-
+          case RouteName.userManage:
+            return const ManageUser();
           default:
             return const Layout(selectedIndex: 0);
         }

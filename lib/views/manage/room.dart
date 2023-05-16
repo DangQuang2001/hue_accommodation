@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -5,14 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
 import 'package:hue_accommodation/models/room.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:hue_accommodation/views/components/slide_route.dart';
 import 'package:hue_accommodation/views/manage/edit_room.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
-import '../../view_models/room_model.dart';
+import '../../view_models/room_view_model.dart';
 
 class RoomManage extends StatefulWidget {
   const RoomManage({Key? key}) : super(key: key);
@@ -26,8 +27,8 @@ class _RoomManageState extends State<RoomManage> {
   void initState() {
 // TODO: implement initState
     super.initState();
-    Provider.of<RoomModel>(context, listen: false).getListRemove(
-        Provider.of<UserModel>(context, listen: false).userCurrent!.id);
+    Provider.of<RoomViewModel>(context, listen: false).getListRemove(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id);
   }
 
   @override
@@ -46,23 +47,29 @@ class _RoomManageState extends State<RoomManage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(),
-              child: const Center(
-                child: Icon(
-                  Icons.arrow_back_outlined,
-                  size: 30,
+          SlideInRight(
+            duration:  const Duration(milliseconds: 300),
+            child: InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(),
+                child: const Center(
+                  child: Icon(
+                    Icons.arrow_back_outlined,
+                    size: 30,
+                  ),
                 ),
               ),
             ),
           ),
-          Text(
-            '      ${S.of(context).manage_room_title}    ',
-            style: Theme.of(context).textTheme.headlineLarge,
+          SlideInRight(
+            duration:  const Duration(milliseconds: 400),
+            child: Text(
+              '      ${S.of(context).manage_room_title}    ',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
           ),
           const SizedBox(
             width: 30,
@@ -73,138 +80,141 @@ class _RoomManageState extends State<RoomManage> {
   }
 
   Widget info(BuildContext context) {
-    return Consumer<UserModel>(
-      builder: (context, userProvider, child) => Container(
-        margin: const EdgeInsets.all(20),
-        padding: const EdgeInsets.all(20),
-        width: MediaQuery.of(context).size.width,
-        height: 200,
-        decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onBackground,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? Colors.grey.withOpacity(0.1)
-                      : Colors.transparent,
-                  blurRadius: 7,
-                  offset: const Offset(2, 3))
-            ]),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: CachedNetworkImage(
-                    imageUrl: userProvider.userCurrent!.image == ""
-                        ? "https://www.seekpng.com/png/detail/966-9665317_placeholder-image-person-jpg.png"
-                        : userProvider.userCurrent!.image,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(userProvider.userCurrent!.name,
-                        style: Theme.of(context).textTheme.displayLarge),
-                    const SizedBox(
-                      height: 5,
+    return Consumer<UserViewModel>(
+      builder: (context, userProvider, child) => SlideInRight(
+        duration:  const Duration(milliseconds: 300),
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
+          width: MediaQuery.of(context).size.width,
+          height: 200,
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onBackground,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.grey.withOpacity(0.1)
+                        : Colors.transparent,
+                    blurRadius: 7,
+                    offset: const Offset(2, 3))
+              ]),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: CachedNetworkImage(
+                      imageUrl: userProvider.userCurrent!.image == ""
+                          ? "https://www.seekpng.com/png/detail/966-9665317_placeholder-image-person-jpg.png"
+                          : userProvider.userCurrent!.image,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
                     ),
-                    Text(
-                      '0 follower',
-                      style: GoogleFonts.readexPro(
-                          color: Colors.grey, fontWeight: FontWeight.w300),
-                    )
-                  ],
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.date_range_outlined,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  S.of(context).manage_room_join_date,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                const Text(
-                  '17/03/2023',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on_outlined,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  S.of(context).manage_room_address,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Text(
-                    userProvider.userCurrent!.address,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.readexPro(
-                        fontSize: 17, fontWeight: FontWeight.w300),
                   ),
-                )
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  S.of(context).manage_room_feedback,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                const Text(
-                  '30',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300),
-                )
-              ],
-            ),
-          ],
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(userProvider.userCurrent!.name,
+                          style: Theme.of(context).textTheme.displayLarge),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        '0 follower',
+                        style: GoogleFonts.readexPro(
+                            color: Colors.grey, fontWeight: FontWeight.w300),
+                      )
+                    ],
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.date_range_outlined,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    S.of(context).manage_room_join_date,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  const Text(
+                    '17/03/2023',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    S.of(context).manage_room_address,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    child: Text(
+                      userProvider.userCurrent!.address,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.readexPro(
+                          fontSize: 17, fontWeight: FontWeight.w300),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    S.of(context).manage_room_feedback,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  const Text(
+                    '30',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w300),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -219,97 +229,103 @@ class _RoomManageState extends State<RoomManage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  S.of(context).manage_room_posted,
-                  style: Theme.of(context).textTheme.displayLarge,
+                SlideInRight(
+                  duration:  const Duration(milliseconds: 300),
+                  child: Text(
+                    S.of(context).manage_room_posted,
+                    style: Theme.of(context).textTheme.displayLarge,
+                  ),
                 ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () =>
-                          Navigator.pushNamed(context, RouteName.addRoom),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.onBackground,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.grey.withOpacity(0.1)
-                                      : Colors.transparent,
-                                  blurRadius: 7,
-                                  offset: const Offset(2, 2))
-                            ]),
-                        child: Center(
-                          child: Icon(
-                            Icons.add_home_outlined,
-                            color: Theme.of(context).iconTheme.color,
+                SlideInRight(
+                  duration:  const Duration(milliseconds: 400),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () =>
+                            Navigator.pushNamed(context, RouteName.addRoom),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.onBackground,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Colors.grey.withOpacity(0.1)
+                                        : Colors.transparent,
+                                    blurRadius: 7,
+                                    offset: const Offset(2, 2))
+                              ]),
+                          child: Center(
+                            child: Icon(
+                              Icons.add_home_outlined,
+                              color: Theme.of(context).iconTheme.color,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    InkWell(
-                      onTap: () =>
-                          Navigator.pushNamed(context, RouteName.removeRoom),
-                      child: Hero(
-                        tag: 'RemoveRoom',
-                        child: Stack(children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? Colors.grey.withOpacity(0.1)
-                                          : Colors.transparent,
-                                      blurRadius: 7,
-                                      offset: const Offset(2, 2))
-                                ]),
-                            child: Center(
-                              child: Icon(
-                                Icons.delete_outlined,
-                                color: Theme.of(context).iconTheme.color,
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      InkWell(
+                        onTap: () =>
+                            Navigator.pushNamed(context, RouteName.removeRoom),
+                        child: Hero(
+                          tag: 'RemoveRoom',
+                          child: Stack(children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).colorScheme.onBackground,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.grey.withOpacity(0.1)
+                                            : Colors.transparent,
+                                        blurRadius: 7,
+                                        offset: const Offset(2, 2))
+                                  ]),
+                              child: Center(
+                                child: Icon(
+                                  Icons.delete_outlined,
+                                  color: Theme.of(context).iconTheme.color,
+                                ),
                               ),
                             ),
-                          ),
-                          Consumer<RoomModel>(
-                            builder: (context, value, child) => Positioned(
-                                right: 5,
-                                top: 5,
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: value.listRemoveLength == 0
-                                          ? Colors.transparent
-                                          : Colors.redAccent),
-                                  child: Center(
-                                    child: Text(
-                                      value.listRemoveLength == 0
-                                          ? ""
-                                          : value.listRemoveLength.toString(),
-                                      style: GoogleFonts.readexPro(
-                                          color: Colors.white),
+                            Consumer<RoomViewModel>(
+                              builder: (context, value, child) => Positioned(
+                                  right: 5,
+                                  top: 5,
+                                  child: Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: value.listRemoveLength == 0
+                                            ? Colors.transparent
+                                            : Colors.redAccent),
+                                    child: Center(
+                                      child: Text(
+                                        value.listRemoveLength == 0
+                                            ? ""
+                                            : value.listRemoveLength.toString(),
+                                        style: GoogleFonts.readexPro(
+                                            color: Colors.white),
+                                      ),
                                     ),
-                                  ),
-                                )),
-                          )
-                        ]),
-                      ),
-                    )
-                  ],
+                                  )),
+                            )
+                          ]),
+                        ),
+                      )
+                    ],
+                  ),
                 )
               ],
             ),
@@ -317,8 +333,8 @@ class _RoomManageState extends State<RoomManage> {
               height: 10,
             ),
             Expanded(
-                child: Consumer<UserModel>(
-              builder: (context, userProvider, child) => Consumer<RoomModel>(
+                child: Consumer<UserViewModel>(
+              builder: (context, userProvider, child) => Consumer<RoomViewModel>(
                 builder: (context, value, child) => FutureBuilder<List<Room>>(
                   future: value.getListRoomHost(userProvider.userCurrent!.id),
                   builder: (context, snapshot) {
@@ -336,38 +352,63 @@ class _RoomManageState extends State<RoomManage> {
                                   onTap: () => Navigator.of(context).push(
                                       slideRightToLeft(BoardingHouseDetail(
                                           motel: snapshot.data![index]))),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 15),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 130,
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onBackground,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.1),
-                                              blurRadius: 7,
-                                              offset: const Offset(0, 2))
-                                        ]),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Slidable(
-                                        key: const ValueKey(0),
+                                  child: SlideInRight(
+                                    duration:   Duration(milliseconds: 100*(index+2)),
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 15),
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color:
+                                                    Colors.grey.withOpacity(0.1),
+                                                blurRadius: 7,
+                                                offset: const Offset(0, 2))
+                                          ]),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Slidable(
+                                          key: const ValueKey(0),
 
-                                        // The start action pane is the one at the left or the top side.
-                                        endActionPane: ActionPane(
-                                          // A motion is a widget used to control how the pane animates.
-                                          motion: const ScrollMotion(),
+                                          // The start action pane is the one at the left or the top side.
+                                          endActionPane: ActionPane(
+                                            // A motion is a widget used to control how the pane animates.
+                                            motion: const ScrollMotion(),
 
-                                          // A pane can dismiss the Slidable.
-                                          // dismissible: DismissiblePane(onDismissed: () {}),
+                                            // A pane can dismiss the Slidable.
+                                            // dismissible: DismissiblePane(onDismissed: () {}),
 
-                                          // All actions are defined in the children parameter.
-                                          children: [
-                                            // A SlidableAction can have an icon and/or a label.
+                                            // All actions are defined in the children parameter.
+                                            children:snapshot.data![index].isConfirmed==2?[
+
+                                              SlidableAction(
+                                              onPressed: (context) {
+                                                _showNote(context,snapshot.data![index].note!);
+                                              },
+                                              backgroundColor:
+                                                  const Color(0xFF2170CA),
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.edit,
+                                              label:'Note',
+                                            ),
+                                            SlidableAction(
+                                              onPressed: (context) {
+                                                _dialogBuilder(context,
+                                                    snapshot.data![index].id);
+                                              },
+                                              backgroundColor:
+                                                  const Color(0xFFFE4A49),
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.delete,
+                                              label: 'Remove',
+                                            ),
+                                            ]: [
+                                              // A SlidableAction can have an icon and/or a label.
 
                                             SlidableAction(
                                               onPressed: (context) {
@@ -517,7 +558,9 @@ class _RoomManageState extends State<RoomManage> {
                                                 ),
                                               ),
                                             )
-                                          ],
+                                            ],
+                                          ),
+                                         
                                         ),
                                       ),
                                     ),
@@ -587,9 +630,9 @@ class _RoomManageState extends State<RoomManage> {
                     const SizedBox(
                       width: 20,
                     ),
-                    Consumer<UserModel>(
+                    Consumer<UserViewModel>(
                       builder: (context, userProvider, child) =>
-                          Consumer<RoomModel>(
+                          Consumer<RoomViewModel>(
                         builder: (context, value, child) => InkWell(
                           onTap: () {
                             (() async {
@@ -647,6 +690,21 @@ class _RoomManageState extends State<RoomManage> {
                 gapless: false,
               ),
             ));
+      },
+    );
+  }
+
+  Future<void> _showNote(BuildContext context, String note) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Center(
+                child: Text(
+              "Note",
+              style: GoogleFonts.readexPro(),
+            )),
+            content: Text(note));
       },
     );
   }

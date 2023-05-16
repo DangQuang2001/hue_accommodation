@@ -15,10 +15,10 @@ import 'dart:ui' as ui;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../models/review.dart';
-import '../services/provinces_repository.dart';
-import '../services/room_repository.dart';
+import '../repository/provinces_repository.dart';
+import '../repository/room_repository.dart';
 
-class RoomModel extends ChangeNotifier {
+class RoomViewModel extends ChangeNotifier {
   bool isLoadMoreRunning = false;
   bool isLoadMoreRunningFilter = false;
   List<Room> listRoom = [];
@@ -53,7 +53,7 @@ class RoomModel extends ChangeNotifier {
       String furnishing,
       double price,
       String typeRoom,
-      List<String> listImageUrl) async {
+      List<String> listImageUrl,int isConfirmed) async {
     final response = await RoomRepository.createRoom(
         hostID,
         hostName,
@@ -67,9 +67,8 @@ class RoomModel extends ChangeNotifier {
         furnishing,
         price,
         typeRoom,
-        listImageUrl);
+        listImageUrl,isConfirmed);
     if (response) {
-      getListRoomHost(hostID);
     } else {
       debugPrint('Có gì đó sai sai');
     }
@@ -514,6 +513,17 @@ class RoomModel extends ChangeNotifier {
       final data = await RoomRepository.getNearby(position, maxDistance, limit, skip);
       listNearbyChoose = data;
       notifyListeners();
+    }
+  }
+
+
+  Future getValidation()async{
+    final data = await RoomRepository.getValidation();
+    if(data['allowPostMotel']){
+      return 1;
+    }
+    else{
+      return 0;
     }
   }
 }

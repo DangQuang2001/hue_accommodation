@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class ChooseRolePage extends StatefulWidget {
@@ -15,7 +15,7 @@ class ChooseRolePage extends StatefulWidget {
 class _ChooseRolePageState extends State<ChooseRolePage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Scaffold(
         backgroundColor:Theme.of(context).colorScheme.onBackground ,
         body: Padding(

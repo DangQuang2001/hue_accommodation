@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
 import 'package:hue_accommodation/views/forum/post_detail.dart';
 import 'package:hue_accommodation/views/messages/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as time_ago;
 import '../../models/post.dart';
-import '../../view_models/post_model.dart';
-import '../../view_models/user_model.dart';
+import '../../view_models/post_view_model.dart';
+import '../../view_models/user_view_model.dart';
 import '../components/slide_route.dart';
 
 class PostCard extends StatefulWidget {
@@ -28,7 +28,7 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
     isLike = widget.post.likedBy!.contains(userProvider.userCurrent!.id);
     likeCount = widget.post.likedBy!.length;
   }
@@ -41,7 +41,7 @@ class _PostCardState extends State<PostCard> {
     Widget spaceW = const SizedBox(
       width: 5,
     );
-    return Consumer3<PostModel, UserModel, ChatModel>(
+    return Consumer3<PostViewModel, UserViewModel, ChatViewModel>(
       builder: (context, postProvider, userProvider, chatProvider, child) =>
           GestureDetector(
         onTap: () => Navigator.of(context).push(slideRightToLeft(PostDetailPage(

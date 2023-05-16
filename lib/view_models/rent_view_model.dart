@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/rent_repository.dart';
+import 'package:hue_accommodation/repository/rent_repository.dart';
 
 import '../models/rent.dart';
 
-class RentModel extends ChangeNotifier {
+class RentViewModel extends ChangeNotifier {
   bool isRent = false;
   List<Rent> listWaiting = [];
   List<Rent> listConfirm = [];
@@ -78,5 +78,10 @@ class RentModel extends ChangeNotifier {
     final data = await RentRepository.getListRent(userId);
     listRent = data;
     notifyListeners();
+  }
+
+  Future<void> createPayment(String rentId,double totalPrice, double transitionFee,String description,String userId) async {
+    await RentRepository.createPayment(rentId,totalPrice,0,description);
+    getListRent(userId);
   }
 }

@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:hue_accommodation/services/chat_repository.dart';
-import 'package:hue_accommodation/services/user_repository.dart';
+import 'package:hue_accommodation/repository/chat_repository.dart';
+import 'package:hue_accommodation/repository/user_repository.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-class ChatModel extends ChangeNotifier {
+class ChatViewModel extends ChangeNotifier {
   bool isGetChat = false;
   bool isUserOnline1 = false;
   Map<String, dynamic> tokenUser = {};

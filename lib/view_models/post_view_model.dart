@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hue_accommodation/models/post.dart';
-import 'package:hue_accommodation/services/post_repository.dart';
+import 'package:hue_accommodation/repository/post_repository.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-class PostModel extends ChangeNotifier {
+import '../repository/room_repository.dart';
+
+class PostViewModel extends ChangeNotifier {
   List<Post> listAllPost = [];
   List<Post> listRoommate = [];
   List<Post> listTransfer = [];
@@ -21,7 +23,9 @@ class PostModel extends ChangeNotifier {
       String? roomId,
       String? roomName,
       int tag,
-      List<AssetEntity> listImage) async {
+      List<AssetEntity> listImage,
+      int isConfirmed
+      ) async {
     List<String> listImageUrl = [];
     if (listImage.isNotEmpty) {
       final storage = FirebaseStorage.instance;
@@ -40,7 +44,7 @@ class PostModel extends ChangeNotifier {
         }
       }
     }
-    final response = await PostRepository.createPost(title, caption, userId, hostName, avatar, roomId, roomName, tag, listImage, listImageUrl);
+    final response = await PostRepository.createPost(title, caption, userId, hostName, avatar, roomId, roomName, tag, listImage, listImageUrl,isConfirmed);
     if (response.statusCode == 200) {
       getPost([tag], userId);
       getPost([0,1,2], userId);
@@ -124,5 +128,15 @@ class PostModel extends ChangeNotifier {
           selectedAssets: [],
         ));
       images = result!;
+  }
+
+  Future getValidation()async{
+    final data = await RoomRepository.getValidation();
+    if(data['allowPostForum']){
+      return 1;
+    }
+    else{
+      return 0;
+    }
   }
 }

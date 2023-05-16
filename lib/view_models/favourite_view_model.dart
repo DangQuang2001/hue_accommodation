@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/favourite_repository.dart';
+import 'package:hue_accommodation/repository/favourite_repository.dart';
 
 import '../models/favourite.dart';
 
-class FavouriteModel extends ChangeNotifier {
+class FavouriteViewModel extends ChangeNotifier {
   bool isCheckFavourite = false;
 
   Future<void> addFavourite(String id, String userId) async {

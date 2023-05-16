@@ -6,7 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/constants/route_name.dart';
-import 'package:hue_accommodation/view_models/room_model.dart';
+import 'package:hue_accommodation/view_models/room_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/filter_house.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -44,7 +44,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
     if (roomProvider.listMiniFirstLoad.isEmpty) {
       roomProvider.getDataFirstTime();
       (()async{
@@ -64,7 +64,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onBackground,
-      body: Consumer<RoomModel>(
+      body: Consumer<RoomViewModel>(
         builder: (context, roomProvider, child) =>
             NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
@@ -232,7 +232,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemMini(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -289,6 +289,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -543,7 +544,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemMotel(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -601,6 +602,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -730,7 +732,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget listItemWhole(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
         builder: (context, roomProvider, child) => ListView(
               children: [
                 ListView.builder(
@@ -788,6 +790,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -931,6 +934,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                 imageUrl:
                 imageList[index],
                 fit: BoxFit.cover,
+                errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
               ),
             ),
           );
@@ -940,7 +944,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
   }
 
   Widget hot(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -987,6 +991,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                     width: double.infinity,
                                     height: 130,
                                     fit: BoxFit.cover,
+                                    errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                   ),
                                 ),
                                 Positioned(
@@ -1115,6 +1120,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,
+                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                           ),
                         ),
                       ),

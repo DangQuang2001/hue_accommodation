@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/rent_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/rent_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
@@ -15,18 +15,23 @@ class InteractManage extends StatefulWidget {
 }
 
 class _InteractManageState extends State<InteractManage> {
-
+  bool show = true;
   @override
   void initState() {
 // TODO: implement initState
     super.initState();
 
-    Provider.of<RentModel>(context, listen: false).getListWaiting(
-        Provider.of<UserModel>(context, listen: false).userCurrent!.id,0);
-    Provider.of<RentModel>(context, listen: false).getListConfirm(
-        Provider.of<UserModel>(context, listen: false).userCurrent!.id,1);
-    Provider.of<RentModel>(context, listen: false).getListUnConfirm(
-        Provider.of<UserModel>(context, listen: false).userCurrent!.id,2);
+   (()async{
+      Provider.of<RentViewModel>(context, listen: false).getListWaiting(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,0);
+     Provider.of<RentViewModel>(context, listen: false).getListConfirm(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,1);
+    await Provider.of<RentViewModel>(context, listen: false).getListUnConfirm(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,2);
+        setState(() {
+          show = false;
+        });
+   })();
   }
   @override
   Widget build(BuildContext context) {
@@ -78,8 +83,8 @@ class _InteractManageState extends State<InteractManage> {
   }
 
   Widget info(BuildContext context) {
-    return  Consumer<RentModel>(
-      builder: (context, rentProvider, child) => (rentProvider.listWaiting.isNotEmpty || rentProvider.listConfirm.isNotEmpty ||rentProvider.listUnConfirm.isNotEmpty)? Padding(
+    return  Consumer<RentViewModel>(
+      builder: (context, rentProvider, child) =>show?const SizedBox() :Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +192,7 @@ class _InteractManageState extends State<InteractManage> {
             ),
           ],
         ),
-      ):const SizedBox(),
+      ),
     );
   }
 
@@ -348,8 +353,8 @@ class _InteractManageState extends State<InteractManage> {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
-          return Consumer<UserModel>(
-            builder: (context, userProvider, child) =>  Consumer<RentModel>(
+          return Consumer<UserViewModel>(
+            builder: (context, userProvider, child) =>  Consumer<RentViewModel>(
               builder: (context, rentProvider, child) => AlertDialog(
                 title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

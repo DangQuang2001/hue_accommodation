@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hue_accommodation/services/notification_repository.dart';
+import 'package:hue_accommodation/repository/notification_repository.dart';
 
 import '../models/notification.dart';
 
-class NotificationModel extends ChangeNotifier{
+class NotificationViewModel extends ChangeNotifier{
 
 
   List<Notifications> listNotification=[];

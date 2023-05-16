@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hue_accommodation/view_models/chat_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/chat_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/login_register/choose_role.dart';
 import 'package:provider/provider.dart';
 
-import '../../view_models/notification_model.dart';
+import '../../view_models/notification_view_model.dart';
 import '../components/layout.dart';
 import 'login.dart';
 
@@ -17,7 +17,7 @@ class AuthService {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData) {
-            var userProvider = Provider.of<UserModel>(context, listen: true);
+            var userProvider = Provider.of<UserViewModel>(context, listen: true);
             if (userProvider.userCurrent != null && userProvider.isNewAccount) {
               return ChooseRolePage(email: userProvider.userCurrent!.email);
             } else {
@@ -32,7 +32,7 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithGoogle(BuildContext context) async {
-    var userProvider = Provider.of<UserModel>(context, listen: false);
+    var userProvider = Provider.of<UserViewModel>(context, listen: false);
 
     // Initiate the auth procedure
     final GoogleSignInAccount? googleUser =

@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../generated/l10n.dart';
-import '../../view_models/room_model.dart';
+import '../../view_models/room_view_model.dart';
 import 'boarding_house_detail.dart';
 
 class FilterHouse extends StatefulWidget {
@@ -30,7 +30,7 @@ class _FilterHouseState extends State<FilterHouse> {
 
   @override
   void initState() {
-    var roomProvider = Provider.of<RoomModel>(context, listen: false);
+    var roomProvider = Provider.of<RoomViewModel>(context, listen: false);
     if (roomProvider.typeName != widget.typeName) {
       isLoading = true;
       roomProvider.typeName = widget.typeName;
@@ -61,7 +61,7 @@ class _FilterHouseState extends State<FilterHouse> {
   }
 
   Widget appBar(BuildContext context) {
-    return Consumer<RoomModel>(
+    return Consumer<RoomViewModel>(
       builder: (context, roomProvider, child) => Padding(
           padding: const EdgeInsets.only(top: 0),
           child: ExpansionPanelList(
@@ -138,7 +138,7 @@ class _FilterHouseState extends State<FilterHouse> {
           ? Container(
               alignment: Alignment.center,
               child: const CircularProgressIndicator())
-          : Consumer<RoomModel>(
+          : Consumer<RoomViewModel>(
               builder: (context, roomProvider, child) =>
                   NotificationListener<ScrollNotification>(
                     onNotification: (ScrollNotification scrollInfo) {
@@ -218,6 +218,7 @@ class _FilterHouseState extends State<FilterHouse> {
                                                             .size
                                                             .height,
                                                     fit: BoxFit.cover,
+                                                    errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                                   ),
                                                 ),
                                               ),
@@ -565,7 +566,7 @@ class _FilterHouseState extends State<FilterHouse> {
             const SizedBox(
               height: 20,
             ),
-            Consumer<RoomModel>(
+            Consumer<RoomViewModel>(
               builder: (context, roomProvider, child) => GestureDetector(
                 onTap: () {
                   if (_character == SingingCharacter.newPost) {

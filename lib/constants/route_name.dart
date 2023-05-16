@@ -25,7 +25,8 @@ class RouteName {
   static const String filterHouse = "/boardinghouse/filterHouse";
   static const String qrcode = "/qrcode";
   static const String myActivity = "/myActivity";
-  static const String transpot = "/transpot";
+  static const String transport = "/transport";
   static const String nearby = "/nearby";
   static const String payment = "/payment";
+  static const String userManage = "/userManage";
 }

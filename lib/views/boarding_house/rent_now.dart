@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hue_accommodation/view_models/rent_model.dart';
-import 'package:hue_accommodation/view_models/user_model.dart';
+import 'package:hue_accommodation/view_models/rent_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../generated/l10n.dart';
@@ -74,7 +74,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
   }
 
   Widget content(BuildContext context) {
-    return Consumer<UserModel>(
+    return Consumer<UserViewModel>(
       builder: (context, userProvider, child) => Form(
         key: _formKey,
         child: Expanded(
@@ -389,7 +389,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                   const SizedBox(
                     height: 50,
                   ),
-                  Consumer<RentModel>(
+                  Consumer<RentViewModel>(
                     builder: (context, rentProvider, child) => InkWell(
                       onTap: () async{
                         if (_formKey.currentState?.validate() ?? false) {
@@ -400,7 +400,7 @@ class _RentNowPageState extends State<RentNowPage> with RestorationMixin {
                               userProvider.userCurrent!.image,
                               widget.room.image,
                               phone,
-                              widget.room.id,
+                              widget.room.roomId,
                               widget.room.name,
                               days,
                               numberPeople,

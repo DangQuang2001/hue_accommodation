@@ -6,7 +6,7 @@ import 'package:hue_accommodation/constants/server_url.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user.dart';
-import '../services/chat_repository.dart';
+import '../repository/chat_repository.dart';
 
 class ChatController {
   late String roomIdReplace;
