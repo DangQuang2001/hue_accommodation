@@ -139,6 +139,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                       height: 50,
                       child: TabBar(
                         controller: _tabController,
+                        isScrollable: true,
                         tabs: _tabs,
                         labelColor: _selectedColor,
                         indicatorColor: _selectedColor,
@@ -289,6 +290,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -331,12 +333,12 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                                 .adParams[
                                                             'deposit'] ==
                                                         null
-                                                    ? "0 đ"
+                                                    ? "0 VNĐ"
                                                     : roomProvider
                                                             .listMiniFirstLoad[
                                                                 index]
                                                             .adParams['deposit']
-                                                        ['value'],
+                                                        ['value'] +" VNĐ",
                                                 style: GoogleFonts.readexPro(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w400,
@@ -601,6 +603,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -788,6 +791,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                                 .size
                                                 .height,
                                             fit: BoxFit.cover,
+                                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                           ),
                                         ),
                                       ),
@@ -931,6 +935,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                 imageUrl:
                 imageList[index],
                 fit: BoxFit.cover,
+                errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
               ),
             ),
           );
@@ -987,6 +992,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                                     width: double.infinity,
                                     height: 130,
                                     fit: BoxFit.cover,
+                                    errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                   ),
                                 ),
                                 Positioned(
@@ -1115,6 +1121,7 @@ class _BoardingHousePageState extends State<BoardingHousePage>
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,
+                            errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                           ),
                         ),
                       ),

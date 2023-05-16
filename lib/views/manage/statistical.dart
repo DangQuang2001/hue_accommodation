@@ -64,7 +64,7 @@ class _StatisticalManageState extends State<StatisticalManage> {
             ),
           ),
           Text(
-            '     Statistical    ',
+            '    Statistical  ',
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           const SizedBox(

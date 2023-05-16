@@ -167,7 +167,10 @@ class _ManageUserState extends State<ManageUser> {
 
   Widget content(BuildContext context) {
     return Consumer<RentViewModel>(
-      builder: (context, rentViewModel, child) => Expanded(
+      builder: (context, rentViewModel, child) =>rentViewModel.listConfirm.isEmpty?const Padding(
+        padding: EdgeInsets.only(top:20.0),
+        child: Text('No renters!'),
+      ): Expanded(
           child: ListView.builder(
         itemCount: rentViewModel.listConfirm.length,
         itemBuilder: (context, index) => GestureDetector(
@@ -411,10 +414,11 @@ class _ManageUserState extends State<ManageUser> {
                                         Column(
                                           children: [
                                             Text('STT',style: Theme.of(context).textTheme.displayMedium,),
+                                            const SizedBox(height: 20,),
                                             ...rent.payment!.map((e) {
                                               var index = rent.payment!.indexOf(e);
                                               return
-                                                  Text((index+1).toString())
+                                                  Text((index+1).toString(),style: GoogleFonts.readexPro(fontSize: 15,fontWeight: FontWeight.w300))
                                                 ;
                                             } )
                                           ],
@@ -423,23 +427,27 @@ class _ManageUserState extends State<ManageUser> {
                                         Column(
                                           children: [
                                             Text('Month',style: Theme.of(context).textTheme.displayMedium,),
+                                            const SizedBox(height: 20,),
                                             ...rent.payment!.map((e) {
                                               return
-                                                Text(e['createdAt'].toString().split("T")[0])
+                                                Text(e['createdAt'].toString().split("T")[0],style: GoogleFonts.readexPro(fontSize: 15,fontWeight: FontWeight.w300))
                                               ;
                                             } )
                                           ],
                                         ),
                                         const SizedBox(width: 20,),
-                                        Column(
-                                          children: [
-                                            Text('Description',style: Theme.of(context).textTheme.displayMedium,),
-                                            ...rent.payment!.map((e) {
-                                              return
-                                                Text(e['description'])
-                                              ;
-                                            } )
-                                          ],
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text('Description',style: Theme.of(context).textTheme.displayMedium,),
+                                              const SizedBox(height: 20,),
+                                              ...rent.payment!.map((e) {
+                                                return
+                                                  Text(e['description'],overflow: TextOverflow.ellipsis,style: GoogleFonts.readexPro(fontSize: 15,fontWeight: FontWeight.w300),)
+                                                ;
+                                              } )
+                                            ],
+                                          ),
                                         ),
                                         const SizedBox(width: 30,),
                                       ],

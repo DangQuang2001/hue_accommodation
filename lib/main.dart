@@ -1,6 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hue_accommodation/config/routes/routes.dart';
@@ -23,7 +22,6 @@ void main() async {
   await Firebase.initializeApp();
   await NotificationController.initializeLocalNotifications(debug: true);
   await NotificationController.initializeRemoteNotifications(debug: true);
-  await FirebaseMessaging.instance.subscribeToTopic("quangdeptrai");
   runApp(const MyApp());
 }
 

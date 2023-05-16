@@ -218,6 +218,7 @@ class _FilterHouseState extends State<FilterHouse> {
                                                             .size
                                                             .height,
                                                     fit: BoxFit.cover,
+                                                    errorWidget:(context, url, error) => Image.asset('assets/images/placeholderImage.jpg',fit: BoxFit.cover,)
                                                   ),
                                                 ),
                                               ),

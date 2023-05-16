@@ -135,8 +135,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   Widget message(BuildContext context, Map<String, dynamic> roomChat) {
-    return Consumer<UserViewModel>(
-      builder: (context, userProvider, child) => GestureDetector(
+    return Consumer2<UserViewModel,ChatViewModel>(
+      builder: (context, userProvider,chatViewModel, child) => GestureDetector(
         onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -144,7 +144,9 @@ class _MessagePageState extends State<MessagePage> {
                       isNewRoom: false,
                       roomId: roomChat['_id']['_id'],
                       infoUserRoom: roomChat['userId'],
-                    ))),
+                    ))).then((value) => {
+                      chatViewModel.getRoomChat(userProvider.userCurrent!.id)
+                    }),
         child: Container(
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(

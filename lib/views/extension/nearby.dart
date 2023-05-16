@@ -434,6 +434,7 @@ class _NearByLocationState extends State<NearByLocation> {
                                 width: double.infinity,
                                 height: double.infinity,
                                 fit: BoxFit.cover,
+                                errorWidget: (context, url, error) => Image.asset('assets/images/placeholderImage.jpg'),
                               ),
                             ),
                           )),

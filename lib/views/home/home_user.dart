@@ -328,50 +328,47 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                                   ? Colors.grey.withOpacity(0.3)
                                   : Colors.transparent)
                     ]),
-                child: InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const QRCodeScanner())),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 20),
-                        alignment: Alignment.center,
-                        width:
-                            (MediaQuery.of(context).size.width / 1.2) / 2 - 15,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                right: BorderSide(
-                                    width: 1,
-                                    color: Colors.grey.withOpacity(0.4)))),
-                        child: Row(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl:
-                                  "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
-                              width: 40,
-                              height: 25,
-                              filterQuality: FilterQuality.low,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("Hue City",
-                                style:
-                                    Theme.of(context).textTheme.displaySmall),
-                          ],
-                        ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(left: 20),
+                      alignment: Alignment.center,
+                      width:
+                          (MediaQuery.of(context).size.width / 1.2) / 2 - 15,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          border: Border(
+                              right: BorderSide(
+                                  width: 1,
+                                  color: Colors.grey.withOpacity(0.4)))),
+                      child: Row(
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl:
+                                "https://product.hstatic.net/200000122283/product/c-e1-bb-9d-vi-e1-bb-87t-nam_2c0683597d2d419fac401f51ccbae779_grande.jpg",
+                            width: 40,
+                            height: 25,
+                            filterQuality: FilterQuality.low,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text("Hue City",
+                              style:
+                                  Theme.of(context).textTheme.displaySmall),
+                        ],
                       ),
-                      Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Consumer<WeatherViewModel>(
-                              builder: (context, value, child) => Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    child: Row(
-                                      children: [
-                                        Column(
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Consumer<WeatherViewModel>(
+                            builder: (context, value, child) => Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 50,
+                                        child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           mainAxisAlignment:
@@ -382,37 +379,31 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
                                                       .main['feels_like']
                                                       .toStringAsFixed(0) +
                                                   "\u2103",
-                                              style: GoogleFonts.readexPro(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: const Color.fromARGB(
-                                                      255, 63, 63, 63)),
+                                              maxLines: 1,overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context).textTheme.displayMedium,
                                             ),
                                             Text(
                                               value.currentweather.weather[0]
                                                   ['main'],
-                                              style: GoogleFonts.readexPro(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: const Color.fromARGB(
-                                                      255, 94, 93, 93)),
+                                              maxLines: 1,overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context).textTheme.displayMedium,
                                             )
                                           ],
                                         ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        const Icon(
-                                          Icons.wb_cloudy_outlined,
-                                          size: 40,
-                                          color:
-                                              Color.fromARGB(255, 94, 93, 93),
-                                        )
-                                      ],
-                                    ),
-                                  ))),
-                    ],
-                  ),
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                       Icon(
+                                        Icons.wb_cloudy_outlined,
+                                        size: 40,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      )
+                                    ],
+                                  ),
+                                ))),
+                  ],
                 ),
               ),
             ))

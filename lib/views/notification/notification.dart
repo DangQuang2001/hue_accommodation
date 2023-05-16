@@ -102,138 +102,136 @@ class _NotificationPageState extends State<NotificationPage> {
                         S.of(context).notification_status,
                         style: Theme.of(context).textTheme.displayMedium,
                       )
-                    : Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                            children: [
-                              ...notificationProvider.listNotification.map((e) =>
-                                  GestureDetector(
-                                    onTap: ()async{
-                                      if(e.type ==1){
-                                        Navigator.pushNamed(context, RouteName.interactManage);
-                                      }
-                                      if(e.type ==2){
-                                        Navigator.pushNamed(context, RouteName.rentHistory);
-                                      }
-                                      if(e.type==3){
-                                        final data= await roomProvider.getDetailRoom(e.dataId);
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.of(context).push(slideRightToLeft( BoardingHouseDetail(motel: data)));
-                                      }
-                                    },
-                                    child: SlideInRight(
-                                      duration: const Duration(milliseconds: 500),
-                                      child: Container(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 20, top: 20),
-                                        width: MediaQuery.of(context).size.width,
-                                        decoration: BoxDecoration(
-                                            border: Border(
-                                                bottom: BorderSide(
-                                                    color: Colors.grey.withOpacity(0.3),
-                                                    width: 1))),
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Stack(children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(50),
-                                                child: CachedNetworkImage(
-                                                  imageUrl:
-                                                  e.sender.image,
-                                                  width: 50,
-                                                  height: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
+                    : SingleChildScrollView(
+                      child: Column(
+                          children: [
+                            ...notificationProvider.listNotification.map((e) =>
+                                GestureDetector(
+                                  onTap: ()async{
+                                    if(e.type ==1){
+                                      Navigator.pushNamed(context, RouteName.interactManage);
+                                    }
+                                    if(e.type ==2){
+                                      Navigator.pushNamed(context, RouteName.rentHistory);
+                                    }
+                                    if(e.type==3){
+                                      final data= await roomProvider.getDetailRoom(e.dataId);
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).push(slideRightToLeft( BoardingHouseDetail(motel: data)));
+                                    }
+                                  },
+                                  child: SlideInRight(
+                                    duration: const Duration(milliseconds: 500),
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20, top: 20),
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: Colors.grey.withOpacity(0.3),
+                                                  width: 1))),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Stack(children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(50),
+                                              child: CachedNetworkImage(
+                                                imageUrl:
+                                                e.sender.image,
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
                                               ),
-                                              Positioned(
-                                                  right: 0,
-                                                  bottom: 0,
-                                                  child: Container(
-                                                    width: 25,
-                                                    height: 25,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(25),
-                                                        color: Colors.orangeAccent),
-                                                    child: const Center(
-                                                      child: Icon(
-                                                        Icons.notifications,
-                                                        color: Colors.white,
-                                                        size: 20,
+                                            ),
+                                            Positioned(
+                                                right: 0,
+                                                bottom: 0,
+                                                child: Container(
+                                                  width: 25,
+                                                  height: 25,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(25),
+                                                      color: Colors.orangeAccent),
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.notifications,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ))
+                                          ]),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        text: '',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .displayMedium,
+                                                        children: <TextSpan>[
+                                                          TextSpan(
+                                                            text: ("${e.sender.name} ${e.title}")
+                                                                .substring(
+                                                                    0,
+                                                                    ("${e.sender.name} ${e.title}")
+                                                                        .indexOf(e.sender.name)),
+                                                          ),
+                                                          TextSpan(
+                                                            text: e.sender.name,
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .displayMedium!
+                                                                .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                          ),
+                                                          TextSpan(
+                                                            text: ("${e.sender.name} ${e.title}")
+                                                                .substring(
+                                                                    ("${e.sender.name} ${e.title}")
+                                                                            .indexOf(e.sender.name) +
+                                                                        e.sender.name
+                                                                            .length),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                  ))
-                                            ]),
-                                            const SizedBox(
-                                              width: 10,
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      e.dateSend.toString().split(".")[0],
+                                                      style: GoogleFonts.readexPro(
+                                                          fontWeight: FontWeight.w300,
+                                                          color: Colors.grey),
+                                                    )
+                                                  ],
+                                                )
+                                              ],
                                             ),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
-                                                    children: [
-                                                      RichText(
-                                                        text: TextSpan(
-                                                          text: '',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .displayMedium,
-                                                          children: <TextSpan>[
-                                                            TextSpan(
-                                                              text: ("${e.sender.name} ${e.title}")
-                                                                  .substring(
-                                                                      0,
-                                                                      ("${e.sender.name} ${e.title}")
-                                                                          .indexOf(e.sender.name)),
-                                                            ),
-                                                            TextSpan(
-                                                              text: e.sender.name,
-                                                              style: Theme.of(context)
-                                                                  .textTheme
-                                                                  .displayMedium!
-                                                                  .copyWith(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600),
-                                                            ),
-                                                            TextSpan(
-                                                              text: ("${e.sender.name} ${e.title}")
-                                                                  .substring(
-                                                                      ("${e.sender.name} ${e.title}")
-                                                                              .indexOf(e.sender.name) +
-                                                                          e.sender.name
-                                                                              .length),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        e.dateSend.toString().split(".")[0],
-                                                        style: GoogleFonts.readexPro(
-                                                            fontWeight: FontWeight.w300,
-                                                            color: Colors.grey),
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  ))
-                            ],
-                          ),
-                      ),
+                                  ),
+                                ))
+                          ],
+                        ),
                     ),
           ),
         ),

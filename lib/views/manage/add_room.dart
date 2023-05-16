@@ -143,7 +143,7 @@ class _AddRoomPageState extends State<AddRoomPage>
                   setState(() {
                     _isLoading = true;
                   });
-
+                  final validation = await roomProvider.getValidation();
                   await roomProvider.uploadImages();
                   final position =
                       await googleMapProvider.getLatLngFromAddress(address);
@@ -160,10 +160,25 @@ class _AddRoomPageState extends State<AddRoomPage>
                       dropdownFurnishingValue,
                       price,
                       dropdownTypeRoomValue,
-                      roomProvider.listImageUrl);
+                      roomProvider.listImageUrl,validation);
                   setState(() {
                     _isLoading = false;
                   });
+                  if(validation==0){
+                    final snackBar = SnackBar(
+                            backgroundColor: Colors.green,
+                            content: const Text('Your room is waiting for approval!'),
+                            action: SnackBarAction(
+                              label: 'Close',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 })();

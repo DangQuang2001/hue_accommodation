@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hue_accommodation/view_models/rent_view_model.dart';
+import 'package:hue_accommodation/view_models/user_view_model.dart';
 import 'package:hue_accommodation/views/boarding_house/boarding_house_detail.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,10 @@ class _MyActivityState extends State<MyActivity> {
     // set the publishable key for Stripe - this is mandatory
     Stripe.publishableKey =
         "pk_test_51N4fplCYZEI22fEEbtNGRxHaUlnUcQfTWdJSd7NW3vkHoTvvk62WUtUh2PwpC07F9RZ7NU0eWfFpkYKw3TU0zep800RSjDjGC0";
+
+    var rentViewModel = Provider.of<RentViewModel>(context, listen: false);
+    rentViewModel.getListRent(
+        Provider.of<UserViewModel>(context, listen: false).userCurrent!.id);
   }
 
   @override
@@ -89,10 +94,12 @@ class _MyActivityState extends State<MyActivity> {
                               height: 200,
                               color: Theme.of(context).colorScheme.onBackground,
                               child: Padding(
-                                padding: const EdgeInsets.all(20.0),
+                                padding: const EdgeInsets.only(
+                                    left: 20.0, right: 20, top: 40),
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     GestureDetector(
                                       onTap: () {
@@ -105,7 +112,7 @@ class _MyActivityState extends State<MyActivity> {
                                       },
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                            MainAxisAlignment.start,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(20),
@@ -133,11 +140,35 @@ class _MyActivityState extends State<MyActivity> {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
-                                        await Payment().makePayment(context,rentModel,e.id,double.parse(e.room.adParams['deposit']['value']),e.user.id);
+                                        if (e.isPay) {
+                                          showModalBottomSheet<void>(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  height: 50,
+                                                  color: Colors.green,
+                                                  child:  Center(
+                                                    child: Text(
+                                                        'You have already paid this month.' ,style: GoogleFonts.readexPro(color: Colors.white,fontSize: 15),),
+                                                  ),
+                                                );
+                                              });
+
+                                          // ignore: use_build_context_synchronously
+                                        } else {
+                                          await Payment().makePayment(
+                                              context,
+                                              rentModel,
+                                              e.id,
+                                              double.parse(
+                                                  e.room.adParams['deposit']
+                                                      ['value']),
+                                              e.user.id);
+                                        }
                                       },
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                            MainAxisAlignment.start,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.all(20),
@@ -159,6 +190,157 @@ class _MyActivityState extends State<MyActivity> {
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .displayMedium,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        showModalBottomSheet<void>(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Container(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onBackground,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      20.0),
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Column(
+                                                            children: [
+                                                              Text(
+                                                                'STT',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              ...e.payment!
+                                                                  .map((item) {
+                                                                var index = e
+                                                                    .payment!
+                                                                    .indexOf(
+                                                                        item);
+                                                                return Text(
+                                                                    (index + 1)
+                                                                        .toString(),
+                                                                    style: GoogleFonts.readexPro(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300));
+                                                              })
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 20,
+                                                          ),
+                                                          Column(
+                                                            children: [
+                                                              Text(
+                                                                'Month',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .displayMedium,
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              ...e.payment!
+                                                                  .map((e) {
+                                                                return Text(
+                                                                    e['createdAt']
+                                                                            .toString()
+                                                                            .split("T")[
+                                                                        0],
+                                                                    style: GoogleFonts.readexPro(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300));
+                                                              })
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 20,
+                                                          ),
+                                                          Expanded(
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                  'Description',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .displayMedium,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                ...e.payment!
+                                                                    .map((e) {
+                                                                  return Text(
+                                                                    e['description'],
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: GoogleFonts.readexPro(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w300),
+                                                                  );
+                                                                })
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 30,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(20),
+                                            width: 100,
+                                            height: 100,
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondary,
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  "https://cdn-icons-png.flaticon.com/512/4313/4313096.png",
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 100,
+                                            child: Text(
+                                              'Payment history',
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .displayMedium,
+                                            ),
                                           )
                                         ],
                                       ),
@@ -253,11 +435,13 @@ class _MyActivityState extends State<MyActivity> {
                                       ),
                                       e.isConfirmed == 1
                                           ? Text(
-                                              e.isPay?"Paid":"UnPay",
+                                              e.isPay ? "Paid" : "UnPay",
                                               style: GoogleFonts.readexPro(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 17,
-                                                  color:e.isPay?Colors.green: Colors.redAccent),
+                                                  color: e.isPay
+                                                      ? Colors.green
+                                                      : Colors.redAccent),
                                             )
                                           : const Text(''),
                                     ],

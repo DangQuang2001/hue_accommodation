@@ -37,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen>
   bool chooseGif = false;
   bool chooseImage = false;
   List<AssetEntity> albums = [];
+  bool isDataProcessed = false;
 
   @override
   void initState() {
@@ -116,7 +117,8 @@ class _ChatScreenState extends State<ChatScreen>
                     Expanded(
                       child: TextField(
                         onChanged: (value) {
-                          setState(() {});
+                          setState(() {
+                          });
                         },
                         controller: _textController,
                         decoration: InputDecoration(
@@ -371,6 +373,7 @@ class _ChatScreenState extends State<ChatScreen>
                             onPressed: () async {
                               setState(() {
                                 chooseImage = true;
+                                isDataProcessed = false;
                               });
                               if (albums.isNotEmpty) {
                                 _textController.text =
@@ -501,18 +504,24 @@ class _ChatScreenState extends State<ChatScreen>
                       ),
                     );
                   } else {
-                    if (snapshot.hasData) {
-                      Map<String, dynamic> messages = snapshot.data!;
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      Map<String, dynamic> messages = {...snapshot.data!};
 
-                      if (_messages.isEmpty || _messages[0] != messages) {
+                       if (_messages.isEmpty || _messages[0] != messages) {
                         _messages.insert(_messages.length, messages);
+                        print(messages['content']);
+                        snapshot.data!.clear();
                       }
+                      
+                     
+                      
                     }
                     return ListView.builder(
                       reverse: true,
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
                         final message = _messages[_messages.length - 1 - index];
+                        
                         final isMyMessage =
                             message['userId'] == userProvider.userCurrent!.id;
                         return Row(

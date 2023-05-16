@@ -15,7 +15,7 @@ class PostRepository{
       String? roomId,
       String? roomName,
       int tag,
-      List<AssetEntity> listImage,List<String> listImageUrl) async {
+      List<AssetEntity> listImage,List<String> listImageUrl,int isConfirmed) async {
     final response = await http.post(Uri.parse('$url/api/post/create'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
@@ -35,7 +35,8 @@ class PostRepository{
           "imageUrls": listImageUrl,
           "likedBy": [],
           "isHidden": [],
-          "isHiddenHost":false
+          "isHiddenHost":false,
+          "isConfirmed":isConfirmed
         }));
     return response;
   }

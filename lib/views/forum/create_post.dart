@@ -106,6 +106,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   setState(() {
                     isPost = false;
                   });
+                  final validation = await postProvider.getValidation();
                   await postProvider.createPost(
                       title,
                       captions,
@@ -115,10 +116,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       _selectRoomId,
                       _selectedName,
                       tagSelect,
-                      imagesChoose);
+                      imagesChoose,
+                      validation
+                      );
                   setState(() {
                     isPost = true;
                   });
+                   if(validation==0){
+                    final snackBar = SnackBar(
+                            backgroundColor: Colors.green,
+                            content: const Text('Your post is waiting for approval!'),
+                            action: SnackBarAction(
+                              label: 'Close',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                   setState(() {
                     Navigator.pop(context);
                   });

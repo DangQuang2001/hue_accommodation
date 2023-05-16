@@ -15,18 +15,23 @@ class InteractManage extends StatefulWidget {
 }
 
 class _InteractManageState extends State<InteractManage> {
-
+  bool show = true;
   @override
   void initState() {
 // TODO: implement initState
     super.initState();
 
-    Provider.of<RentViewModel>(context, listen: false).getListWaiting(
+   (()async{
+      Provider.of<RentViewModel>(context, listen: false).getListWaiting(
         Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,0);
-    Provider.of<RentViewModel>(context, listen: false).getListConfirm(
+     Provider.of<RentViewModel>(context, listen: false).getListConfirm(
         Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,1);
-    Provider.of<RentViewModel>(context, listen: false).getListUnConfirm(
+    await Provider.of<RentViewModel>(context, listen: false).getListUnConfirm(
         Provider.of<UserViewModel>(context, listen: false).userCurrent!.id,2);
+        setState(() {
+          show = false;
+        });
+   })();
   }
   @override
   Widget build(BuildContext context) {
@@ -66,7 +71,7 @@ class _InteractManageState extends State<InteractManage> {
             ),
           ),
           Text(
-            '     ${S.of(context).manage_rent_title}    ',
+            '    ${S.of(context).manage_rent_title} ',
             style: Theme.of(context).textTheme.headlineLarge,
           ),
           const SizedBox(
@@ -79,7 +84,7 @@ class _InteractManageState extends State<InteractManage> {
 
   Widget info(BuildContext context) {
     return  Consumer<RentViewModel>(
-      builder: (context, rentProvider, child) => (rentProvider.listWaiting.isNotEmpty || rentProvider.listConfirm.isNotEmpty ||rentProvider.listUnConfirm.isNotEmpty)? Padding(
+      builder: (context, rentProvider, child) =>show?const SizedBox() :Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +192,7 @@ class _InteractManageState extends State<InteractManage> {
             ),
           ],
         ),
-      ):const SizedBox(),
+      ),
     );
   }
 

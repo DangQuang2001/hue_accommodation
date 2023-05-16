@@ -53,7 +53,7 @@ class RoomViewModel extends ChangeNotifier {
       String furnishing,
       double price,
       String typeRoom,
-      List<String> listImageUrl) async {
+      List<String> listImageUrl,int isConfirmed) async {
     final response = await RoomRepository.createRoom(
         hostID,
         hostName,
@@ -67,9 +67,8 @@ class RoomViewModel extends ChangeNotifier {
         furnishing,
         price,
         typeRoom,
-        listImageUrl);
+        listImageUrl,isConfirmed);
     if (response) {
-      getListRoomHost(hostID);
     } else {
       debugPrint('Có gì đó sai sai');
     }
@@ -514,6 +513,17 @@ class RoomViewModel extends ChangeNotifier {
       final data = await RoomRepository.getNearby(position, maxDistance, limit, skip);
       listNearbyChoose = data;
       notifyListeners();
+    }
+  }
+
+
+  Future getValidation()async{
+    final data = await RoomRepository.getValidation();
+    if(data['allowPostMotel']){
+      return 1;
+    }
+    else{
+      return 0;
     }
   }
 }
