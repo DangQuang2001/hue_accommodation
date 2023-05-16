@@ -620,53 +620,59 @@ class _HomeUserPageState extends State<HomeUserPage> with AppCloser {
 
   Widget extension(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 30.0, left: 30, right: 30),
+      padding: const EdgeInsets.only(top: 30.0, left: 15, right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SlideInRight(
             delay: const Duration(milliseconds: 200),
             duration: const Duration(milliseconds: 200),
-            child: Text(
-              S.of(context).home_page_feature,
-              style: Theme.of(context).textTheme.displayLarge,
+            child: Padding(
+              padding: const EdgeInsets.only(left:10.0),
+              child: Text(
+                S.of(context).home_page_feature,
+                style: Theme.of(context).textTheme.displayLarge,
+              ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+
           SizedBox(
+            width: MediaQuery.of(context).size.width,
             height: 270,
-            child: Row(
+            child: Flex(
+              direction: Axis.horizontal,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    buttonLink(
-                        context,
-                        "https://cdn-icons-png.flaticon.com/512/9156/9156007.png",
-                        S.of(context).home_page_reservation,
-                        RouteName.myActivity,
-                        true,
-                        400),
-                    buttonLink(
-                        context,
-                        "https://cdn-icons-png.flaticon.com/512/411/411712.png",
-                        S.of(context).home_page_transport,
-                        RouteName.transport,
-                        true,
-                        400),
-                  ],
+                Expanded(
+                  flex:1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      buttonLink(
+                          context,
+                          "https://cdn-icons-png.flaticon.com/512/9156/9156007.png",
+                          S.of(context).home_page_reservation,
+                          RouteName.myActivity,
+                          true,
+                          400),
+                      buttonLink(
+                          context,
+                          "https://cdn-icons-png.flaticon.com/512/411/411712.png",
+                          S.of(context).home_page_transport,
+                          RouteName.transport,
+                          true,
+                          400),
+                    ],
+                  ),
                 ),
                 const SizedBox(
-                  width: 30,
+                  width: 20,
                 ),
                 Expanded(
+                  flex: 2,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: double.infinity,
                         height: 243,
                         decoration: BoxDecoration(
                             color: Colors.grey.withOpacity(0.2),

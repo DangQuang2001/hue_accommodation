@@ -393,31 +393,36 @@ class _HomePageState extends State<HomePage> with AppCloser {
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: 270,
-          child: Row(
+          child: Flex(
+            direction: Axis.horizontal,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    buttonLink(
-                        context,
-                        "https://cdn-icons-png.flaticon.com/512/3010/3010995.png",
-                        S.of(context).home_page_motel,
-                        RouteName.boardinghouse,
-                        true,
-                        300),
-                    buttonLink(
-                        context,
-                        "https://cdn-icons-png.flaticon.com/512/3820/3820134.png",
-                        S.of(context).home_page_forum,
-                        RouteName.blogSale,
-                        userProvider.userCurrent != null,
-                        400),
-                  ]),
+              Expanded(
+                flex: 1,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      buttonLink(
+                          context,
+                          "https://cdn-icons-png.flaticon.com/512/3010/3010995.png",
+                          S.of(context).home_page_motel,
+                          RouteName.boardinghouse,
+                          true,
+                          300),
+                      buttonLink(
+                          context,
+                          "https://cdn-icons-png.flaticon.com/512/3820/3820134.png",
+                          S.of(context).home_page_forum,
+                          RouteName.blogSale,
+                          userProvider.userCurrent != null,
+                          400),
+                    ]),
+              ),
               const SizedBox(
                 width: 10,
               ),
               Expanded(
+                flex: 2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -509,14 +514,17 @@ class _HomePageState extends State<HomePage> with AppCloser {
 
   Widget utilities(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 30.0, left: 30, right: 20),
+      padding: const EdgeInsets.only(top: 30.0, left: 10, right: 10),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(S.of(context).home_page_manage,
-                style: Theme.of(context).textTheme.displayLarge),
+            Padding(
+              padding: const EdgeInsets.only(left:10.0),
+              child: Text(S.of(context).home_page_manage,
+                  style: Theme.of(context).textTheme.displayLarge),
+            ),
             const SizedBox(
               height: 20,
             ),
