@@ -174,7 +174,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
               content: Container(
                 alignment: Alignment.center,
                 width: 400,
-                height: 400,
+                height: 420,
                 child: FutureBuilder(
                   future: roomProvider.getDetailRoom(id),
                   builder: (context, snapshot) {

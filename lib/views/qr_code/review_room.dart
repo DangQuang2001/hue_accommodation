@@ -49,9 +49,11 @@ class _ReviewRoomState extends State<ReviewRoom> {
             child: Column(
               children: [
                 appBar(context),
-                ratingStar(context),
-                comment(context),
-                images(context),
+               Expanded(child: Column(children: [
+                 ratingStar(context),
+                 comment(context),
+                 images(context),
+               ],))
               ],
             ),
           ),
@@ -76,33 +78,36 @@ class _ReviewRoomState extends State<ReviewRoom> {
   }
 
   Widget appBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 40.0, right: 20, left: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(),
-              child: const Center(
-                child: Icon(
-                  Icons.arrow_back_outlined,
-                  size: 30,
+    return SizedBox(
+      height: 70,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 40.0, right: 20, left: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(),
+                child: const Center(
+                  child: Icon(
+                    Icons.arrow_back_outlined,
+                    size: 30,
+                  ),
                 ),
               ),
             ),
-          ),
-          Text(
-            S.of(context).qr_code_review_title,
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          const SizedBox(
-            width: 30,
-          )
-        ],
+            Text(
+              S.of(context).qr_code_review_title,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            const SizedBox(
+              width: 30,
+            )
+          ],
+        ),
       ),
     );
   }
